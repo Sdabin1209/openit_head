@@ -22,6 +22,7 @@
 - 2026-10-15: D30(O12 닫음: 저자=의료인 신뢰, 저자 확인이 임상 승인), D31(O15 닫음: 문항 자료 파싱은 필수, 미리보기로 저자 확인), D32(보지 못한 문항 평가와 일반화), O18(문항 자료 형식) 신설. DatasetManifest에 files[].question_sets(선택) 추가. 브리프 4개 갱신
 - 2026-10-15: D33(O18 닫음: 지원 형식을 정하지 않고 "가져온 문항을 등록할 수 있다"가 요구, 항상 화면 입력으로 폴백). 남은 사용자 결정은 O06, O11, O16
 - 2026-10-15: 10개 리포지토리를 main으로 첫 커밋하고 SSH 원격(git@github.com:Sdabin1209/openit_*)에 push(모두 비공개). 커밋 작성자는 Sdabin1209 <99588729+Sdabin1209@users.noreply.github.com>(noreply 주소)로 고쳐 쓰고 force push함. turn-engine은 원격 생성 뒤 `git push -u origin main`만 남음. workspace.yaml·setup.sh는 SSH 주소 사용
+- 2026-10-15: model-runtime 에이전트 시작(파일럿). 에이전트 질의에 헤드가 답함: INTERFACES I9에 expected_serving_config_hash 강제, validate_serving_config, serving_config_hash 추가, 어댑터에는 버전 기록 없음, 재시도는 시드만 변경. 변경 요청 없이 헤드가 직접 반영(boundary-contracts 로컬 커밋, push 전)
 - 워크스페이스 루트 `CLAUDE.md`는 `head/shared/CLAUDE.root.md`의 링크. 공통 규칙에 `../survey-service/schema` 읽기 허용을 추가
 
 - 전체 설계서 작성(`ARCHITECTURE_FULL.md`, 내보낸 파일)

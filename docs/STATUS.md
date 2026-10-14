@@ -26,6 +26,7 @@
 - 2026-10-15: model-runtime 에이전트가 I9를 FakeBackend로 구현(테스트 16개 통과, 커밋 전). 헤드 답변: D34(해시 기준 구현을 boundary-contracts에 둠, RFC 8785 벡터 테스트 8개 통과), D35(schema_dir 호출자 전달, vLLM 잠정). 세션 간 메시지는 SendMessage로 직접 조율. 환경: GPU 없음. pip·venv는 설치됨(2026-10-15)
 - 2026-10-15: model-runtime 26개 테스트 통과·커밋(fbe0460). 헤드 답변: D36(출력 보호: 규칙이 정한 대체 출력, 모델은 is_fallback을 채우지 않음, *_raw 제공), I9 개정(schema_dir 단일화, configure 금지). 파서 대체 출력과 생성기 규칙 원문을 model-runtime에 전달
 - 2026-10-15: 사용자가 목표를 명확히 함(D38: 실제로 쓸 시스템을 모델 성능 제외하고 제대로, 모델 학습은 설정으로 반복 가능한 파이프라인), D39(자동화는 저장소를 보고 일하는 멱등 잡, 스케줄러는 deploy). docs/E2E.md에 합격 시나리오 9단계. 브리프 5개와 공통 규칙에 반영. 이전에 제안한 "느슨한 정책·스텁"은 철회
+- 2026-10-15: model-runtime 파일럿 구간 완료(GPU·실제 백엔드 제외): 헤드가 pytest 61개 통과와 커밋 확인. 변경 요청 001 처리, 보호 정책 protect-1(잠정 문구는 사용자 확인 대기), D40(서빙·학습 서버 분리 가정). 교훈: 업무 규칙 문서(원본 HealthCheckSchema의 work/rules)는 영역이 시작하기 전에 필요한 것을 헤드가 전달해야 한다. 영역별 규칙 대응은 아래 메모 참조
 - 워크스페이스 루트 `CLAUDE.md`는 `head/shared/CLAUDE.root.md`의 링크. 공통 규칙에 `../survey-service/schema` 읽기 허용을 추가
 
 - 전체 설계서 작성(`ARCHITECTURE_FULL.md`, 내보낸 파일)
@@ -48,6 +49,8 @@
 없음
 
 ## 메모
+
+- 업무 규칙 문서 전달 계획(원본 HealthCheckSchema `work/rules/`, 읽기만 했고 영역 시작 때 해당 영역 `docs/rules/`로 전달): turn-engine = answer_normalizer, answer_judge, record_writer, dialogue_planner, preconditions, mapping, principles, timing / survey-service = orchestrator, session_store, timing, trace_contract / synthetic-data·model-lab = utterance_parser(라벨 기준), response_generator / model-runtime = 전달 완료(파서 대체 출력, 생성기 규칙). question-authoring과 release-gate는 해당 규칙을 먼저 확인할 것.
 
 - 계약(경계 계약 세트, 공통 규약)은 사용자와 논의하며 쓴다. 논의 전에는 쓰지 않는다. 계약이 확정되면 브리프 9개의 계약 상태 안내문을 갱신해 다시 전달한다.
 - 사용자가 영역 리포지토리의 내용은 맡기지 않았다. 헤드는 구조와 계약, 연결을 맡는다.

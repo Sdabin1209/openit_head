@@ -32,6 +32,7 @@
 - 2026-10-15: question-authoring(114)·release-gate(118/2skip)·ops-feedback(85) 후속까지 확인 후 push. synthetic-data(83, 잡 재현 확인) 변경 요청 5건 처리: boundary-contracts 1.1.0(D43). synthetic-data·ops-feedback 후속 지시. 남은 보고: turn-engine, synthetic-data·ops-feedback 후속. 기술 부채: boundary_contracts.validator가 jsonschema RefResolver(폐기 예고)를 씀
 - 2026-10-15: turn-engine 첫 구간 보고(329 passed, 변경 요청 8건). 원본 semantics로 CR-003(위험 표현 안전망: 발화에 risk_phrases가 들어 있으면 맞은 표현을 근거로 risk_signal, 케이스 G2·G9·S3c) 등 결정. 원본 요구사항 케이스의 입출력 쌍 209개를 turn-engine/tests/golden에 전달(해석 갈림을 가리는 정답 예시). synthetic-data 후속(86)·ops-feedback 1.1 반영(91) 확인·push. 남은 것: turn-engine 후속 보고, 이어서 survey-service 시작. 같은 golden의 파서·생성기 쌍은 synthetic-data·model-lab·model-runtime용으로 따로 전달할 것
 - 2026-10-15: turn-engine v0.2.0(1205 passed, golden 806/868, 위험 표현 안전망 직접 확인)·model-runtime v0.2.0 태그 push. golden을 survey-service·synthetic-data·model-lab·model-runtime에 전달(D44). survey-service 시작(사용자 승인). 사용자에게 올릴 것: golden 예시 오류 37건(CR-009), 설계서 9-2절 효과표, 비식별 O19. 알림 규칙을 어긴 일 있음 → 완료·결정 필요 시 Discord+소리 필수
+- 2026-10-15: survey-service 첫 구간 확인(148 passed, 스모크 OK, golden 1215/1220, 불일치는 예시 오류 5). 변경 요청 결정 D45(I9 역할별 설정, model-runtime 0.3.0 진행)·D46(릴리스 적재 거부 정책, ID 변환, 스키마 v2 후보 모음). bindings.yaml 등 입력 출처 표를 survey-service에 전달. 후속: survey-service(bindings 대조·정책), model-runtime 0.3.0. 그 뒤 deploy 시작 가능. survey-service는 아직 push 전(후속 뒤에 push)
 - 워크스페이스 루트 `CLAUDE.md`는 `head/shared/CLAUDE.root.md`의 링크. 공통 규칙에 `../survey-service/schema` 읽기 허용을 추가
 
 - 전체 설계서 작성(`ARCHITECTURE_FULL.md`, 내보낸 파일)

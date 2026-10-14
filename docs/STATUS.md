@@ -27,6 +27,7 @@
 - 2026-10-15: model-runtime 26개 테스트 통과·커밋(fbe0460). 헤드 답변: D36(출력 보호: 규칙이 정한 대체 출력, 모델은 is_fallback을 채우지 않음, *_raw 제공), I9 개정(schema_dir 단일화, configure 금지). 파서 대체 출력과 생성기 규칙 원문을 model-runtime에 전달
 - 2026-10-15: 사용자가 목표를 명확히 함(D38: 실제로 쓸 시스템을 모델 성능 제외하고 제대로, 모델 학습은 설정으로 반복 가능한 파이프라인), D39(자동화는 저장소를 보고 일하는 멱등 잡, 스케줄러는 deploy). docs/E2E.md에 합격 시나리오 9단계. 브리프 5개와 공통 규칙에 반영. 이전에 제안한 "느슨한 정책·스텁"은 철회
 - 2026-10-15: model-runtime 파일럿 구간 완료(GPU·실제 백엔드 제외): 헤드가 pytest 61개 통과와 커밋 확인. 변경 요청 001 처리, 보호 정책 protect-1(잠정 문구는 사용자 확인 대기), D40(서빙·학습 서버 분리 가정). 교훈: 업무 규칙 문서(원본 HealthCheckSchema의 work/rules)는 영역이 시작하기 전에 필요한 것을 헤드가 전달해야 한다. 영역별 규칙 대응은 아래 메모 참조
+- 2026-10-15: question-authoring(pytest 111·스모크 OK), ops-feedback(85), release-gate(112, 2 skip) 첫 구간 완료를 헤드가 직접 확인(pytest, 스모크, 작성자). 변경 요청 17건 처리: D42, boundary-contracts 1.0.0 태그·push. 스모크 시험 고정 포트 충돌(병렬) 규약화. 남은 것: synthetic-data, turn-engine 보고 대기. 새 열린 결정 O19(비식별 뒤 발화 보존)
 - 워크스페이스 루트 `CLAUDE.md`는 `head/shared/CLAUDE.root.md`의 링크. 공통 규칙에 `../survey-service/schema` 읽기 허용을 추가
 
 - 전체 설계서 작성(`ARCHITECTURE_FULL.md`, 내보낸 파일)

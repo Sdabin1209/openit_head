@@ -1,0 +1,16 @@
+# 워크스페이스 구성. head/setup.sh가 읽어 리포지토리를 clone한다. 위치는 워크스페이스 루트 기준이다.
+# 원격은 SSH 주소다(저장소는 모두 비공개). 원격 이름은 Sdabin1209/openit_<디렉터리 이름>이다(D28). 문진 스키마는 survey-service 안의 schema/ 디렉터리다(D29).
+# tag는 서로 호환되는 것으로 확인된 묶음이다. null이면 기본 브랜치를 쓴다.
+host: git@github.com:Sdabin1209
+repos:
+  - {path: head,               remote: openit_head,               tag: null}
+  - {path: boundary-contracts, remote: openit_boundary-contracts, tag: null}
+  - {path: turn-engine,        remote: openit_turn-engine,        tag: null}
+  - {path: model-runtime,      remote: openit_model-runtime,      tag: null}
+  - {path: survey-service,     remote: openit_survey-service,     tag: null}
+  - {path: question-authoring, remote: openit_question-authoring, tag: null}
+  - {path: synthetic-data,     remote: openit_synthetic-data,     tag: null}
+  - {path: model-lab,          remote: openit_model-lab,          tag: null}
+  - {path: release-gate,       remote: openit_release-gate,       tag: null}
+  - {path: ops-feedback,       remote: openit_ops-feedback,       tag: null}
+  - {path: deploy,             remote: openit_deploy,             tag: null}

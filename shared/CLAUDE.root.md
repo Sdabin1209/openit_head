@@ -26,3 +26,10 @@
 - 라이브러리와 SDK는 Git 태그로 설치하고, 이미지를 빌드할 때 태그를 고정한다. 의존 버전은 잠금 파일로 고정한다.
 - 이미지는 CI에서 빌드해 digest를 게시한다. 서버 안의 로컬 레지스트리에 올리고 digest를 deploy에 제출한다(D24).
 - 문진 스키마(`../survey-service/schema`) 변경은 survey-service가 반영한다(D21). 다른 영역은 변경 요청을 낸다.
+
+## 커밋 (D37)
+
+- 작업 단위가 끝날 때마다 자기 리포지토리에 커밋한다(설계서 한 편, 기능 하나, 시험 통과 한 묶음). 커밋 없이 오래 두지 않는다. 세션을 끝내기 전에는 반드시 커밋한다.
+- 작성자는 `git -c user.name=Sdabin1209 -c user.email=99588729+Sdabin1209@users.noreply.github.com commit`으로 한다. 개인 이메일을 쓰지 않는다.
+- push는 하지 않는다. 사용자가 정한다.
+- Python 의존은 리포지토리의 가상환경(`python3 -m venv .venv`)에 설치하고 `.venv/`는 커밋하지 않는다.

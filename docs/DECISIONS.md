@@ -42,6 +42,7 @@
 | D34 | 해시의 기준 구현 | 해시(JCS 정규화 + SHA-256)는 `boundary-contracts`의 `boundary_contracts.canonical`이 유일한 기준 구현이다. SDK와 서비스는 자기 구현을 두지 않고 이것을 가져다 쓴다(RFC 8785 시험 벡터 포함). 어댑터의 `adapter_hash`는 `directory_hash`다. 헤드가 결정 |
 | D35 | model-runtime 세부 | 문진 스키마 사본은 라이브러리에 묶지 않고 호출자가 `schema_dir`로 넘기며 `CONTRACT_VERSION`을 대조한다. `load`의 `backend`·`schema_dir` 선택 인자와 `last_call_info`를 승인한다. 첫 추론 백엔드는 vLLM(구조화 출력 + LoRA)을 잠정 채택하되, GPU 환경의 시험으로 확인한 뒤 확정한다. 헤드가 결정 |
 | D36 | 모델 출력 보호 | 업무 규칙(원칙 9, 파서 대체 출력, 생성기 규칙 5)에 따라 `parse`와 `generate`는 모델 출력이 깨져도 예외 없이 규칙이 정한 대체 출력을 돌려준다. 파서는 형식 위반이면 빈 목록, 의도·대상·값이 규칙을 어기면 정해진 대로 고친다. 생성기는 모델이 `response_text`만 내고 `is_fallback`은 코드가 채우며, 지시를 못 지키면 문장 재료를 그대로 읽는 문장을 `is_fallback=true`로 낸다. 보호 적용은 `last_call_info`에 남기고, model-lab 평가용으로 보호 전 출력(`*_raw`)도 제공한다. 이 보호 규칙의 구현은 model-runtime이 맡는다. 이전의 `ModelOutputInvalid` 던지기를 대체한다. `configure()` 같은 전역 설정은 두지 않고 `schema_dir`를 인자로 받는다. 헤드가 결정 |
+| D37 | 커밋 규칙 | 모든 세션은 작업 단위마다 자기 리포지토리에 커밋한다. 작성자는 사용자 noreply 주소, push는 사용자가 한다. Python 의존은 리포지토리의 `.venv`에 설치한다(pip와 venv는 설치됨). 2026-10-15 사용자 요청 |
 
 ## 구조를 확정하기 전에 닫을 열린 결정(A)
 

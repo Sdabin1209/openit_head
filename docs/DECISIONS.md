@@ -49,6 +49,7 @@
 | D41 | push 허락 | 모든 리포지토리의 push는 헤드가 허락한다. 영역이 시험 통과와 커밋을 알리면 헤드가 시험 결과와 작성자를 확인해 허락한다. 강제 push는 하지 않는다. 원격은 모두 비공개다. 2026-10-15 사용자가 헤드에게 위임 |
 | D42 | 경계 계약 1.0 확정 | 영역의 첫 구간 보고(변경 요청 17건)를 반영해 `boundary-contracts`를 1.0.0으로 태그했다(릴리스된 레코드가 없을 때 보강). 변경: `ReleaseManifest.adapters`(어댑터 해시, serving_config, 해시) 필수 / `GateDecision.reject_codes`와 `checks[].result=SKIPPED` / `ModelPackageManifest.lineage.question_sets`(선택) / I1·I3 `list_ids` / 스키마를 패키지 데이터로 포함(`load_schema`, `validator`) / 역할은 토큰에 묶음 / 현재 판정은 가장 최근 것 / HTTP 규약과 상태 코드 / `SlotRef`는 `<question_id>.<slot_id>` / `QuestionBank.version`은 `ArtifactRef.version`의 정수 / `reviewed_only`는 가장 최근 검수 기준 / `serving_config_hash`는 `canonical.sha256_hash(serving_config)` / 비식별 Trace는 구조 정보만 쓴다 / `evidence_refs`는 불투명한 Id. 이후 변경은 `CONVENTIONS.md`의 진화 규칙(MINOR는 추가만)을 따른다 |
 | D43 | 경계 계약 1.1 | synthetic-data의 변경 요청을 반영해 `FailureCase`에 선택 필드 `question_set`, `expected_kind`를 추가했다(MINOR, 1.0 레코드는 그대로 유효하며 하위 호환 시험이 있다). 읽기 규칙: `SlotRef` 문자열은 마지막 `.`에서 나눈다. 모든 산출물의 `version`은 Id 규칙을 따르고 SDK가 `INVALID_RECORD`로 강제한다. 재현성은 시각·버전을 뺀 내용 해시로 비교한다. 위험 신호 감지는 파서가 아니라 코드의 위험 표현 대조(G9)가 하고, 과거 증상 진술은 파서 라벨로 OUT_OF_SCOPE다. 태그 v1.1.0 |
+| D44 | 라이브러리 태그와 정답 예시 | 영역이 의존하는 태그: boundary-contracts v1.1.0, turn-engine v0.2.0, model-runtime v0.2.0. turn-engine은 원본 요구사항 케이스의 입출력 쌍(golden)을 기준으로 비교해 868쌍 중 806쌍이 일치하고 나머지 62쌍을 구현 결함(0) / 규칙 해석 차이(25) / 예시 자체의 오류(37)로 분류했다. 정답 예시는 정적 예시이며 정답 보증이 아니므로 불일치는 분류해서 처리한다. 같은 방식의 golden을 survey-service, synthetic-data, model-lab, model-runtime에도 전달했다 |
 
 ## 구조를 확정하기 전에 닫을 열린 결정(A)
 

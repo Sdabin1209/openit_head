@@ -14,3 +14,4 @@ repos:
   - {path: release-gate,       remote: openit_release-gate,       tag: null}
   - {path: ops-feedback,       remote: openit_ops-feedback,       tag: null}
   - {path: deploy,             remote: openit_deploy,             tag: null}
+  - {path: kiosk-frontend,     remote: openit_kiosk-frontend,     tag: null}

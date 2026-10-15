@@ -20,7 +20,7 @@
 └── deploy/                 단일 서버 배포
 ```
 
-리포지토리는 12개이고 이름은 `Sdabin1209/openit_<디렉터리 이름>`이다. 목록과 원격은 `workspace.yaml`에 있다.
+리포지토리는 13개이고 이름은 `Sdabin1209/openit_<디렉터리 이름>`이다. 목록과 원격은 `workspace.yaml`에 있다.
 
 ## 설치
 

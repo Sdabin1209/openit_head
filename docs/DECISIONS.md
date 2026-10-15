@@ -52,6 +52,7 @@
 | D44 | 라이브러리 태그와 정답 예시 | 영역이 의존하는 태그: boundary-contracts v1.1.0, turn-engine v0.2.0, model-runtime v0.2.0. turn-engine은 원본 요구사항 케이스의 입출력 쌍(golden)을 기준으로 비교해 868쌍 중 806쌍이 일치하고 나머지 62쌍을 구현 결함(0) / 규칙 해석 차이(25) / 예시 자체의 오류(37)로 분류했다. 정답 예시는 정적 예시이며 정답 보증이 아니므로 불일치는 분류해서 처리한다. 같은 방식의 golden을 survey-service, synthetic-data, model-lab, model-runtime에도 전달했다 |
 | D45 | I9 역할별 설정 | `ReleaseManifest.adapters`와 모델 패키지가 역할별로 `serving_config`와 해시를 갖는데 I9 `load`가 하나만 받던 불일치를 고친다. `load`는 `serving_configs`와 `expected_serving_config_hashes`를 역할(LORA_A, LORA_B)별 맵으로 받는다. 파서는 결정적, 생성기는 다른 디코딩을 쓸 수 있기 때문이다. model-runtime 0.3.0으로 구현(라이브러리 API 변경) |
 | D46 | 릴리스 적재 정책 | 서비스는 릴리스의 `turn_engine_version`·`model_runtime_version`의 MAJOR.MINOR가 설치본과 다르면 적재를 거부하고 이전 릴리스를 유지한다(PATCH 차이는 경고). 게이트가 승인한 동작과 서비스 동작이 달라지지 않게 하려는 것이다. 바깥 식별자가 경계 `Id` 형식에 맞지 않으면 `x-` + SHA-256 앞 32자로 봉투에 넣는다(Trace를 버리지 않는다). 문진 스키마 변경 후보(고정 문장 정보, 도움 요청 사유, `pending_id_seed`)는 정수 버전 1→2로 한 번에 모아 올린다 |
+| D47 | GPU 호스트 사용 | 개발용 GPU 호스트 `gpu-dev`(RTX 4070급 12GB, Ubuntu 24.04 WSL2, 15GB RAM, Docker 없음, pip 없음, 서버가 꺼질 수 있음)를 ssh로 쓴다. 코드는 rsync로 보내고 비밀 값은 보내지 않는다. 작업 폴더는 `~/openit-gpu/`, sudo 금지, GPU는 flock으로 한 번에 한 작업. 12GB에 맞춘 값은 설정 프로파일로 빼고, 이 호스트의 학습 결과는 파이프라인 검증용이다(실제 스테이션은 더 크다). 임시 기반 모델은 Qwen/Qwen2.5-1.5B-Instruct(Apache-2.0)이며 실제 기반 모델 선정은 스테이션 사양 확인 뒤 별도 결정이다. 2026-10-15 사용자 결정 |
 
 ## 구조를 확정하기 전에 닫을 열린 결정(A)
 

@@ -26,6 +26,8 @@
 - `boundary-contracts`는 태그(`v1.0.0`)로 설치한다: `pip install git+ssh://git@github.com/Sdabin1209/openit_boundary-contracts.git@v1.0.0`. 스키마는 패키지에 들어 있으므로 `load_schema`, `validator`를 쓰고 복사본을 만들지 않는다.
 - 라이브러리와 SDK는 Git 태그로 설치하고, 이미지를 빌드할 때 태그를 고정한다. 의존 버전은 잠금 파일로 고정한다.
 - 스모크 시험은 고정 포트를 쓰지 않는다. 여러 영역이 같은 서버에서 동시에 돌리면 충돌한다. 호스트 포트를 Docker가 배정하게 하거나(`-p 127.0.0.1::8080`) `SMOKE_PORT` 기본값을 빈 포트로 고른다. 컨테이너 이름과 이미지 태그에는 리포지토리 이름을 넣는다.
+- 이미지 라벨 키는 `io.openit.service`, `io.openit.revision`, `io.openit.contracts.boundary`, `io.openit.contracts.survey-schema`, `io.openit.turn-engine`, `io.openit.model-runtime`로 통일한다(D50).
+- 영역 사이 호출은 `boundary-contracts/HTTP.md`의 HTTP API로 한다. 서버는 소유 영역이, 클라이언트는 `boundary_contracts.clients`가 맡는다. 이웃의 저장소 볼륨을 공유하지 않는다(D49).
 - 이미지는 CI에서 빌드해 digest를 게시한다. 서버 안의 로컬 레지스트리에 올리고 digest를 deploy에 제출한다(D24).
 - 문진 스키마(`../survey-service/schema`) 변경은 survey-service가 반영한다(D21). 다른 영역은 변경 요청을 낸다.
 

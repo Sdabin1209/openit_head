@@ -39,6 +39,7 @@
 - 2026-10-15: deploy 첫 구간(E2E 62 PASS, 1·4a·6수집·8a·9 실제, 3 대신, 나머지 막힘). 막힘의 원인: 영역끼리 이어지는 원격 클라이언트·읽기 면 없음(CR-D01). D49(영역 사이 호출은 HTTP, HTTP.md, boundary_contracts.clients), D50(SQLite 볼륨 소유 서비스만, 이웃은 HTTP, 라벨 통일, O10 닫음). 진행: 클라이언트 라이브러리(v1.1.1 예정), 각 영역 서버 읽기 면. 열린 것: D08 모델 추론 GPU의 서빙 서버 위치(사용자 확인)
 - 2026-10-15: model-lab 완료 확인(pytest 61, GPU 실제 학습·평가·패키징·게시 한 바퀴: Qwen2.5-1.5B 4비트 r=16 3스텝, 어댑터 PEFT), push. release-gate 후속(135, 스모크 OK) push. boundary-contracts v1.2.0 태그·push(클라이언트 6종 + 읽기 관대 모드 + base_model.id 완화, D51). 다음: 소비 영역이 v1.2.0·클라이언트로 전환, deploy가 연결·E2E 재실행. 확인 못 한 것: model-lab의 재개 결정성
 - 2026-10-15: deploy 재검증(E2E 직접 재실행: PASS 전부, FAIL 0, 정리 완료, 남은 컨테이너 없음) 후 push. 소비 영역 전환 지시(v1.2.0·클라이언트): survey-service, synthetic-data, ops-feedback, question-authoring, release-gate, model-lab(진행). 이후 deploy가 연결·E2E 재실행
+- 2026-10-15: deploy E2E 직접 재검증(73 PASS/0 FAIL, 정리 완료). 소비 영역 v1.2.0 전환과 D52(ops-feedback 검토 POST, release-gate 정책 스키마·실행기 규약·운영 모드 거부, model-lab 회귀 평가·파일 저장소, question-authoring 개선 신호) 모두 확인·push. deploy 재실행 지시. 발견: 비식별 기본이 자유 문자열 전부 마스킹이라 환류가 구조 수준(O19 권고안 B 기록). 사용자 결정 대기: O11, O06, O16, O19, 서빙 GPU 추론 위치와 GPU 서버 접근, 도메인·TLS·외부 감시·스케줄 주기, 정답 예시 오류 검토
 - 워크스페이스 루트 `CLAUDE.md`는 `head/shared/CLAUDE.root.md`의 링크. 공통 규칙에 `../survey-service/schema` 읽기 허용을 추가
 
 - 전체 설계서 작성(`ARCHITECTURE_FULL.md`, 내보낸 파일)

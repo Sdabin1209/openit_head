@@ -53,6 +53,7 @@
 | D45 | I9 역할별 설정 | `ReleaseManifest.adapters`와 모델 패키지가 역할별로 `serving_config`와 해시를 갖는데 I9 `load`가 하나만 받던 불일치를 고친다. `load`는 `serving_configs`와 `expected_serving_config_hashes`를 역할(LORA_A, LORA_B)별 맵으로 받는다. 파서는 결정적, 생성기는 다른 디코딩을 쓸 수 있기 때문이다. model-runtime 0.3.0으로 구현(라이브러리 API 변경) |
 | D46 | 릴리스 적재 정책 | 서비스는 릴리스의 `turn_engine_version`·`model_runtime_version`의 MAJOR.MINOR가 설치본과 다르면 적재를 거부하고 이전 릴리스를 유지한다(PATCH 차이는 경고). 게이트가 승인한 동작과 서비스 동작이 달라지지 않게 하려는 것이다. 바깥 식별자가 경계 `Id` 형식에 맞지 않으면 `x-` + SHA-256 앞 32자로 봉투에 넣는다(Trace를 버리지 않는다). 문진 스키마 변경 후보(고정 문장 정보, 도움 요청 사유, `pending_id_seed`)는 정수 버전 1→2로 한 번에 모아 올린다 |
 | D47 | GPU 호스트 사용 | 개발용 GPU 호스트 `gpu-dev`(RTX 4070급 12GB, Ubuntu 24.04 WSL2, 15GB RAM, Docker 없음, pip 없음, 서버가 꺼질 수 있음)를 ssh로 쓴다. 코드는 rsync로 보내고 비밀 값은 보내지 않는다. 작업 폴더는 `~/openit-gpu/`, sudo 금지, GPU는 flock으로 한 번에 한 작업. 12GB에 맞춘 값은 설정 프로파일로 빼고, 이 호스트의 학습 결과는 파이프라인 검증용이다(실제 스테이션은 더 크다). 임시 기반 모델은 Qwen/Qwen2.5-1.5B-Instruct(Apache-2.0)이며 실제 기반 모델 선정은 스테이션 사양 확인 뒤 별도 결정이다. 2026-10-15 사용자 결정 |
+| D48 | 첫 추론 백엔드와 한계 | vLLM을 첫 백엔드로 확정한다(gpu-dev에서 확인: LoRA+구조화 출력 동시 사용, 두 어댑터를 한 기반 모델에 올리는 VRAM 증가 약 0.07GiB, 요청마다 어댑터 선택). 한계: 구조화 출력이 `allOf`·`if/then`·`not`을 조용히 무시하고 `uniqueItems`를 거부하므로 조건 규칙은 사후 검증과 보호가 맡고(보호 개입이 더 잦을 수 있어 model-lab 평가가 보호 전 유효율을 보고한다), 문진 스키마 v2 후보에 "조건 규칙을 oneOf 가지로 표현"을 올린다. 어댑터는 PEFT 형식이고 순위가 `max_lora_rank`를 넘으면 로딩 전에 거부한다(엔진이 죽는 것을 막는다). 재현성은 같은 서버 프로세스 안에서만 약속하고 평가는 온도 0에서 한다. 엔진·xgrammar 버전은 `serving_config.constraint.backend_version`으로 고정한다. 사용자 요청에 따른 GPU 시험 결과, 헤드가 결정 |
 
 ## 구조를 확정하기 전에 닫을 열린 결정(A)
 

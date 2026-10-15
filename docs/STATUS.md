@@ -35,6 +35,7 @@
 - 2026-10-15: survey-service 첫 구간 확인(148 passed, 스모크 OK, golden 1215/1220, 불일치는 예시 오류 5). 변경 요청 결정 D45(I9 역할별 설정, model-runtime 0.3.0 진행)·D46(릴리스 적재 거부 정책, ID 변환, 스키마 v2 후보 모음). bindings.yaml 등 입력 출처 표를 survey-service에 전달. 후속: survey-service(bindings 대조·정책), model-runtime 0.3.0. 그 뒤 deploy 시작 가능. survey-service는 아직 push 전(후속 뒤에 push)
 - 2026-10-15: survey-service 후속 확인(pytest 통과, 스모크 OK, 라벨 model-runtime v0.3.0·turn-engine v0.2.0·boundary v1.1.0) 후 push, 태그 survey-schema-v1.0.0(문진 스키마 패키지, 설치: git+ssh://git@github.com/Sdabin1209/openit_survey-service.git@survey-schema-v1.0.0#subdirectory=schema). model-runtime v0.3.0(D45). 완료 영역: model-runtime, turn-engine, question-authoring, ops-feedback, release-gate, synthetic-data, survey-service. 남은 것: deploy(시작 가능), model-lab(GPU 서버 필요)
 - 2026-10-15: gpu-dev 접속 확인(RTX 4070급 12GB, 12코어, RAM 15GB, 디스크 954GB, Ubuntu 24.04 WSL2, Python 3.12, pip·Docker 없음, HF·PyPI 접속 가능, GitHub SSH 불가). D47(사용 규칙). 사용자 조치 필요: gpu-dev에 python3-pip·python3-venv 설치(sudo). model-lab 시작, model-runtime vLLM 시험 지시
+- 2026-10-15: model-runtime vLLM 시험 완료(pytest 81, GPU 확인: LoRA+구조화 출력, 한계: allOf/if/then/not 무시). D48(vLLM 확정, 어댑터 PEFT 형식, 재현성 범위). 후속: rank 사전 검사, 0.4.0 태그. deploy 시작(사용자 허락: 관리 여유가 되면). 실행 중: model-lab, deploy
 - 워크스페이스 루트 `CLAUDE.md`는 `head/shared/CLAUDE.root.md`의 링크. 공통 규칙에 `../survey-service/schema` 읽기 허용을 추가
 
 - 전체 설계서 작성(`ARCHITECTURE_FULL.md`, 내보낸 파일)

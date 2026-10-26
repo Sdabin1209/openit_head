@@ -28,7 +28,8 @@
 
 | ID | 내용 | 상태 | 비고 |
 |---|---|---|---|
-| U01 | gpu-dev(12GB)에서 Qwen3-4B가 적재되는지, A·B 어댑터 동시 적재가 되는지 | 열림 | `gpu-12g` 프로파일은 추정값 |
+| U01 | gpu-dev(12GB)에서 Qwen3-1.7B(`gpu-12g`, D81)가 적재되는지, 중립 A·B 어댑터 동시 적재가 되는지. (Qwen3-4B는 12GB 대상에서 제외, 사용자 지시) | 열림 | 프로파일은 추정값 |
+| U13 | 학습된 어댑터(Qwen3-4B/8B)의 실제 서빙·평가는 24GB급 GPU 서버가 필요하다. 아직 그런 서버에서 해 보지 않았다 | 열림 | D81. 사용자의 4090 서빙 서버 사용 시점 미정 |
 | U02 | 24GB(RTX 4090)에서 Qwen3-8B 적재, 실측 | 열림 | |
 | U03 | 서빙 프롬프트와 학습 데이터의 글자 일치: 서버 val 앞 400행씩(A, B)에서 user 메시지·전체 프롬프트 일치 확인(model-runtime v0.6.1 `prompt-4`, 2026-10-27). **남은 것**: transformers `apply_chat_template` 실행과 토큰 ID 대조, 학습 때 쓴 채팅 템플릿 설정(서버 코드 확인), assistant 쪽 `<think>` 처리, val 나머지 행·test | 부분 | D77 |
 | U04 | vLLM 제약 디코딩(xgrammar)이 `ActionExtraction`의 `pattern`, `minItems`, 배열 `type`을 어디까지 지키는지, 재시도 빈도 | 열림 | 지금은 사후 검증과 재시도에 의존 |

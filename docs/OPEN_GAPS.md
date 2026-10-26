@@ -16,7 +16,8 @@
 | G05 | v1의 G1(응답 숫자가 입력 재료에 있는지 검사)에 해당하는 검사를 v2에서 둘지 정하지 않았다 | model-runtime | 열림 | |
 | G06 | model-lab 학습기(`trainers/hf.py`)는 학습 서버의 코드와 달라 같은 어댑터를 만들 수 없다. 학습 정본은 서버 코드(D78). 비전문가도 쓸 수 있는 학습 실행(설정 + 한 명령 + doctor)으로 서버 코드를 감싸는 수정이 필요하다 | model-lab | 열림 | 사용자 지시(2026-10-27): 서버 코드를 정본으로 보고, 대상이 비전문가이므로 이후 수정 필요 |
 | G07 | turn-engine의 `normalize`, `judge`, `write_record`, `plan`은 폐기 표시만 했고 제거하지 않았다(survey-service 이전 뒤 제거) | turn-engine | 열림 | |
-| G08 | release-gate의 turn-engine·model-runtime 기본 태그(v0.2.0, v0.4.0)와 `GATE_*_VERSION`을 새 태그(v0.3.0, v0.6.x)로 올리지 않았다 | release-gate | 열림 | prompt-4 태그 이후 한 번에 |
+| G08 | release-gate의 turn-engine·model-runtime 기본 태그(v0.2.0, v0.4.0)와 `GATE_*_VERSION`을 새 태그(turn-engine v0.3.0, model-runtime v0.6.1)로 올리지 않았다 | release-gate | 열림 | 태그가 나왔으므로 이제 가능(survey-service 이전과 함께) |
+| G10 | `prompt-3`(JCS)은 폐기 예정으로 남겼다. 제거 시점은 다음 MINOR로 제안 | model-runtime | 열림 | 0.6.0으로 만든 릴리스가 있으면 깨짐 |
 | G09 | `tests/golden/`(model-runtime, model-lab)은 v1 정적 예시라 시험이 쓰지 않는다. 삭제 여부 미정 | model-lab, model-runtime | 열림 | |
 
 ## 2. 미확인 (해 보지 않음)
@@ -25,7 +26,7 @@
 |---|---|---|---|
 | U01 | gpu-dev(12GB)에서 Qwen3-4B가 적재되는지, A·B 어댑터 동시 적재가 되는지 | 열림 | `gpu-12g` 프로파일은 추정값 |
 | U02 | 24GB(RTX 4090)에서 Qwen3-8B 적재, 실측 | 열림 | |
-| U03 | prompt-4가 학습 데이터와 바이트까지 같은지(서버 val 비교), Qwen3 토크나이저 `apply_chat_template` 결과와 같은지 | 열림 | 진행 중(D77) |
+| U03 | 서빙 프롬프트와 학습 데이터의 글자 일치: 서버 val 앞 400행씩(A, B)에서 user 메시지·전체 프롬프트 일치 확인(model-runtime v0.6.1 `prompt-4`, 2026-10-27). **남은 것**: transformers `apply_chat_template` 실행과 토큰 ID 대조, 학습 때 쓴 채팅 템플릿 설정(서버 코드 확인), assistant 쪽 `<think>` 처리, val 나머지 행·test | 부분 | D77 |
 | U04 | vLLM 제약 디코딩(xgrammar)이 `ActionExtraction`의 `pattern`, `minItems`, 배열 `type`을 어디까지 지키는지, 재시도 빈도 | 열림 | 지금은 사후 검증과 재시도에 의존 |
 | U05 | 실제 브라우저 화면, 한국어 음성 인식(STT), 웹 푸시 수신 | 열림 | 키오스크 프런트 |
 | U06 | 일반 Linux 서버에서의 설치(지금은 WSL2 + Docker Desktop 두 환경) | 열림 | |
@@ -52,3 +53,4 @@
 |---|---|---|
 | C01 | 서버 실제 LLM 데모(학습 전 모델) | 2026-10-26, survey-service 8e0ba7e, deploy f76a94b |
 | C02 | 계약 v2.0.0 | 태그 `v2.0.0`, D74, D75 |
+| C03 | 서빙 프롬프트 직렬화를 학습 글자에 맞춤(model-runtime v0.6.1) | 시험 123 통과, 스모크 통과, D77 |

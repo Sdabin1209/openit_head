@@ -20,7 +20,7 @@
 | G10 | `prompt-3`(JCS)은 폐기 예정으로 남겼다. 제거 시점은 다음 MINOR로 제안 | model-runtime | 열림 | 0.6.0으로 만든 릴리스가 있으면 깨짐 |
 | G11 | 문진 스키마 정수 버전 1 안에서 비호환 변경이 있었다(`SessionStore`, `TurnTrace`, v1 모델 입출력 계약 12개 삭제). survey-service와 ops-feedback은 반드시 같은 잠금으로 함께 배포해야 한다 | survey-service, ops-feedback | 열림 | D79. 운영 데이터가 생기기 전에 TurnTrace 별도 버전 필드 검토 |
 | G12 | v2에서는 A가 REASK/CONFIRM을 계속 내도 서비스가 끊지 않는다(v1의 반복 물음 상한·못 알아들음 상한은 사라짐). 환자가 같은 질문을 무한히 받을 수 있다 | survey-service | 열림 | CR-012. 직원 알림 입력원과 함께 사용자가 정한다 |
-| G13 | 표 초안(`ask` 틀, 칸 설명표, 술 이름 등)이 `DRAFT_UNCONFIRMED` 상태다(G03 상세). 57행 문제 처리용 새 `next.text`(남은 칸만 묻기)는 학습 분포에 없어 B 모델이 어떻게 다루는지 확인하지 못했다. A 입력 state의 직전/참조 묶음 순서는 데이터의 약 90%만 따른다 | survey-service | 열림 | 서버 데이터 기준 in-sample 일치만 확인 |
+| G13 | 표 초안(`ask` 틀, 칸 설명표, 술 이름 등)이 `DRAFT_UNCONFIRMED` 상태다(G03 상세). 57행 문제 처리용 새 `next.text`(남은 칸만 묻기)는 학습 분포에 없어 B 모델이 어떻게 다루는지 확인하지 못했다. A 입력 state의 묶음 순서는 서버 val 549행 중 536행(97.6%)이 서비스 규칙과 글자 단위로 같고 13행이 다르다. 원인(확인, `prev_state.py`): 학습 데이터는 원래 시나리오 state에 있던 값이 먼저, 그 뒤에 흐름 생성기가 더한 직전·참조 문항이 오는 구조라 "직전이 먼저"라는 단일 규칙이 아니다. 서비스는 이 시나리오 정보를 모르므로 완전히 재현할 수 없다. 영향은 드문 키 순서 차이이며 성능 영향은 미측정. B 입력은 `next.text`만 다르다(데이터는 같은 문항도 문장이 제각각, 서비스는 문항 은행 문장) | survey-service | 열림 | 서버 val 대조(in-sample) |
 | G14 | ops-feedback 탐지 규칙 `REASK_STREAK`(연속 REASK)은 임계값이 자리표시자(예시 설정 `enabled:false`, threshold 3)다. `EXTRACT_FAILED`가 값 없는 HOLD·SKIP을 실패로 볼지, `extract_protections` 건수를 비식별에서 남길지도 미정 | ops-feedback | 열림 | G12(반복 물음 상한)와 함께 사용자가 정한다 |
 | G09 | `tests/golden/`(model-runtime, model-lab)은 v1 정적 예시라 시험이 쓰지 않는다. 삭제 여부 미정 | model-lab, model-runtime | 열림 | |
 

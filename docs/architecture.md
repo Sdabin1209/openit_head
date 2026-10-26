@@ -10,15 +10,15 @@
 
 | 표시 | 뜻 |
 |---|---|
-| [확인됨] | 서비스끼리 실제 HTTP로 도는 전체 시험(`deploy/scripts/e2e.sh`, 전체 모드 87 PASS / 0 FAIL, 개발 PC)에서 확인 |
+| [확인됨] | 서비스끼리 실제 HTTP로 도는 전체 시험(`deploy/scripts/e2e.sh`, 전체 모드 87 PASS / 0 FAIL, 개발 PC. gpu-dev에서 88 PASS는 사용자 보고)에서 확인 |
 | [구현됨] | 해당 리포의 단위·스모크 시험으로만 확인. 서비스끼리 E2E로는 확인하지 못함 |
 | [제안/가정] | 설계의 제안이거나 사용자가 가정으로 정한 것. 바뀔 수 있음 |
 | [미정] | 결정이 필요하거나 확인하지 못한 것 |
 | [시험용 대체] | E2E에서 가짜 백엔드, 시험용 어댑터, 시험용 토큰 등으로 대신한 것 (`TEST-SUB`) |
 
-도식 아래의 "근거"는 그 도식을 그릴 때 읽은 파일과 결정 번호다. 경로는 워크스페이스 루트(`healthKiosk/`) 기준이다.
+도식 아래의 "근거"는 그 도식을 그릴 때 읽은 파일과 결정 번호다. 경로는 워크스페이스 루트 기준이다.
 
-참고: `head/docs/STATUS.md`는 2026-10-15 상단의 "현재 단계" 문구가 오래되었다(구조 확정 단계로 적혀 있음). 이 문서는 STATUS.md의 완료 목록과 `deploy/docs/STATUS.md`, `PROJECT_STRUCTURE.md` 5절의 최신 내용을 따랐다.
+참고: `head/docs/STATUS.md` 상단의 "현재 단계"는 2026-10-26에 갱신했다(리포 13개, 계약 v1.3.3, E2E 87 PASS, 서버 검증 완료). 이 문서는 `deploy/docs/STATUS.md`와 `PROJECT_STRUCTURE.md` 5절의 내용도 따랐다.
 
 ## 1. 한눈에 보는 다이어그램 목록
 
@@ -126,6 +126,7 @@ flowchart TB
 해석:
 
 - 실선은 런타임 HTTP 호출(I번호는 `INTERFACES.md`), 점선은 빌드 시 의존이나 소유 관계다.
+- 도식은 주요 호출만 그렸다. `INTERFACES.md`의 소비 영역 표 기준으로 도식에 없는 소비가 있다: I1은 model-lab도 읽고, I4는 question-authoring·model-lab도 소비자로 적혀 있으며, I8은 synthetic-data·model-lab·release-gate·question-authoring도 쓰고, I9는 model-lab·release-gate도 쓴다. 반대로 survey-service는 question-authoring를 부르지 않고 문항 세트를 릴리스 번들(I4)로 받는다(`survey-service/survey_service/clients.py`는 `HttpReleaseReader`, `HttpTraceIngest`만 만든다).
 - I2(데이터셋)는 HTTP가 아니라 같은 호스트(GPU 호스트)의 파일 저장소다(D49).
 - 상태: 서비스끼리의 HTTP 연결은 [확인됨]. 단 모델은 [시험용 대체](가짜 백엔드)이고, `model-lab`의 실제 학습은 gpu-dev에서 따로 한 바퀴 확인했을 뿐 E2E에는 시험용 어댑터가 쓰였다. 문항 저작 화면은 구현 범위 밖이다.
 - 키오스크 프론트(`kiosk-frontend`)는 다른 팀 담당이던 외부 접점을 분리 가능하게 만든 것이다(D12, D65). 이 리포를 통째로 바꿔도 나머지는 영향받지 않는 것이 목표다.
@@ -281,7 +282,7 @@ sequenceDiagram
 
 ## 5. 도식 D: survey-service LangGraph 그래프
 
-한 턴의 오케스트레이션은 LangGraph `StateGraph`로 만들어져 있다(D62). 노드 이름은 `survey-service/docs/design.md` 14.1절에서 확인한 것만 썼다: `load_session`, `fail_no_session`, `col_none`, `col_progress`, `col_paused`, `col_ended`, `ignore`, `bind_release`, `parse`, `normalize`, `judge`, `write_record`, `plan`, `commit`, `deliver_staff`, `dispatch_result`, `generate`, `finalize`. 설계서는 "노드 약 20개"라고 적었는데 14.1절 그림에서 이름이 확인되는 것은 위 18개다. 나머지 노드가 있는지는 `survey_service/graph.py`를 읽지 않아 [미정]이다.
+한 턴의 오케스트레이션은 LangGraph `StateGraph`로 만들어져 있다(D62). 노드 이름은 `survey-service/docs/design.md` 14.1절에서 확인한 것만 썼다: `load_session`, `fail_no_session`, `col_none`, `col_progress`, `col_paused`, `col_ended`, `ignore`, `bind_release`, `parse`, `normalize`, `judge`, `write_record`, `plan`, `commit`, `deliver_staff`, `dispatch_result`, `generate`, `finalize`. 설계서는 "노드 약 20개"라고 적었으나 실제 `survey_service/graph.py`의 `build()`가 `add_node`로 등록하는 노드는 위 18개이고 이름이 모두 같다(확인됨, 2026-10-26).
 
 ```mermaid
 flowchart TB
@@ -352,9 +353,9 @@ flowchart TB
 
 | 항목 | 상태 |
 |---|---|
-| 그래프 구성, 간선, 체크포인터 없음, 상태 JSON 직렬화, 턴 처리 중 외부 연결 없음 | [구현됨] `tests/test_graph.py`와 survey-service 단위 시험 |
+| 그래프 구성(노드 18개 확인), 간선, 체크포인터 없음, 상태 JSON 직렬화, 턴 처리 중 외부 연결 없음 | [구현됨] `tests/test_graph.py`와 survey-service 단위 시험 |
 | deploy E2E에서 실제 이미지의 그래프가 턴을 처리 | [확인됨] (다섯째 구간 이후 survey-service는 LangGraph 오케스트레이터 HEAD로 빌드) |
-| `langgraph` 1.2.15를 잠금 파일에 고정 | [확인됨] design.md 14.5절 (현재 잠금 파일은 읽지 않음) |
+| `langgraph` 1.2.15를 잠금 파일에 고정 | [확인됨] `survey-service/requirements.lock`의 `langgraph==1.2.15` |
 
 근거: `survey-service/docs/design.md` 3·14절, D36, D62, D63.
 
@@ -419,14 +420,15 @@ sequenceDiagram
 ```mermaid
 stateDiagram-v2
   [*] --> RECEIVED: submit_candidate
-  RECEIVED --> DECIDED_REJECT: 자동 검사 하나라도 FAIL
+  RECEIVED --> DECIDED: 자동 검사 하나라도 FAIL (REJECT 판정)
   RECEIVED --> AWAITING_APPROVAL: 자동 검사 모두 PASS
-  AWAITING_APPROVAL --> DECIDED_PASS: APPROVE (릴리스 생성)
-  AWAITING_APPROVAL --> DECIDED_REJECT: REJECT (사유 필수)
+  AWAITING_APPROVAL --> DECIDED: APPROVE (PASS 판정, 릴리스 생성)
+  AWAITING_APPROVAL --> DECIDED: REJECT (사유 필수)
   AWAITING_APPROVAL --> RECEIVED: 승인 직전 재검사 실패 (412)
-  DECIDED_PASS --> [*]
-  DECIDED_REJECT --> [*]
+  DECIDED --> [*]
 ```
+
+위 상태는 release-gate의 내부 작업 상태 3개(`RECEIVED`, `AWAITING_APPROVAL`, `DECIDED`; `release_gate/gate.py`, `docs/design.md` 4절)다. API가 보여 주는 제출 상태(`SubmissionView.status`)는 5개이고 `release_gate/views.py`가 다음처럼 대응시킨다: RECEIVED는 `PENDING_CHECK`, AWAITING_APPROVAL은 `AWAITING_APPROVAL`, DECIDED는 판정이 PASS면 `PASSED`, REJECT이고 승인 기록(approval_id)이 없으면 `REJECTED_AUTO`, 있으면 `REJECTED_HUMAN`. (이전 판의 `DECIDED_PASS`/`DECIDED_REJECT`는 코드에 없는 이름이었다.)
 
 | 항목 | 상태 |
 |---|---|
@@ -523,14 +525,14 @@ flowchart LR
     AC["admin-console<br/>정적"]:::ui
   end
 
-  subgraph SERVING["네트워크 serving (internal)"]
+  subgraph SERVING["네트워크 serving"]
     SS["survey-service"]:::svc
     MS["model-serving"]:::svc
     OFI["ops-feedback-ingest"]:::svc
     RG["release-gate"]:::svc
   end
 
-  subgraph AUTH["네트워크 authoring (internal)"]
+  subgraph AUTH["네트워크 authoring"]
     QA["question-authoring"]:::svc
   end
 
@@ -577,7 +579,7 @@ flowchart LR
   MS --- V6
 ```
 
-네트워크 소속은 `compose.yaml`의 `networks:`를 그대로 옮긴 것이다. 이 그림은 가독성을 위해 한 서비스를 한 상자에만 두었다. 실제로는 여러 네트워크에 걸친 것이 있다.
+네트워크 소속은 `compose.yaml`의 `networks:`를 그대로 옮긴 것이고 표의 소속은 모두 `compose.yaml`과 일치함을 확인했다. 이 그림은 가독성을 위해 한 서비스를 한 상자에만 두었다. 실제로는 여러 네트워크에 걸친 것이 있다.
 
 | 서비스 | 붙는 네트워크 | 볼륨 (쓰기는 소유 서비스만) |
 |---|---|---|
@@ -592,7 +594,7 @@ flowchart LR
 | job-ops-feedback | logs, release | ops-data, 잡 설정(읽기 전용) |
 | job-release-gate-collect | release | gate-data |
 
-보안 기본값(`x-hardening`): `no-new-privileges`, `cap_drop: ALL`, 읽기 전용 루트, `/tmp`는 tmpfs, 로그는 표준 출력(json-file 회전), 비root 실행. 이웃 저장소 볼륨은 공유하지 않고 HTTP와 영역별 토큰으로만 읽는다(D50). `release`와 `logs`는 `internal: true`다. 비밀 값은 `secrets/*.env`와 `secrets/gateway-*.caddy`에서 환경 변수와 Compose `configs`로 주입하며 이 문서는 변수 이름만 적는다.
+보안 기본값(`x-hardening`): `no-new-privileges`, `cap_drop: ALL`, 읽기 전용 루트, `/tmp`는 tmpfs, 로그는 표준 출력(json-file 회전), 비root 실행. 이웃 저장소 볼륨은 공유하지 않고 HTTP와 영역별 토큰으로만 읽는다(D50). `release`와 `logs`만 `internal: true`다(확인: `compose.yaml`의 `networks:`; `edge`, `serving`, `authoring`은 internal이 아니다). `logs` 네트워크에는 ops-feedback-ingest와 job-ops-feedback이 붙는다(도식에는 생략). 비밀 값은 `secrets/*.env`와 `secrets/gateway-*.caddy`에서 환경 변수와 Compose `configs`로 주입하며 이 문서는 변수 이름만 적는다.
 
 상태: Compose 기동, 네트워크 도달·차단 검사(survey→qa, survey→model-registry, qa→ops, ops→qa 등 차단), healthz/readyz, 이미지 라벨 6개, 백업·삭제·복구 [확인됨] (E2E 9단계). 운영 도메인·TLS는 [미정]이다(게이트웨이는 `auto_https off`, HTTP만).
 
@@ -667,7 +669,7 @@ flowchart TB
     LREG["로컬 이미지 deploy-build/*"]:::ok
   end
 
-  subgraph GDEV["gpu-dev  (개인 워크스테이션, ssh)"]
+  subgraph GDEV["gpu-dev  (개인 워크스테이션, ssh, Docker Desktop 연동)"]
     GD["RTX 4070급 12GB · 12코어 · RAM 15GB<br/>Ubuntu 24.04 WSL2 · Python 3.12<br/>작업 폴더 ~/openit-gpu · flock으로 GPU 한 번에 한 작업"]:::sub
     GRUN["학습·평가·패키징 · vLLM 시험<br/>Qwen2.5-1.5B 4비트 · 파이프라인 검증용"]:::sub
   end
@@ -693,8 +695,8 @@ flowchart TB
 |---|---|---|---|
 | 개발 PC (WSL2, Docker Desktop) | 서비스끼리 실제 HTTP로 도는 E2E 전체 모드 87 PASS / 0 FAIL, `--fast` 59 PASS. 표준 `docker` 경로 하나로 동작(우회 코드 제거, 열셋째 구간) | [확인됨] | `deploy/docs/STATUS.md`, `docs/SETUP.md`, `PROJECT_STRUCTURE.md` 5절 |
 | 임시 서버 형태 점검 | 형제 리포 13개를 임시 폴더에 clone해 `e2e.sh --fast` 통과(60 PASS), 소스 없는 deploy 사본과 digest 이미지만으로 운영 구성 기동 | [확인됨] | `check-relocatable.sh`, `check-standalone.sh` (열한째 구간) |
-| gpu-dev | 개발용 GPU 호스트. 12GB 값은 설정 프로파일(`model-runtime/profiles/gpu-dev-12g.json`)로 뺌. 결과는 파이프라인 검증용. 학습·평가·패키징·게시 한 바퀴와 vLLM(LoRA + 구조화 출력, 두 어댑터)을 직접 확인 | [확인됨] gpu-dev에서. E2E의 일부는 아님(`E2E_GPU=1` 경로는 미검증) | D47, D48, `model-runtime/docs/design.md` 11절 |
-| gpu-dev에서의 전체 시험 | `PROJECT_STRUCTURE.md`는 "서버(gpu-dev)에서의 전체 시험은 진행 중"이라 적었다. 그러나 D47(2026-10-15)은 gpu-dev에 Docker가 없다고 적었고, 그 뒤 Docker 설치 여부를 이 문서가 읽은 파일에서 확인하지 못했다 | [미정] 진행 상황과 환경 확인 필요 | `PROJECT_STRUCTURE.md` 112줄, D47 |
+| gpu-dev | 개발용 GPU 호스트(Docker 사용 가능, 위 행 참조). 12GB 값은 설정 프로파일(`model-runtime/profiles/gpu-dev-12g.json`)로 뺌. 결과는 파이프라인 검증용. 학습·평가·패키징·게시 한 바퀴와 vLLM(LoRA + 구조화 출력, 두 어댑터)을 직접 확인 | [확인됨] gpu-dev에서. E2E의 일부는 아님(`E2E_GPU=1` 경로는 미검증) | D47, D48, `model-runtime/docs/design.md` 11절 |
+| gpu-dev에서의 Docker와 전체 시험 | 사용자 보고(2026-10-26): gpu-dev는 Docker Desktop 연동으로 Docker를 쓰고, 서버에서 `doctor.sh` 통과, E2E 88 PASS. D47(2026-10-15)의 "Docker 없음"은 그 시점의 사실이며 **이후 변경됨**. 88건은 개발 PC의 87건과 1건 다르고 그 이유는 확인하지 못했다 | [확인됨] 사용자 보고. 리포의 기록 파일로는 [확인 못 함] | 사용자 보고, D47, `PROJECT_STRUCTURE.md` 5절 |
 | 서빙·백 서버 | RTX 4090 24GB 1장, Compose 서비스 + 추론 컨테이너. 프로파일 `rtx4090-24g.json`은 잠정. 기반 모델 크기와 배치에서만 쓰임 | [제안/가정] 사용자가 맞다고 확인(D59), 실물 실측 없음 | D54, D59, `model-runtime/profiles/` |
 | 학습·평가 서버 | A6000 48GB. 학습은 워커 방식으로 서빙 서버의 model-registry에 게시. 서빙 서버는 외부 호출을 받지 않음 | [제안/가정] | D40, D54 |
 | 추론 서버 컨테이너 | CPU/fake 변형은 E2E에 사용. GPU 변형 이미지는 개발 PC에서 빌드됨(13.1GB). 컨테이너 안 GPU 추론은 이 문서가 읽은 파일에서 확인하지 못함 | CPU/fake [확인됨], GPU [구현됨] 또는 [미정] | `model-runtime/docs/STATUS.md` 8차, `deploy/docs/STATUS.md` |
@@ -753,15 +755,15 @@ flowchart LR
 | 축 | 값(2026-10-26 읽은 기준) | 규칙 | 근거 |
 |---|---|---|---|
 | 문진 스키마 | 정수 `1`(`survey-service/schema/CONTRACT_VERSION`), 태그 `survey-schema-v1.0.0` | 정확 일치. 바뀌면 survey-service가 반영(D21). v2 후보(고정 문장 정보, 도움 요청 사유, `pending_id_seed`, 조건 규칙을 oneOf로 표현)는 모아서 한 번에 올림 | D14, D21, D46, D48 |
-| 경계 계약 | 스키마 `1.3`, 패키지 태그 `v1.3.3`(태그 목록 v1.0.0 ~ v1.3.3). deploy `lib.sh`의 기본 태그도 v1.3.3. 단 synthetic-data(호스트 실행)는 v1.2.0을 고정해 쓴다 | MINOR는 추가만. 쓰는 쪽은 엄격, 읽는 쪽은 모르는 필드·열거값 허용. 의미 변경은 새 필드로. 모든 레코드는 불변 | D14, D25, D26, D42, D43, D51, D58, D66, D68 |
+| 경계 계약 | 스키마 `1.3`, 패키지 태그 `v1.3.3`(태그 목록 v1.0.0 ~ v1.3.3). deploy `lib.sh`의 기본 태그도 v1.3.3. 단 synthetic-data(호스트 실행)는 v1.2.0을 고정해 쓴다(question-authoring 잠금 파일도 v1.2.0) | MINOR는 추가만. 쓰는 쪽은 엄격, 읽는 쪽은 모르는 필드·열거값 허용. 의미 변경은 새 필드로. 모든 레코드는 불변 | D14, D25, D26, D42, D43, D51, D58, D66, D68 |
 | turn-engine | v0.2.0 (1205 passed, 골든 868쌍 중 806쌍 일치) | 출력이 달라지면 MINOR | D44 |
-| model-runtime | v0.5.1 (태그 v0.2.0 ~ v0.5.1) | 라이브러리와 추론 서버(I9)를 같은 리포가 가짐 | D45, D62 |
+| model-runtime | v0.5.1 (태그 v0.2.0, v0.3.0, v0.4.0, v0.5.0, v0.5.1) | 라이브러리와 추론 서버(I9)를 같은 리포가 가짐 | D45, D62 |
 | 라이브러리 설치 | Git 태그. 이미지 빌드 때 태그를 고정하고 의존 버전은 잠금 파일로 고정 | `pip install git+ssh://…@태그`. 별도 패키지 인덱스 서버 없음 | D18, 루트 `CLAUDE.md` |
 | 해시 | JCS(RFC 8785) 정규화 + SHA-256, 기준 구현은 `boundary_contracts.canonical` | 클라이언트가 응답을 읽을 때 해시를 다시 계산 | D20, D34, D49 |
 | 이미지 라벨 | 필수 6개는 해당하는 것만(kiosk-frontend는 turn-engine·model-runtime 라벨 불필요). 추가 라벨 허용 | 존재만 검사 | D50, D63, D66 |
 | 공개 API | `PUBLIC_API.md`(경계 계약 v1.3.2에서 확정, 상태 코드 표 포함) | `turn_id`는 API 봉투 필드. 문진 스키마는 바꾸지 않음 | D55, D58, D66 |
 
-주의: 문서 사이의 표기 차이를 읽다 발견했다. `boundary-contracts/README.md`의 설치 예시는 `v1.1.1`이고 루트 `CLAUDE.md`의 예시는 `v1.0.0`이다. 현재 기준 태그는 `deploy/scripts/lib.sh`의 v1.3.3이다(`deploy/docs/SETUP.md` 증상표도 같은 태그를 든다). 문서 정리는 헤드의 일이며 이 문서는 건드리지 않았다.
+참고: `boundary-contracts/README.md`의 설치 예시 태그는 2026-10-26에 `v1.3.3`으로 고쳤다. 루트 `CLAUDE.md`의 예시는 `v1.0.0`으로 남아 있다(이 문서가 고치지 않음, 헤드의 일). 현재 기준 태그는 `v1.3.3`이다(`deploy/scripts/lib.sh`의 `DEPLOY_BC_TAG`, `git tag`). 리포마다 고정한 태그는 다르다(확인: 각 `requirements*`): release-gate v1.3.3, survey-service v1.3.2, ops-feedback·model-lab v1.3.0, question-authoring·synthetic-data v1.2.0(잠금 파일). deploy가 이미지 빌드 때 `v1.3.3`으로 넘긴다.
 
 ---
 
@@ -790,8 +792,8 @@ flowchart LR
 | 17 | 모델 기반 실패 탐지기, 사람 신고 경로 | 후속 구간 | `ops-feedback/docs/design.md` 5절 |
 | 18 | 문진 스키마 v2 | 후보만 모아 둠 | D46, D48 |
 | 19 | Trace 크기: Trace가 세션 문서 전체를 담아 턴이 늘수록 커짐 | 스키마가 정한 필드라 줄이지 않았다. 문제가 되면 ops-feedback과 협의 | `survey-service/docs/design.md` 6절 |
-| 20 | gpu-dev에서의 전체 시험 | `PROJECT_STRUCTURE.md`는 진행 중이라 적었으나 D47의 "Docker 없음"과 어긋나 보임 | 9절 참고 |
-| 21 | LangGraph 그래프의 18개 외 노드 | 설계서에 "약 20개"라고만 적혀 있어 이름은 확인하지 못함 | 5절 |
+| 20 | gpu-dev에서의 전체 시험 | 해소: 사용자 보고로 서버 검증 완료(doctor 통과, 88 PASS, Docker Desktop 연동). D47의 "Docker 없음"은 이후 변경됨. 리포 기록으로는 [확인 못 함] | 9절 참고 |
+| 21 | LangGraph 그래프의 노드 수 | 해소: `graph.py`가 등록하는 노드는 18개로 설계서 14.1절과 같다("약 20개"는 어림) | 5절 |
 | 22 | 서빙 서버의 단일 장애 지점 | 고가용성은 범위 밖 | D10 |
 | 23 | 데이터셋 저장소의 서버 위치 | 데이터셋(I2)은 같은 호스트의 파일 저장소. 운영의 호스트 간 이동 방식 미정(개발은 rsync) | D49, D52 |
 | 24 | GPU 서버가 서빙 서버 model-registry·저작·ops 읽기 면에 닿는 길 | 개발은 SSH 역터널. 운영의 공개 포트·터널 여부 미정 | D52, `deploy/docs/design.md` 1절 |

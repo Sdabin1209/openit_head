@@ -93,3 +93,5 @@
 - 학습 서버(`openit`)를 탐색했다(읽기 전용). 최신 학습 데이터셋은 `~/taehyeon/data/dataset_10_14`. 형식은 정규화·절차·다음 문항을 LoRA-A가 하고 서비스는 표 찾기만 하는 v2다. 학습 기반은 Qwen3-4B/8B/14B(rank 16).
 - D74: 서비스 구조를 이 데이터셋 v2에 맞춘다. 영향 목록은 `docs/impact-d74.md`(초안). 구현은 아직 시작하지 않았다.
 - 다음: 형식 확정(boundary-contracts 새 스키마·예시)부터. 12GB 적재, 두 어댑터 동시 적재, 정규화 담당자의 수정 시점은 미확인.
+
+- 2026-10-27 계약 `v2.0.0` push. 1단계 영역 이전 병합: turn-engine v0.3.0, model-runtime v0.6.0(태그), release-gate, ops-feedback, synthetic-data. model-lab은 브랜치에서 진행 중, survey-service 이전 진행 중. 결정 D75, D76. 지시서 `docs/migration-2.0.0.md`.

@@ -4,7 +4,13 @@
 
 ## 현재 단계
 
-구조 확정 단계. 구조의 골격(D01~D12)은 확정했고, 경계 계약을 스키마로 쓰기 전에 닫을 열린 결정(O01~O07)이 남아 있다.
+(2026-10-26 갱신. 근거는 각 항목에 적었다. 이전 문구 "구조 확정 단계"는 2026-10-14 시점이라 낡았다.)
+
+- 리포 13개가 모두 있다(`ls`: head, boundary-contracts, turn-engine, model-runtime, survey-service, question-authoring, synthetic-data, model-lab, release-gate, ops-feedback, deploy, kiosk-frontend, admin-console). 결정은 D71까지 기록했다(`DECISIONS.md`).
+- 경계 계약 패키지는 `v1.3.3`이다(`git -C boundary-contracts tag`, `pyproject.toml` version 1.3.3). 파이프라인 스키마 버전은 1.3, 문진 스키마는 정수 1(`survey-schema-v1.0.0`). turn-engine `v0.2.0`, model-runtime `v0.5.1`.
+- 서비스끼리 실제 HTTP로 도는 전체 시험(`deploy/scripts/e2e.sh`)은 개발 PC에서 87 PASS / 0 FAIL(`deploy/docs/STATUS.md` 여덟째 구간, 모델은 가짜 백엔드).
+- 서버 검증 완료(사용자 보고, 2026-10-26): gpu-dev에서 `doctor.sh` 통과, 전체 시험 88 PASS. gpu-dev는 Docker Desktop 연동으로 Docker를 쓴다(D47의 "Docker 없음"은 이후 변경됨). 리포 기록으로는 확인하지 못했다.
+- 남은 일(확인하지 못했거나 미정, 자세한 목록은 `architecture.md` 11절): 운영 도메인·HTTPS, 직원 콘솔·사람 계정의 운영 로그인, CI가 서버 로컬 레지스트리에 닿는 방법, 토큰 발급·회전, 주기 잡의 실행 주기(`config/jobs.yaml`의 `interval_seconds`가 모두 null), 백업 설정과 외부 감시, 원본 로그 보관 기간, 롤백 기준과 실패 유형 분류체계, 실제 브라우저 화면·한국어 STT·웹 푸시 수신, RTX 4090 실측과 GPU 모델 E2E(`E2E_GPU=1` 미검증), 문진 스키마 v2 후보 정리, 문항 저작 화면.
 
 ## 완료
 
@@ -47,6 +53,8 @@
 - 스타터 킷 생성(2026-10-14)
 
 ## 다음 작업(순서)
+
+(2026-10-14 시점의 계획이다. 현재 단계는 위 "현재 단계"를 따른다.)
 
 1. 경계 계약과 명세는 확정 상태(사용자가 논의 생략). 변경은 `CONVENTIONS.md`의 진화 규칙 안에서만 한다.
 2. 영역 에이전트를 시작할 준비가 끝났다. 시작은 사용자 지시 후.

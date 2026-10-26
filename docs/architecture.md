@@ -279,4 +279,226 @@ sequenceDiagram
 
 ---
 
-<!-- SECTION-DEF -->
+## 5. 도식 D: survey-service LangGraph 그래프
+
+한 턴의 오케스트레이션은 LangGraph `StateGraph`로 만들어져 있다(D62). 노드 이름은 `survey-service/docs/design.md` 14.1절에서 확인한 것만 썼다: `load_session`, `fail_no_session`, `col_none`, `col_progress`, `col_paused`, `col_ended`, `ignore`, `bind_release`, `parse`, `normalize`, `judge`, `write_record`, `plan`, `commit`, `deliver_staff`, `dispatch_result`, `generate`, `finalize`. 설계서는 "노드 약 20개"라고 적었는데 14.1절 그림에서 이름이 확인되는 것은 위 18개다. 나머지 노드가 있는지는 `survey_service/graph.py`를 읽지 않아 [미정]이다.
+
+```mermaid
+flowchart TB
+  classDef pure fill:#dbe9f7,stroke:#2e6da4,color:#000
+  classDef model fill:#f0e6f7,stroke:#7d4ba0,color:#000
+  classDef io fill:#e2f0d9,stroke:#4f8a2f,color:#000
+  classDef end_ fill:#eee,stroke:#666,color:#000
+
+  START(["START"]):::end_
+  LS["load_session<br/>세션 조회 · OrchestratorInput 조립"]:::io
+  FNS["fail_no_session<br/>조회 실패 · 세션 정보 생성 실패<br/>활성 릴리스 없음"]:::end_
+  CN["col_none<br/>세션 없음 열"]:::io
+  CP["col_progress<br/>진행 중 열"]:::io
+  CPA["col_paused<br/>일시 중지 열"]:::io
+  CE["col_ended<br/>종료 열"]:::io
+  IG["ignore<br/>처리 안 함 (route 없음)"]:::end_
+  BR["bind_release<br/>릴리스 결정 · 세션 정보 생성"]:::io
+  PA["parse<br/>LoRA-A, 추론 서버 호출"]:::model
+  NO["normalize"]:::pure
+  JU["judge"]:::pure
+  WR["write_record"]:::pure
+  PL["plan"]:::pure
+  CM["commit<br/>SQLite 한 트랜잭션"]:::io
+  DS["deliver_staff<br/>직원 알림 전달"]:::io
+  DR["dispatch_result<br/>flow == END 일 때 결과 전달"]:::io
+  GE["generate<br/>LoRA-B, 추론 서버 호출"]:::model
+  FI["finalize<br/>신호 · 출력 조립"]:::io
+  END_(["END"]):::end_
+
+  START --> LS
+  LS -->|"실패"| FNS --> END_
+  LS --> CN
+  LS --> CP
+  LS --> CPA
+  LS --> CE
+  CN -->|"route 없음"| IG
+  CP -->|"route 없음"| IG
+  CPA -->|"route 없음"| IG
+  CE -->|"route 없음"| IG
+  CN -->|"route 있음"| BR
+  CP -->|"route 있음"| BR
+  CPA -->|"route 있음"| BR
+  CE -->|"route 있음"| BR
+  IG --> END_
+  BR -->|"실패"| FI
+  BR -->|"발화: 전체 흐름"| PA
+  BR -->|"Plan만"| PL
+  PA --> NO --> JU --> WR --> PL --> CM
+  PA -.->|"단계 실패"| FI
+  NO -.->|"단계 실패"| FI
+  JU -.->|"단계 실패"| FI
+  WR -.->|"단계 실패"| FI
+  PL -.->|"단계 실패"| FI
+  CM -->|"실패"| FI
+  CM -->|"확정"| DS
+  DS -->|"flow == END"| DR --> GE
+  DS -->|"그 밖"| GE
+  GE --> FI --> END_
+```
+
+읽는 법:
+
+- 파란색 노드(`normalize`, `judge`, `write_record`, `plan`)는 turn-engine의 순수 결정 함수를 호출하는 노드다(D62 방침 1). 보라색 노드(`parse`, `generate`)는 추론 서버(I9)를 HTTP로 부른다. 어느 노드가 turn-engine의 어느 함수를 부르는지는 설계서 14절에 노드별 대응이 적혀 있지 않아, 이 색 구분은 3절 처리 흐름("Parser → normalize → judge → write_record → plan")을 따른 것이다.
+- 열 노드(`col_*`)가 설계서 9-1 처리 표의 열(세션 상태)이고, 행(입력 종류)은 각 열 노드 안의 표에 있다. 표는 `COLUMNS` 한 곳에만 둔다.
+- `parse`부터 `commit`까지 한 단계가 실패하면 `failed`에 `BEFORE_COMMIT/<단계>`를 더하고 `finalize`로 간다. 되돌아가는 간선은 없다. 확정 뒤 노드(`deliver_staff`, `dispatch_result`, `generate`)는 서로의 성패와 무관하게 이어진다.
+- 그래프 밖에서 유지하는 것: 세션별 락, `turn_id` 멱등(저장된 결과 재생), 입력 검증, 쓰기 확정(SQLite), Trace outbox, 출력 보호(D36, 모델 서버 안). 체크포인터를 쓰지 않는다. LangGraph의 체크포인트 저장소는 세션 저장소를 대신하지 않는다(D62).
+- 외부 추적 차단: 이미지에 `LANGSMITH_TRACING=false`, `LANGCHAIN_TRACING_V2=false`를 고정한다(D63). 이미지 라벨 `io.openit.langgraph`가 추가 라벨이다.
+
+| 항목 | 상태 |
+|---|---|
+| 그래프 구성, 간선, 체크포인터 없음, 상태 JSON 직렬화, 턴 처리 중 외부 연결 없음 | [구현됨] `tests/test_graph.py`와 survey-service 단위 시험 |
+| deploy E2E에서 실제 이미지의 그래프가 턴을 처리 | [확인됨] (다섯째 구간 이후 survey-service는 LangGraph 오케스트레이터 HEAD로 빌드) |
+| `langgraph` 1.2.15를 잠금 파일에 고정 | [확인됨] design.md 14.5절 (현재 잠금 파일은 읽지 않음) |
+
+근거: `survey-service/docs/design.md` 3·14절, D36, D62, D63.
+
+---
+
+## 6. 도식 E: 출고 승인 시퀀스
+
+출고는 사람이 정한다(D53). 지표 통과가 곧 서빙이 아니고, `HUMAN_APPROVAL` 검사가 PASS가 아닌 PASS 판정은 코드에 만들 경로가 없다(`assert_decision_rule`). 자동 검사는 기술 호환만 본다.
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant C as 후보 수집기<br/>(release-gate collect, run-once)
+  participant Q as question-authoring<br/>(I1)
+  participant R as model-registry<br/>(I3)
+  participant G as release-gate
+  participant W as 게이트웨이
+  participant A as admin-console<br/>(승인자 브라우저)
+  participant S as survey-service
+  participant O as ops-feedback
+
+  C->>Q: list_ids · latest(reviewed_only) · get_question_bank
+  C->>R: list_ids · get_manifest (LORA_A, LORA_B 최신)
+  C->>G: submit_candidate (문항 세트 x LORA_A x LORA_B)
+  Note over G: 접수 RECEIVED. 같은 조합은 한 번만(sub-조합해시)
+  G->>G: 자동 검사 4종<br/>CONTRACT_COMPAT · QUESTION_MODEL_COMPAT<br/>ACCEPTANCE_EVAL(형식만) · CLINICAL_SAFETY
+  alt 하나라도 FAIL
+    G->>G: GateDecision REJECT (CHECK_FAILED) 기록
+  else 모두 PASS
+    Note over G: 상태 AWAITING_APPROVAL
+    A->>W: GET /v1/submissions?status=AWAITING_APPROVAL
+    W->>G: release-approver 읽기 토큰 + X-Openit-User
+    A->>W: GET /v1/submissions/id/review-report
+    G-->>A: ReviewReport + 헤더 X-Openit-Report-Hash
+    Note over A: 후보와 현재 활성 릴리스를 같은 지표끼리 맞댄 보고서
+    A->>W: POST /v1/approvals {APPROVE 또는 REJECT, reason, report_hash}
+    W->>G: release-approver 쓰기 토큰 + X-Openit-User(인증된 계정)
+    alt 보고서가 그 사이 바뀜
+      G-->>A: 409 STALE_REPORT
+    else 이미 다른 결정
+      G-->>A: 409 ALREADY_DECIDED
+    else REJECT (reason 필수)
+      G->>G: GateDecision REJECT (HUMAN_APPROVAL FAIL)
+    else APPROVE
+      G->>G: 자동 검사 재확인 (임상 승인 철회되었으면 412)
+      G->>R: open_adapter, directory_hash 재검증
+      G->>G: 한 트랜잭션: GateApproval · GateDecision PASS · ReleaseManifest · 번들
+    end
+  end
+  Note over G: 활성화는 별도 호출 activate (PASS 릴리스만)
+  G->>G: 활성 포인터 pointer_version + 1 (추가만, 원자적)
+  S->>G: 포인터 폴링 → get_release → load_bundle (모든 해시 검증)
+  S->>S: 계약 버전 · turn-engine · model-runtime MAJOR.MINOR 검사 후 적재
+  Note over S: 새 세션부터 새 릴리스
+  O->>G: POST /v1/rollback (RollbackRequest)
+  G->>G: from이 현재 활성이고 to가 PASS면 APPLIED, 포인터 cause=ROLLBACK
+  G-->>O: RollbackReceipt
+```
+
+제출 상태기계는 다음과 같다.
+
+```mermaid
+stateDiagram-v2
+  [*] --> RECEIVED: submit_candidate
+  RECEIVED --> DECIDED_REJECT: 자동 검사 하나라도 FAIL
+  RECEIVED --> AWAITING_APPROVAL: 자동 검사 모두 PASS
+  AWAITING_APPROVAL --> DECIDED_PASS: APPROVE (릴리스 생성)
+  AWAITING_APPROVAL --> DECIDED_REJECT: REJECT (사유 필수)
+  AWAITING_APPROVAL --> RECEIVED: 승인 직전 재검사 실패 (412)
+  DECIDED_PASS --> [*]
+  DECIDED_REJECT --> [*]
+```
+
+| 항목 | 상태 |
+|---|---|
+| 수집기 → 자동 검사 → AWAITING_APPROVAL → review-report → 승인 → 릴리스·번들 → 활성화 | [확인됨] 승인자는 [시험용 대체](스크립트가 시험용 `release-approver` 토큰으로 결정). 승인 전 PASS 없음, operator 403, 낡은 `report_hash` 409, REJECT, 번복 409 확인 |
+| 게이트웨이 경유 승인 화면 경로 (목록 → 헤더 해시 → 승인, 승인자 ID가 인증 계정으로 기록, 위조 헤더 무시) | [확인됨] E2E 4g |
+| 승인 화면의 실제 브라우저 렌더링·접근성 | [미정] jsdom 시험까지 |
+| 롤백 요청 → APPLIED → 서비스가 이전 릴리스로 복귀, 권한 없는 역할 403 | [확인됨] 요청 주체는 e2e가 쥔 ops-feedback 역할 토큰 |
+| 운영에서 활성화(`activate`)를 누가 언제 호출하는지 | [미정] 게이트웨이는 `/v1/activate`를 닫아 둠(D70). 허용 역할은 operator(`release-gate/docs/design.md` 7절) |
+| 운영 승인 평가 지표·기준 | 기준 없음: 임계치 없는 보고서가 설계(D53). 지표 카탈로그 `METRICS.md`는 [제안/가정]이며 승인자가 다듬는다 |
+| 게이트웨이가 여는 승인 경로 4개: GET `/v1/submissions`, GET `/v1/submissions/*`, POST `/v1/approvals` (+ 화면) | [확인됨] 제출 접수·활성화·롤백·릴리스 조회는 닫혀 있음(D70) |
+
+근거: `release-gate/docs/design.md` 2~4·6·7·9절, `boundary-contracts/HTTP.md`(I5), `deploy/config/Caddyfile`, `deploy/docs/STATUS.md`(넷째, 여덟째 구간), D30, D42, D53, D58, D69, D70.
+
+---
+
+## 7. 도식 F: 비식별·피드백 흐름
+
+원본 Trace는 비식별 처리기만 읽고, 실패 사례(FailureCase)는 항상 비식별 뒤에만 만든다(D15). 기본 방침은 "허용 목록만 남기고 자유 문자열은 전부 마스킹"이다.
+
+```mermaid
+flowchart TB
+  classDef raw fill:#f8d7da,stroke:#a94442,stroke-width:2px,color:#000
+  classDef safe fill:#e2f0d9,stroke:#4f8a2f,color:#000
+  classDef human fill:#fde7c8,stroke:#b9770e,stroke-width:2px,color:#000
+  classDef cons fill:#dbe9f7,stroke:#2e6da4,color:#000
+
+  OB["survey-service Trace outbox<br/>TraceEnvelope"]
+  ING["ingest-api (I6)<br/>세션 ID, 턴 ID로 멱등"]
+  RAW[("원본 로그 저장소<br/>log.db (ops-data 볼륨)")]:::raw
+  VIEW["DeidentifierView<br/>원본을 읽는 유일한 경로"]:::raw
+  DEID["비식별 처리기 deid.py<br/>스키마를 따라 걸으며 허용 목록만 남김<br/>환자 값은 MASKED, 세션·턴 ID는 salt 가명"]:::safe
+  CHK{"잔여 패턴 검사<br/>이메일 전화 주민번호 등"}:::safe
+  FAILD["DEID_FAILED<br/>사례를 만들지 않음 (실패로 닫음)"]:::raw
+  DT[("비식별 Trace 저장<br/>tr-해시")]:::safe
+  DET["실패 탐지기 RuleDetector<br/>구조 필드만 본다"]:::safe
+  CLS["분류기<br/>rule_to_type 설정"]:::safe
+  FS[("실패 사례 저장소 failures.db<br/>FailureCase PENDING v1")]:::safe
+  RQ["검토 큐<br/>PENDING 최신 사례 목록"]:::safe
+  HR{{"사람 검토 (reviewer)<br/>admin-console 검토 화면"}}:::human
+  FS2[("FailureCase v+1<br/>CONFIRMED + expected + reviewed_input<br/>또는 DISMISSED")]:::safe
+  SDN["synthetic-data<br/>실패 사례를 시드로 인용"]:::cons
+  MLN["model-lab<br/>확정 사례를 회귀 평가 집합으로"]:::cons
+  QAN["question-authoring<br/>문항별 실패율 · 혼동 사례 (개선 신호)"]:::cons
+  RBP["RollbackPlanner<br/>릴리스별 실패율 집계"]:::safe
+  GATE["release-gate<br/>I5 request_rollback"]:::cons
+
+  OB --> ING --> RAW --> VIEW --> DEID --> CHK
+  CHK -->|"통과"| DT --> DET --> CLS --> FS --> RQ --> HR --> FS2
+  CHK -->|"걸림"| FAILD
+  FS2 -->|"I7 읽기"| SDN
+  FS2 -->|"I7 읽기"| MLN
+  FS2 -->|"I7 읽기"| QAN
+  FS --> RBP -->|"RollbackRequest"| GATE
+```
+
+게이트웨이와의 관계: 브라우저(검토 화면)에 열리는 경로는 `GET /v1/cases*`, `GET /v1/deidentified-traces/*`(읽기 토큰), `POST /v1/cases/*/review`(`reviewer` 쓰기 토큰)뿐이다. 원본을 받는 `POST /v1/traces`와 서비스 내부 면은 게이트웨이가 열지 않는다(`Caddyfile`, D71).
+
+| 항목 | 상태 |
+|---|---|
+| 수집(ACCEPTED/DUPLICATE) → 비식별 잡 run-once → FailureCase 생성 → 비식별 Trace 검증 | [확인됨] 봉투는 e2e가 만든 시험 자료 [시험용 대체] |
+| 검토 HTTP (잘못된 expected 400, 읽기 토큰 403, 없는 사례 404, 신규 201, 같은 검토 재전송 200) | [확인됨] E2E 7단계 |
+| `reviewed_by`가 인증 계정으로 기록되고 위조 `X-Openit-User`는 무시 | [확인됨] E2E 7h |
+| 원본에 대한 접근을 소스 수준에서 막는 시험 | [구현됨] `tests/test_raw_access.py` |
+| 탐지 규칙은 구조 필드(턴 실패 신호, 커밋 오류, 생성기 폴백, 파서 빈 결과 등)만 봄. 의미적 오류는 못 잡음 | [구현됨] 모델 기반 탐지기와 사람 신고 경로는 [미정] (후속 구간) |
+| 발화 문장의 보존: 잠정 B안 = 검토자가 개인정보를 빼고 고쳐 쓴 `reviewed_input`만 보존. 원문은 보존하지 않음 | [제안/가정] D55, D57 (사용자가 잠정 승인). 법적 근거 확인 전 원문 보존(C)은 하지 않음 |
+| 원본 로그의 보관 기간·접근 통제 | [미정] D57: 지금은 고려하지 않음 |
+| 실패 유형 분류체계 | [미정] 코드에 값이 없고 설정(`rule_to_type`, `default_failure_type`)으로만 받음 |
+| 롤백 기준(`window_hours`, `min_turns`, `max_failure_rate`) | [미정] 기본값 없음, 사용자 결정 |
+| 지표 대시보드, 피드백 배포기 | [미정] ops-feedback 범위 밖으로 남겨 둠 |
+
+근거: `ops-feedback/docs/design.md` 1·3~10·12절, `boundary-contracts/HTTP.md`(I6, I7), `deploy/config/Caddyfile`, D15, D16, D25, D52, D55, D57, D71.
+
+---
+
+<!-- SECTION-GHI -->

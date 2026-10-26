@@ -34,7 +34,7 @@
 | U04 | vLLM 제약 디코딩(xgrammar)이 `ActionExtraction`의 `pattern`, `minItems`, 배열 `type`을 어디까지 지키는지, 재시도 빈도 | 열림 | 지금은 사후 검증과 재시도에 의존 |
 | U05 | 실제 브라우저 화면, 한국어 음성 인식(STT), 웹 푸시 수신 | 열림 | 키오스크 프런트 |
 | U06 | 일반 Linux 서버에서의 설치(지금은 WSL2 + Docker Desktop 두 환경) | 열림 | |
-| U07 | 새 구조(v2)의 E2E와 실제 LLM 데모(Qwen3 어댑터) | 열림 | deploy 단계 |
+| U07 | 새 구조(v2)의 **실제 LLM** 데모(Qwen3, GPU). 가짜 모델 E2E는 87 PASS / 0 FAIL로 닫힘(이 PC 한 환경, deploy fcd9b85, 2026-10-27). 건너뜀: 단계 2(G02), 직원 알림 화면(G01), 브라우저·STT·푸시(U05) | 부분 | gpu-dev에서 `demo.sh up --llm`, RUN.md 7-2-2절 |
 | U08 | LoRA 교체 시험: 같은 기반 모델의 두 번째 어댑터로 model-serving만 바꿔 나머지가 그대로 동작하는지(D72) | 열림 | |
 | U09 | 정규화 쪽을 다른 담당자가 수정 중이다(`~/WS/AGENTS.md`). 확정 시점과 범위 모름 | 열림 | 학습 서버 쪽 |
 | U10 | 평가가 가짜 모델로만 돌았다. 실제 모델 평가 값 없음 | 열림 | |

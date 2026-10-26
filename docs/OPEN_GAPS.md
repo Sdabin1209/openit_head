@@ -16,7 +16,7 @@
 | G05 | v1의 G1(응답 숫자가 입력 재료에 있는지 검사)에 해당하는 검사를 v2에서 둘지 정하지 않았다 | model-runtime | 열림 | |
 | G06 | model-lab 학습기(`trainers/hf.py`)는 학습 서버의 코드와 달라 같은 어댑터를 만들 수 없다. 학습 정본은 서버 코드(D78). 비전문가도 쓸 수 있는 학습 실행(설정 + 한 명령 + doctor)으로 서버 코드를 감싸는 수정이 필요하다 | model-lab | 열림 | 사용자 지시(2026-10-27): 서버 코드를 정본으로 보고, 대상이 비전문가이므로 이후 수정 필요 |
 | G07 | turn-engine의 `normalize`, `judge`, `write_record`, `plan`은 폐기 표시만 했고 제거하지 않았다(survey-service 이전 뒤 제거) | turn-engine | 열림 | |
-| G08 | release-gate의 turn-engine·model-runtime 기본 태그(v0.2.0, v0.4.0)와 `GATE_*_VERSION`을 새 태그(turn-engine v0.3.0, model-runtime v0.6.1)로 올리지 않았다 | release-gate | 열림 | 태그가 나왔으므로 이제 가능(survey-service 이전과 함께) |
+| G08 | release-gate의 기본 태그를 turn-engine v0.3.0, model-runtime v0.6.1로 올림 | release-gate | 닫힘 | 시험 209 통과, 스모크 통과, release-gate 7139123 |
 | G10 | `prompt-3`(JCS)은 폐기 예정으로 남겼다. 제거 시점은 다음 MINOR로 제안 | model-runtime | 열림 | 0.6.0으로 만든 릴리스가 있으면 깨짐 |
 | G11 | 문진 스키마 정수 버전 1 안에서 비호환 변경이 있었다(`SessionStore`, `TurnTrace`, v1 모델 입출력 계약 12개 삭제). survey-service와 ops-feedback은 반드시 같은 잠금으로 함께 배포해야 한다 | survey-service, ops-feedback | 열림 | D79. 운영 데이터가 생기기 전에 TurnTrace 별도 버전 필드 검토 |
 | G12 | v2에서는 A가 REASK/CONFIRM을 계속 내도 서비스가 끊지 않는다(v1의 반복 물음 상한·못 알아들음 상한은 사라짐). 환자가 같은 질문을 무한히 받을 수 있다 | survey-service | 열림 | CR-012. 직원 알림 입력원과 함께 사용자가 정한다 |

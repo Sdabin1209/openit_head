@@ -4,7 +4,7 @@
 
 확인한 것(boundary-contracts `V2_DRAFT.md`, 데이터 전수 집계):
 
-1. 문서에 없는 `reason` 4종이 데이터에 있다(합 55건, 모두 REASK): OTHER_BEVERAGE 45, MISSING_NUMBER 6, UNPARSED_VALUE 2, INVALID_OPTION 2. IO_SPEC 표에 넣거나 기존 사유로 합칠지 정해 달라.
+1. 여기서 "문서"는 학습 서버의 `~/WS/dataset/docs/IO_SPEC.md`(팀 문서)다. 우리가 만든 문서가 아니다. IO_SPEC 표에 없는 `reason` 4종이 데이터에 있다(합 55건, 모두 REASK): OTHER_BEVERAGE 45, MISSING_NUMBER 6, UNPARSED_VALUE 2, INVALID_OPTION 2. 네 가지 모두 정규화기 쪽 문서(`~/minji/openit-normalizer/docs/routing_policy.md` 266~271행, status UNCLEAR)와 코드(`~/minji/normalizer-v0.4.1/normalizer/mappings.py`)에 정의되어 있다(확인, 2026-10-27). 즉 데이터와 정규화기는 맞고 IO_SPEC만 이 4종을 표에 싣지 않았다. IO_SPEC 표에 추가해 달라.
 2. `BEVERAGE_MISSING`은 문서에서 HOLD 사유인데 데이터에서는 REASK 44건뿐이다. HOLD는 UNCERTAIN만 있다.
 3. CONFIRM의 `next_item`은 333건 중 278건이 현재 문항이 아니라 충돌 대상 칸의 문항이다. 문서는 "현재 문항"이라고 적었다.
 4. 술 종류를 모를 때 괄호 없는 키(`Q7_1.amount`, `Q7_1.unit`)가 나온다(`targets`에서 129건). 문서의 예시(`whisky`, `.beverage`)는 데이터와 다르다(데이터는 `spirits`, `glass`).

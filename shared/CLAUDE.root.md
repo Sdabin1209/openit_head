@@ -23,7 +23,7 @@
 - 서비스를 가진 영역은 자기 리포지토리에 `Dockerfile`을 두고, 변경을 완료했다고 말하기 전에 이미지가 빌드되고 `/healthz`에 응답하는 것을 확인한다(스모크 테스트 스크립트를 리포지토리에 둔다). 데이터베이스처럼 앱 밖의 의존이 필요하면 `compose.dev.yaml`로 그것만 띄운다.
 - 이웃 영역이 필요하면 그 영역의 메모리 구현(가짜 SDK)으로 대신해, 다른 영역 없이 혼자 시험할 수 있어야 한다.
 - 이미지는 다음을 지킨다: 설정은 환경 변수로만 받는다. 비밀 값은 이미지와 리포지토리에 넣지 않는다. 로그는 표준 출력으로 낸다. root가 아닌 사용자로 실행한다. HTTP 서비스는 `/healthz`(살아 있음)와 `/readyz`(의존 준비됨)를 둔다. 이미지 라벨에 커밋, 소비하는 계약 버전, turn-engine·model-runtime 버전을 기록한다.
-- `boundary-contracts`는 태그(`v1.0.0`)로 설치한다: `pip install git+ssh://git@github.com/Sdabin1209/openit_boundary-contracts.git@v1.0.0`. 스키마는 패키지에 들어 있으므로 `load_schema`, `validator`를 쓰고 복사본을 만들지 않는다.
+- `boundary-contracts`는 태그로 설치한다(현재 기준은 `deploy/scripts/lib.sh`의 `BOUNDARY_TAG`, 예: `v1.3.3`): `pip install git+ssh://git@github.com/Sdabin1209/openit_boundary-contracts.git@<태그>`. 스키마는 패키지에 들어 있으므로 `load_schema`, `validator`를 쓰고 복사본을 만들지 않는다.
 - 라이브러리와 SDK는 Git 태그로 설치하고, 이미지를 빌드할 때 태그를 고정한다. 의존 버전은 잠금 파일로 고정한다.
 - 스모크 시험은 고정 포트를 쓰지 않는다. 여러 영역이 같은 서버에서 동시에 돌리면 충돌한다. 호스트 포트를 Docker가 배정하게 하거나(`-p 127.0.0.1::8080`) `SMOKE_PORT` 기본값을 빈 포트로 고른다. 컨테이너 이름과 이미지 태그에는 리포지토리 이름을 넣는다.
 - 이미지 라벨 키는 `io.openit.service`, `io.openit.revision`, `io.openit.contracts.boundary`, `io.openit.contracts.survey-schema`, `io.openit.turn-engine`, `io.openit.model-runtime`로 통일한다(D50).

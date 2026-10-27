@@ -4,6 +4,8 @@
 
 표기: 확인은 리포지토리 문서에서 직접 확인한 것, 제안은 이 설계의 제안, 미정은 결정이 필요한 것(`DECISIONS.md`)이다.
 
+> v2 정렬(2026-10-27, D74~D84): 모델 입출력과 턴 처리 서술을 학습 데이터셋 v2 기준으로 고쳤다. 정규화·절차·다음 문항은 LoRA-A가 하고 서비스는 표 찾기·저장·안전장치만 한다. 흐름 도식은 `PROJECT_STRUCTURE.md` 3-1절. 영역·저장소·교환 구조(3~6절)는 그대로다.
+
 ## 1. 한눈에
 
 ```mermaid
@@ -34,7 +36,7 @@ flowchart LR
 
 | # | 영역 | 리포지토리 | 소유 저장소 | 하는 일 | 시드 컴포넌트(참고, 구속 아님) |
 | --- | --- | --- | --- | --- | --- |
-| 1 | 문진 서비스 | survey-service | Session Store(서비스 내부) | 발화 한 턴을 정형 값으로 바꾸고 응답한다 | Orchestrator, Parser(LoRA-A), Normalizer, Judge, Record Writer, Planner, Generator(LoRA-B), 릴리스 로더, 트레이스 내보내기, 추론 서버 |
+| 1 | 문진 서비스 | survey-service | Session Store(서비스 내부) | 발화 한 턴을 정형 값으로 바꾸고 응답한다 | Orchestrator, 추출기 호출(LoRA-A), 출력 사후 검증, 세션 저장, 표 찾기(질문 문장·`ask` 틀·칸 설명), 응답기 호출(LoRA-B), 릴리스 로더, 트레이스 내보내기, 추론 서버. v1의 Normalizer, Judge, Record Writer, Planner 코드는 두지 않는다(D74) |
 | 2 | 문항 저작 | question-authoring | 문항 저장소 | 관리자가 문항을 추가·수정하고 검수받는다 | 저작 콘솔, 템플릿, 코드·단위 사전, 초안 변환기, 계약·의미 검증기, 규칙 미리보기, 변경 영향 분석기, 검수 워크플로, 문항 버전 관리자, 개선 신호 수신함 |
 | 3 | 합성 데이터 | synthetic-data | 데이터셋 저장소 | 학습·평가 데이터를 계약 형식으로 만든다 | 시나리오 설계기, 시드 수집기, 정답 구성기, 발화 생성기, STT 노이즈 주입기, 응답 문장 생성기, 품질 검사기, 감수 샘플링, 분할기, 패키저 |
 | 4 | 모델 개발·평가 | model-lab | 모델 레지스트리 | LoRA-A·B를 학습·평가해 패키지로 올린다 | 데이터셋 로더, LoRA-A·B 학습기, 실험 추적기, Parser·Generator 평가기, 턴 시뮬레이터, 회귀 평가기, 보고서 작성기, 모델 패키저 |
@@ -42,7 +44,7 @@ flowchart LR
 | 6 | 운영 관측·피드백 | ops-feedback | 로그 저장소, 실패 사례 저장소 | 기록을 비식별해 실패 사례를 선별한다 | 로그 수집기, 비식별 처리기, 실패 탐지기, 사례 분류기, 사람 검토 큐, 지표 대시보드, 피드백 배포기 |
 | 7 | 경계 계약 | boundary-contracts | 계약 패키지 | 영역 사이 교환의 형식을 정의하고 검증한다. 헤드 소유(D19) | 요구사항 케이스, 계약 원본, 업무 규칙, 정적 예시, `verify.py`, 배포 스키마 |
 
-문진 서비스의 컴포넌트(Frontend, Orchestrator, Parser, Normalizer, Judge, Record Writer, Planner, Generator, Staff Console, Result Dispatcher, Question Bank, Session Store)와 그 계약은 리포지토리에서 확인한 것이다. 릴리스 로더, 트레이스 내보내기, 그리고 나머지 영역의 컴포넌트는 모두 제안이다.
+문진 서비스의 컴포넌트(Frontend, Orchestrator, Staff Console, Result Dispatcher, Question Bank, Session Store)와 그 계약은 리포지토리에서 확인한 것이다. Parser, Normalizer, Judge, Record Writer, Planner, Generator는 v1 컴포넌트 이름이다. v2에서는 LoRA-A(`ActionExtraction`)와 LoRA-B(`ResponseText`)가 이 일을 대신하며, 이 문서가 읽은 문진 스키마의 해당 계약 12개는 삭제됐다(G11, D79). 릴리스 로더, 트레이스 내보내기, 그리고 나머지 영역의 컴포넌트는 모두 제안이다.
 
 ## 3. 저장소 6개와 계약 패키지
 
@@ -64,8 +66,8 @@ flowchart LR
 | --- | --- | --- |
 | head | 설계 문서, 결정, 브리프 | 없음 |
 | boundary-contracts | 영역 7. 영역 사이 계약, 헤드 소유 | 문진 스키마(참조만) |
-| turn-engine | 공유 라이브러리(Normalizer·Judge·Record Writer·Planner 코드와 규칙) | 문진 스키마 |
-| model-runtime | 공유 라이브러리(어댑터 로딩, 프롬프트 템플릿, 디코딩·출력 형식 보장) | 문진 스키마 |
+| turn-engine | 공유 라이브러리(LoRA-A 출력의 사후 검증 `validate_extraction`과 `QuestionFlowTable`. v1의 정규화·판정·기록·Plan은 v0.4.0에서 제거) | boundary-contracts |
+| model-runtime | 공유 라이브러리와 추론 서버(어댑터 로딩, 프롬프트 템플릿 `prompt-4`, 제약 디코딩·출력 형식 보장) | 문진 스키마(정수 버전 확인용), boundary-contracts |
 | survey-service | 영역 1. 문진 스키마(`schema/`)를 이 리포지토리 안에 포함하고 소유한다(D29) | boundary-contracts, turn-engine, model-runtime, 릴리스 읽기 SDK, 로그 수집 SDK |
 | question-authoring | 영역 2 | 문진 스키마, boundary-contracts, turn-engine(규칙 미리보기), 실패 사례 읽기 SDK |
 | synthetic-data | 영역 3 | 문진 스키마, boundary-contracts, turn-engine, 문항 읽기 SDK, 실패 사례 읽기 SDK |
@@ -88,7 +90,7 @@ flowchart LR
 8. 로그 저장소의 원본은 비식별 처리기만 읽는다.
 9. 평가셋은 합성 학습 데이터와 분리해 관리한다.
 10. 데이터셋·모델·릴리스 매니페스트에 turn-engine과 model-runtime의 버전을 기록한다.
-11. 모델은 발화 해석과 문장 생성만 하고 판단은 코드가 한다(역할 분리 원칙, 확인).
+11. ~~모델은 발화 해석과 문장 생성만 하고 판단은 코드가 한다.~~ v2(D74)에서 바뀌었다: 정규화·절차·다음 문항은 LoRA-A가 정한다. 코드는 결정을 대신하지 않고 **출력을 검증**한다(`validate_extraction`, D75). 위반이면 값을 지어내지 않고 턴을 실패로 처리해 세션을 바꾸지 않는다. 안전과 닿는 고정 문장은 서비스가 쓴다.
 12. 계약의 소유는 경계로 가른다. 두 리포지토리 이상이 주고받는 것은 경계 계약이며 헤드가 소유해 `boundary-contracts`에 둔다. 한 리포지토리 안의 컴포넌트 사이 계약은 그 영역 에이전트가 소유하고 `docs/design.md`에 둔다. 단 문진 서비스 영역의 컴포넌트 계약은 영역을 넘어 공유되어 문진 스키마(`survey-service/schema`)에 있고, 그 소유는 문진 서비스 영역이다(D19). 내부 계약이 다른 리포지토리에 닿게 되면 변경 요청으로 올려 경계 계약이 된다. 
 
 ## 6. 영역 간 교환
@@ -100,7 +102,7 @@ flowchart LR
 | E01 | 관리자 → 문항 저작 | 문항 내용 | 화면 입력 |
 | E02 | 문항 저작 → 문항 저장소 | 문항 정의 버전, 검수 기록, 변경 분류 | QuestionBank(확인), ReviewRecord, ChangeClassification |
 | E03 | 문항 저장소 → 합성 데이터 | 문항 정의 | QuestionBank |
-| E04 | 합성 데이터 → 데이터셋 저장소 | 학습·검증·평가셋, 매니페스트 | ParserSample, GeneratorSample, DatasetManifest |
+| E04 | 합성 데이터 → 데이터셋 저장소 | 학습·검증·평가셋, 매니페스트 | ActionExtractionSample(LORA_A), ResponseSample(LORA_B), DatasetManifest (v1의 ParserSample, GeneratorSample은 삭제) |
 | E05 | 데이터셋 저장소 → 모델 개발·평가 | 지정 버전의 데이터셋 | 위와 같음 |
 | E06 | 모델 개발·평가 → 모델 레지스트리 | 모델 패키지 | ModelPackageManifest |
 | E07 | 문항 저장소 → 게이트 | 후보 문항 버전, 검수 기록, 변경 분류 | QuestionBank, ReviewRecord, ChangeClassification |
@@ -124,7 +126,7 @@ flowchart LR
 
 ## 7. 계약 현황
 
-기존 계약(문진 스키마, 확인): UtteranceParserInput·ParserOutput, AnswerNormalizerInput·NormalizerOutput, AnswerJudgeInput·JudgeOutput, RecordWriterInput·StoreResult, DialoguePlannerInput·PlannerOutput, ResponseGeneratorInput·GeneratorOutput, FrontendMessage·FrontendInput, OrchestratorInput·OrchestratorOutput, TurnTrace, LogEntry, StaffConsoleInput·InterventionDecision, DispatchInput·DispatchOutput, QuestionBank, SessionStore, SessionLoad·SessionCommit 요청·결과(초안).
+기존 계약(문진 스키마, 확인; 아래 모델 입출력 12개는 v2에서 삭제됐다. 모델 입출력은 `boundary-contracts`의 `ActionExtractionInput`·`ActionExtraction`·`ResponseRequest`·`ResponseText`다): ~~UtteranceParserInput·ParserOutput, AnswerNormalizerInput·NormalizerOutput, AnswerJudgeInput·JudgeOutput, RecordWriterInput·StoreResult, DialoguePlannerInput·PlannerOutput, ResponseGeneratorInput·GeneratorOutput~~, FrontendMessage·FrontendInput, OrchestratorInput·OrchestratorOutput, TurnTrace, LogEntry, StaffConsoleInput·InterventionDecision, DispatchInput·DispatchOutput, QuestionBank, SessionStore, SessionLoad·SessionCommit 요청·결과(초안).
 
 신규 계약 11개(필드는 제안이며 확정이 아니다). `boundary-contracts`에 두며, ReleaseManifest·GateDecision·TraceEnvelope는 초안이 있다.
 
@@ -132,10 +134,10 @@ flowchart LR
 | --- | --- | --- | --- |
 | ReviewRecord | 문항 저작 | 게이트 | 문항 세트 ID, 버전, 검수자 역할, 결정, 사유, 임상 기준 승인 여부, 시각 |
 | ChangeClassification | 문항 저작 | 합성 데이터, 게이트 | 문항 세트 ID, 이전·새 버전, 변경 종류, 영향 슬롯 참조, 필요 후속 작업 |
-| ParserSample | 합성 데이터 | 모델 개발·평가 | 샘플 ID, 입력(UtteranceParserInput), 정답(ParserOutput), 시나리오 ID, 문항 버전, 노이즈 유형, 분할 |
-| GeneratorSample | 합성 데이터 | 모델 개발·평가 | 샘플 ID, 입력(ResponseGeneratorInput), 정답(GeneratorOutput), 시나리오 ID, 문항 버전, 문체 가이드 버전, 분할 |
+| ActionExtractionSample (v1: ParserSample) | 합성 데이터 | 모델 개발·평가 | sample_id, scenario_id, split, origin, 입력(ActionExtractionInput), 정답(ActionExtraction). v1의 `noise_types`, `style_guide_version`, `runtime_contract_version`은 뺐다 |
+| ResponseSample (v1: GeneratorSample) | 합성 데이터 | 모델 개발·평가 | 같은 모양, 입력(ResponseRequest), 정답(ResponseText 문자열) |
 | DatasetManifest | 합성 데이터 | 모델 개발·평가 | 데이터셋 ID, 버전, 계약 버전, 문항 버전 목록, 생성기 버전, 시드 사례 ID, 분할별 개수, 파일 해시 |
-| ModelPackageManifest | 모델 개발·평가 | 게이트, 서비스 | 역할(A·B), 버전, 기반 모델, 어댑터 해시, 서빙 설정, 학습 계보, 평가 리포트 참조(상태는 없음, D25) |
+| ModelPackageManifest | 모델 개발·평가 | 게이트, 서비스 | 역할(A·B), 버전, 기반 모델, 어댑터 해시, 서빙 설정, system_prompt{path, sha256}(2.0.0부터 필수, D75), 학습 계보, 평가 리포트 참조(상태는 없음, D25) |
 | ReleaseManifest | 게이트 | 서비스 | 릴리스 ID, 문항 세트 버전, LoRA-A 버전, LoRA-B 버전, 계약 버전, 판정 기록 참조, 내용 해시 |
 | GateDecision | 게이트 | 문항 저작, 모델 개발·평가, 서비스, 운영 관측 | 판정 ID, 대상 조합, 결과(통과·반려), 검사별 결과와 근거, 반려 사유, 승인자, 시각, 통과 시 릴리스 ID |
 | TraceEnvelope | 문진 서비스 | 운영 관측·피드백 | 릴리스 ID, 런타임 계약 버전, 세션 ID, 턴 ID, 전송 시각, TurnTrace 본문(E14) |

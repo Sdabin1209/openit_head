@@ -1,10 +1,10 @@
 # 아키텍처: 흐름, 시퀀스, 상태, 배포
 
-이 문서는 문진 시스템 워크스페이스(리포 13개)의 지금까지 알려진 구조를 도식으로 보여 준다. 리포별 목록과 큰 흐름 한 장은 [`PROJECT_STRUCTURE.md`](PROJECT_STRUCTURE.md)가 다룬다. 이 문서는 그것이 다루지 않는 영역 의존 지도, 순환 파이프라인의 단계, 한 턴의 시퀀스, 그래프, 출고 승인, 비식별, 배포, 서버 배치, 버전 관계를 깊이 다룬다. 결정의 근거는 [`DECISIONS.md`](DECISIONS.md)(D01~D74), 계약은 `../../boundary-contracts/`의 `INTERFACES.md`, `HTTP.md`, `PUBLIC_API.md`, `CONVENTIONS.md`, `METRICS.md`에 있다.
+이 문서는 문진 시스템 워크스페이스(리포 13개)의 지금까지 알려진 구조를 도식으로 보여 준다. 리포별 목록과 큰 흐름 한 장은 [`PROJECT_STRUCTURE.md`](PROJECT_STRUCTURE.md)가 다룬다. 이 문서는 그것이 다루지 않는 영역 의존 지도, 순환 파이프라인의 단계, 한 턴의 시퀀스, 그래프, 출고 승인, 비식별, 배포, 서버 배치, 버전 관계를 깊이 다룬다. 결정의 근거는 [`DECISIONS.md`](DECISIONS.md)(D01~D84), 계약은 `../../boundary-contracts/`의 `INTERFACES.md`, `HTTP.md`, `PUBLIC_API.md`, `CONVENTIONS.md`, `METRICS.md`에 있다.
 
-> 주의(2026-10-27): 턴 처리(파서·정규화기·판정기·기록기·Plan 코드·생성기)를 그린 도식은 v1 구조다. D74로 학습 데이터셋 v2(정규화·절차·다음 문항을 LoRA-A가 함)에 맞추기로 했고, 구현 전까지 이 도식이 현재 코드다. 영향은 `impact-d74.md`.
+> 2026-10-27 갱신(D74~D84): 턴 처리 도식(4절, 5절)과 버전 표(10절), 빈 곳(11절)을 v2 구조로 고쳤다. 정규화·절차·다음 문항은 LoRA-A가 하고 서비스에는 정규화기·판정기·기록기·Plan 코드가 없다. 영향은 `impact-d74.md`. 2·3·6·7·8·9절의 서술 가운데 E2E 수치(87·88 PASS)와 단계 상태는 2026-10-26 기록이며 v2 열차로 다시 확인하지 못했다. 현재 값은 `STATUS.md`를 따른다. 지표 카탈로그 `METRICS.md`는 아직 v1 용어이고 변경 제안은 [`metrics-v2-proposal.md`](metrics-v2-proposal.md)에 있다.
 
-작성 기준일은 2026-10-26이다. 이 문서의 모든 도식은 아래 파일을 읽고 그렸다. 서비스와 도커는 실행하지 않았다.
+작성 기준일은 2026-10-26이고 위 갱신 범위만 2026-10-27이다. 이 문서의 모든 도식은 아래 파일을 읽고 그렸다. 서비스와 도커는 실행하지 않았다.
 
 ## 0. 상태 표시와 읽는 법
 
@@ -55,7 +55,7 @@ flowchart TB
   subgraph SHARED["공유 계약 · 라이브러리 (코드로 의존, 태그 설치)"]
     BC["boundary-contracts<br/>경계 계약 스키마 · HTTP 규약 · clients<br/>소유: 헤드"]:::lib
     SCH["survey-service/schema<br/>문진 스키마 (정수 버전)<br/>소유: survey-service"]:::lib
-    TE["turn-engine<br/>턴 결정 규칙 (순수 라이브러리)"]:::lib
+    TE["turn-engine<br/>A 출력 사후 검증 (순수 라이브러리)"]:::lib
     MR["model-runtime<br/>추론 런타임 · 추론 서버"]:::lib
   end
 
@@ -101,7 +101,7 @@ flowchart TB
   GW --> OF
   AU -.->|"저작 화면: 이 프로젝트 범위 밖 [미정]"| QA
 
-  SS -->|"I9 parse · generate"| MS
+  SS -->|"I9 extract · respond"| MS
   SS -->|"I4 활성 포인터 · 번들"| RG
   SS -->|"I6 Trace 전송"| OF
   MS -->|"I4 번들 읽기"| RG
@@ -115,7 +115,7 @@ flowchart TB
   ML -->|"I7 회귀 평가"| OF
   QA -->|"I7 개선 신호"| OF
 
-  SS -.->|"import"| TE
+  SS -.->|"import: validate_extraction"| TE
   SS -.->|"스키마"| SCH
   MS -.->|"import"| MR
   ML -.->|"import"| MR
@@ -205,36 +205,41 @@ sequenceDiagram
   participant K as 키오스크 앱<br/>(kiosk-frontend)
   participant G as 게이트웨이<br/>(Caddy)
   participant S as survey-service<br/>(LangGraph 그래프)
-  participant T as turn-engine<br/>(라이브러리)
   participant M as model-serving<br/>(I9, vLLM 또는 fake)
+  participant T as turn-engine<br/>(validate_extraction)
   participant DB as 세션 저장소<br/>SQLite
   participant OB as Trace outbox<br/>SQLite
   participant O as ops-feedback<br/>ingest-api (I6)
   participant ST as 직원 콘솔<br/>(SSE · 웹 푸시)
 
+  Note over K,S: 세션 시작은 B만 부른다: 표에서 B 입력(topic, next)을 조립해 respond (A를 부르지 않는다)
   K->>G: POST /v1/sessions/id/turns<br/>STT 텍스트 + turn_id
   G->>S: Bearer 키오스크 토큰을 붙여 전달
   Note over S: 세션 락 · turn_id 멱등 검사 (그래프 밖)
   S->>DB: 세션 조회 (SessionLoad)
-  S->>M: parse (LoRA-A) UtteranceParserInput
-  M-->>S: ParserOutput (출력 보호는 서버가 수행)
-  S->>T: normalize → judge → write_record → plan
-  T-->>S: 저장 결정 · Plan (staff_alert 포함 가능)
-  S->>DB: 쓰기 확정: 한 트랜잭션 (SessionCommit)
-  alt Plan이 직원 알림을 냄
-    S->>ST: 알림 저장 후 SSE alert · 웹 푸시 (세션 ID와 종류만)
-  end
-  S->>M: generate (LoRA-B) ResponseGeneratorInput
-  M-->>S: GeneratorOutput (is_fallback 포함)
+  S->>M: extract (LoRA-A) ActionExtractionInput<br/>question_id, current_question, user_utterance, state
+  M-->>S: ActionExtraction JSON (제약 디코딩 anyOf로 형식 보장)<br/>끝내 못 지키면 503 OUTPUT_INVALID
+  S->>T: validate_extraction(input, output, QuestionFlowTable)
+  T-->>S: 위반 목록
+  Note over S: 위반이나 OUTPUT_INVALID면 1회 재시도, 그래도 안 되면<br/>turn_failure_signal로 끝내고 세션 상태는 바꾸지 않는다 (D75)
+  S->>DB: 저장: save=true인 값만, 한 트랜잭션 (SessionCommit)
+  Note over S: 표 조회로 B 입력 조립: 질문 문장(next.text), ask 틀, 칸 설명, known
+  S->>M: respond (LoRA-B) ResponseRequest
+  M-->>S: 텍스트 한 문장 (X-Openit-Outcome ok 또는 fallback)
   S-->>G: FrontendInput (response_text, turn_failure_signal)
   G-->>K: 응답
   S->>OB: TraceEnvelope enqueue (로컬 INSERT 한 번)
   Note over S,OB: 턴 응답은 전송을 기다리지 않는다
   OB-->>O: POST /v1/traces (최소 1회, 재시도)
   O-->>OB: ACCEPTED 또는 DUPLICATE (세션 ID, 턴 ID로 멱등)
+  opt 직원 알림 입력원이 켜져 있을 때만 (지금은 없음, G01)
+    S->>ST: 알림 저장 후 SSE alert · 웹 푸시 (세션 ID와 종류만)
+  end
 ```
 
-### 4.1 위험 정지와 재개
+### 4.1 정지와 재개 (직원 호출 경로)
+
+이 경로는 v1에서 파서의 위험 신호가 만들었다. v2 A 출력에는 위험 신호 필드가 없어 **입력원이 비어 있다**(G01). 정지·재개·알림 API와 SSE·푸시는 살아 있고, 입력원을 꽂는 포트(`RiskSource`)와 재질문 상한(`SURVEY_MAX_CONSECUTIVE_REASK`, 기본 꺼짐, G12)이 이 경로를 쓴다. 정지 상태 이름은 `PAUSED_RISK`이다. 아래 시퀀스의 "위험 표현 감지"는 입력원이 생겼을 때의 모양이다.
 
 ```mermaid
 sequenceDiagram
@@ -244,8 +249,8 @@ sequenceDiagram
   participant ST as 직원 콘솔
   participant G as 게이트웨이
 
-  K->>S: 발화 턴 (위험 표현 감지)
-  S->>S: Plan이 위험 정지 결정, 세션 PAUSED_RISK
+  K->>S: 발화 턴 (입력원이 위험을 알림, 미정)
+  S->>S: 서비스가 정지 결정, 세션 PAUSED_RISK
   S-->>K: FrontendInput (안내 문장)
   S->>ST: StaffAlert RISK_STOP 저장 후 SSE alert 및 푸시
   loop 2초마다
@@ -263,17 +268,19 @@ sequenceDiagram
 | 항목 | 상태 | 근거 |
 |---|---|---|
 | 게이트웨이 경유 공개 API 한 턴, 같은 `turn_id` 재전송 시 같은 응답 | [확인됨] | E2E 5단계, `PUBLIC_API.md` |
-| parse·generate가 model-serving을 거침 | [확인됨] 고정 출력 "(가짜 응답)" 확인, 모델은 [시험용 대체] | `deploy/docs/STATUS.md` 다섯째 구간 |
+| (v1 기록) parse·generate가 model-serving을 거침 | [확인됨] 고정 출력 "(가짜 응답)", 모델은 [시험용 대체]. v2의 extract·respond 경로로는 가짜 모델 E2E 88 PASS 기록이 있다(deploy 37117d2) | `deploy/docs/STATUS.md` 다섯째 구간 |
+| 실제 LLM(Qwen3-1.7B, 학습 안 됨)으로 extract가 형식을 통과 | [확인됨] gpu-dev 2026-10-27 v0.6.5: extract 48회 모두 형식 통과, 키오스크 발화 14턴은 모두 `UNKNOWN_SLOT`으로 턴 실패(학습 안 된 모델이 없는 key를 지어냄, 의도대로의 동작) | OPEN_GAPS U04, U07 |
+| 직원 알림의 입력원 | [미정] 비어 있음. `/readyz` `staff_alert_source.active=false` | G01 |
 | 추론 서버를 멈추면 그 턴만 실패하고 서비스는 살며, 다시 띄우면 다음 턴이 복구 | [확인됨] | 같은 곳 |
 | Trace outbox 전송, DUPLICATE도 전달 완료로 취급 | [확인됨] (봉투는 E2E가 만든 시험 자료) | `survey-service/docs/design.md` 6절, D16 |
-| 위험 정지 → 직원 RESUME/END → state ACTIVE+resume_text → 알림 RESOLVED, SSE alert/resolved | [확인됨] 위험 문구 스위치는 시험 구성 전용(`TEST-RISK`) [시험용 대체] | E2E 5f, `compose.test.yaml` |
+| 정지 -> 직원 RESUME/END -> state ACTIVE+resume_text -> 알림 RESOLVED, SSE alert/resolved | [확인됨, v1 기록] 위험 문구 스위치는 시험 구성 전용(`TEST-RISK`) [시험용 대체]. v2 입력원 없이 이 시험이 어떻게 도는지는 이번에 확인하지 못했다 | E2E 5f, `compose.test.yaml` |
 | 웹 푸시 수신 (VAPID 키, HTTPS 필요) | [미정] BLOCKED. 키가 없으면 푸시 없이 SSE만 동작 | `survey-service/docs/design.md` 15절, D64 |
 | 직원 알림이 안 닿으면 `DELIVERY_FAILED`, 프론트는 현장 직원 호출 화면 | [구현됨] | `PUBLIC_API.md`, `design.md` 15절 |
-| 처리 표(세션 상태 × 입력 종류) | [구현됨] 골든 대조 1220쌍 중 1215 일치, 5건은 예시 오류 | `design.md` 3절, D44 |
+| 처리 표(세션 상태 × 입력 종류) | [구현됨, v1 기록] 골든 대조 1220쌍 중 1215 일치, 5건은 예시 오류. v2에서 이 표가 어떻게 바뀌었는지 확인하지 못함 | `design.md` 3절, D44 |
 
 설명:
 
-- 모델은 해석(파서)과 문장 생성만 하고, 판단은 turn-engine 코드가 한다(STRUCTURE.md 5절 규칙 11).
+- v2에서는 모델(LoRA-A)이 정규화·절차·다음 문항까지 정하고, 코드(turn-engine `validate_extraction`)는 그 출력이 규칙을 지키는지 검증한다. 틀린 값을 기록에 넣는 것보다 다시 묻는 편이 안전하다(D75, STRUCTURE.md 5절 규칙 11).
 - 쓰기 확정이 실패하면 확정 뒤의 일은 하지 않는다. 확정 뒤의 일(직원 알림, 결과 전달, 응답 생성)은 서로의 성패와 무관하게 시도한다(`design.md` 3절 7~8항).
 - 위험 정지 중인 세션은 유휴 만료로 닫지 않는다(D66).
 - 새 세션만 새 릴리스에 묶이고, 진행 중 세션은 자기 릴리스로 끝까지 간다. 턴 처리 중에는 이웃(I4)을 부르지 않는다(`design.md` 5절).
@@ -282,9 +289,9 @@ sequenceDiagram
 
 ---
 
-## 5. 도식 D: survey-service LangGraph 그래프
+## 5. 도식 D: survey-service 오케스트레이션 (v2, 단계 수준)
 
-한 턴의 오케스트레이션은 LangGraph `StateGraph`로 만들어져 있다(D62). 노드 이름은 `survey-service/docs/design.md` 14.1절에서 확인한 것만 썼다: `load_session`, `fail_no_session`, `col_none`, `col_progress`, `col_paused`, `col_ended`, `ignore`, `bind_release`, `parse`, `normalize`, `judge`, `write_record`, `plan`, `commit`, `deliver_staff`, `dispatch_result`, `generate`, `finalize`. 설계서는 "노드 약 20개"라고 적었으나 실제 `survey_service/graph.py`의 `build()`가 `add_node`로 등록하는 노드는 위 18개이고 이름이 모두 같다(확인됨, 2026-10-26).
+한 턴의 오케스트레이션은 LangGraph `StateGraph`다(D62, 잠금 파일의 `langgraph` 1.2.15는 `survey-service/docs/boundary.md` 3절에서 확인). **v1의 노드 18개(`parse`, `normalize`, `judge`, `write_record`, `plan` 등)는 v2에서 재구성됐다.** 지시서(`migration-2.0.0.md` survey-service 절)는 파서·정규화·판정·기록·Plan 노드를 `extract` 한 번과 `validate_extraction`으로 합친다고 정했다. 그러나 v2 그래프의 실제 노드 이름과 개수는 이 문서가 읽을 수 있는 자료(`survey-service/docs/boundary.md`)에 없어 **확인하지 못했다.** 아래는 지시서와 경계 문서에서 확인한 단계만 그린 것이고 노드 이름이 아니다. 노드 이름은 `survey-service/docs/design.md`와 `survey_service/graph.py`를 survey-service 세션이 확인한 뒤 채운다.
 
 ```mermaid
 flowchart TB
@@ -294,72 +301,42 @@ flowchart TB
   classDef end_ fill:#eee,stroke:#666,color:#000
 
   START(["START"]):::end_
-  LS["load_session<br/>세션 조회 · OrchestratorInput 조립"]:::io
-  FNS["fail_no_session<br/>조회 실패 · 세션 정보 생성 실패<br/>활성 릴리스 없음"]:::end_
-  CN["col_none<br/>세션 없음 열"]:::io
-  CP["col_progress<br/>진행 중 열"]:::io
-  CPA["col_paused<br/>일시 중지 열"]:::io
-  CE["col_ended<br/>종료 열"]:::io
-  IG["ignore<br/>처리 안 함 (route 없음)"]:::end_
-  BR["bind_release<br/>릴리스 결정 · 세션 정보 생성"]:::io
-  PA["parse<br/>LoRA-A, 추론 서버 호출"]:::model
-  NO["normalize"]:::pure
-  JU["judge"]:::pure
-  WR["write_record"]:::pure
-  PL["plan"]:::pure
-  CM["commit<br/>SQLite 한 트랜잭션"]:::io
-  DS["deliver_staff<br/>직원 알림 전달"]:::io
-  DR["dispatch_result<br/>flow == END 일 때 결과 전달"]:::io
-  GE["generate<br/>LoRA-B, 추론 서버 호출"]:::model
-  FI["finalize<br/>신호 · 출력 조립"]:::io
+  LS["세션 조회 · 처리 표(세션 상태 x 입력 종류)"]:::io
+  BR["릴리스 결정 · 세션 정보 생성"]:::io
+  X["extract<br/>LoRA-A, 추론 서버 호출"]:::model
+  VE["validate_extraction<br/>turn-engine 순수 함수"]:::pure
+  RT["위반/OUTPUT_INVALID: 1회 재시도"]:::io
+  CM["저장 확정 (save=true만)<br/>SQLite 한 트랜잭션"]:::io
+  TB["표 조회로 B 입력 조립"]:::io
+  RS["respond<br/>LoRA-B, 추론 서버 호출"]:::model
+  FI["신호 · 출력 조립"]:::io
+  FAIL["turn_failure_signal<br/>세션 상태 불변"]:::end_
   END_(["END"]):::end_
 
-  START --> LS
-  LS -->|"실패"| FNS --> END_
-  LS --> CN
-  LS --> CP
-  LS --> CPA
-  LS --> CE
-  CN -->|"route 없음"| IG
-  CP -->|"route 없음"| IG
-  CPA -->|"route 없음"| IG
-  CE -->|"route 없음"| IG
-  CN -->|"route 있음"| BR
-  CP -->|"route 있음"| BR
-  CPA -->|"route 있음"| BR
-  CE -->|"route 있음"| BR
-  IG --> END_
-  BR -->|"실패"| FI
-  BR -->|"발화: 전체 흐름"| PA
-  BR -->|"Plan만"| PL
-  PA --> NO --> JU --> WR --> PL --> CM
-  PA -.->|"단계 실패"| FI
-  NO -.->|"단계 실패"| FI
-  JU -.->|"단계 실패"| FI
-  WR -.->|"단계 실패"| FI
-  PL -.->|"단계 실패"| FI
-  CM -->|"실패"| FI
-  CM -->|"확정"| DS
-  DS -->|"flow == END"| DR --> GE
-  DS -->|"그 밖"| GE
-  GE --> FI --> END_
+  START --> LS --> BR
+  BR -->|"발화"| X --> VE
+  BR -->|"세션 시작: A를 부르지 않는다"| TB
+  VE -->|"통과"| CM --> TB
+  VE -->|"위반"| RT
+  X -.->|"OUTPUT_INVALID"| RT
+  RT -->|"재시도"| X
+  RT -->|"그래도 실패"| FAIL --> FI
+  TB --> RS --> FI --> END_
 ```
 
 읽는 법:
 
-- 파란색 노드(`normalize`, `judge`, `write_record`, `plan`)는 turn-engine의 순수 결정 함수를 호출하는 노드다(D62 방침 1). 보라색 노드(`parse`, `generate`)는 추론 서버(I9)를 HTTP로 부른다. 어느 노드가 turn-engine의 어느 함수를 부르는지는 설계서 14절에 노드별 대응이 적혀 있지 않아, 이 색 구분은 3절 처리 흐름("Parser → normalize → judge → write_record → plan")을 따른 것이다.
-- 열 노드(`col_*`)가 설계서 9-1 처리 표의 열(세션 상태)이고, 행(입력 종류)은 각 열 노드 안의 표에 있다. 표는 `COLUMNS` 한 곳에만 둔다.
-- `parse`부터 `commit`까지 한 단계가 실패하면 `failed`에 `BEFORE_COMMIT/<단계>`를 더하고 `finalize`로 간다. 되돌아가는 간선은 없다. 확정 뒤 노드(`deliver_staff`, `dispatch_result`, `generate`)는 서로의 성패와 무관하게 이어진다.
-- 그래프 밖에서 유지하는 것: 세션별 락, `turn_id` 멱등(저장된 결과 재생), 입력 검증, 쓰기 확정(SQLite), Trace outbox, 출력 보호(D36, 모델 서버 안). 체크포인터를 쓰지 않는다. LangGraph의 체크포인트 저장소는 세션 저장소를 대신하지 않는다(D62).
-- 외부 추적 차단: 이미지에 `LANGSMITH_TRACING=false`, `LANGCHAIN_TRACING_V2=false`를 고정한다(D63). 이미지 라벨 `io.openit.langgraph`가 추가 라벨이다.
+- 파란색은 turn-engine의 순수 함수, 보라색은 추론 서버(I9) 호출이다. 세션 시작은 A를 부르지 않고 B만 `action=START`로 부른다(D74).
+- 그래프 밖에서 유지하는 것(`design.md` 14절 기준, v1 기록. v2에서 바뀌었는지는 확인하지 못함): 세션별 락, `turn_id` 멱등, 쓰기 확정(SQLite), Trace outbox, 출력 보호(모델 서버 안, D36). 체크포인터를 쓰지 않는다(D62). 외부 추적은 끈다(D63).
+- 직원 알림 전달(`deliver_staff`)과 결과 전달(`dispatch_result`)은 v1 노드였다. 알림 입력원이 없는 동안 알림은 만들어지지 않는다(G01).
 
 | 항목 | 상태 |
 |---|---|
-| 그래프 구성(노드 18개 확인), 간선, 체크포인터 없음, 상태 JSON 직렬화, 턴 처리 중 외부 연결 없음 | [구현됨] `tests/test_graph.py`와 survey-service 단위 시험 |
-| deploy E2E에서 실제 이미지의 그래프가 턴을 처리 | [확인됨] (다섯째 구간 이후 survey-service는 LangGraph 오케스트레이터 HEAD로 빌드) |
-| `langgraph` 1.2.15를 잠금 파일에 고정 | [확인됨] `survey-service/requirements.lock`의 `langgraph==1.2.15` |
+| 단계 구성(위 그림) | [구현됨 또는 제안] 지시서와 경계 문서에서 읽은 것. 코드로 확인하지 못함 |
+| 그래프가 가짜 모델로 E2E를 통과 | [확인됨] 88 PASS / 0 FAIL(deploy 37117d2, 이 PC 한 환경). 현재 열차로는 재확인하지 못함 |
+| `langgraph` 1.2.15를 잠금 파일에 고정 | [확인됨] `survey-service/docs/boundary.md` 3절 |
 
-근거: `survey-service/docs/design.md` 3·14절, D36, D62, D63.
+근거: `docs/migration-2.0.0.md`, `survey-service/docs/boundary.md`, D62, D63, D74, D75.
 
 ---
 
@@ -604,7 +581,7 @@ flowchart LR
 
 브라우저에는 서버 토큰을 두지 않는다. 게이트웨이가 사람 인증(기본 인증, 개발·E2E용)이나 경로 규칙에 따라 서버 토큰을 붙인다(D65, D69, D71). 토큰 변수의 이름만 적는다.
 
-| 경로 | 사람 인증 · 역할 | 전달 대상 | 붙이는 토큰(환경 변수 이름) | 비고 |
+| 경로 | 사람 인증 · 역할 | 전달 대상 | 붙이는 토큰(비밀 이름) | 비고 |
 |---|---|---|---|---|
 | `/healthz`, `/readyz` | 없음 | 게이트웨이 자체 응답 | - | |
 | `/v1/sessions`, `/v1/sessions/*` (키오스크 공개 API) | 없음 (토큰만) | survey-service | `SURVEY_KIOSK_TOKEN` | 개입 경로는 아래 행이 먼저 잡음 |
@@ -617,6 +594,8 @@ flowchart LR
 | `/staff/*` | 직원 기본 인증 | kiosk-frontend | - | 직원 콘솔 정적 화면 |
 | 그 밖의 `/v1/*` | - | - | - | 404 (활성화, 롤백, 릴리스 조회, 제출 접수, `POST /v1/traces` 등은 닫힘, D70, D71) |
 | 그 밖의 경로 | 없음 | kiosk-frontend | - | 키오스크 정적 화면 |
+
+비밀 전달(D84): 서비스는 자기 비밀만 `/run/secrets`로 받아 `<이름>_FILE` 경로로 읽는다(`deploy/docs/boundary.md`). 위 표의 "토큰" 열은 환경 변수 이름이 아니라 비밀의 이름이다. 게이트웨이가 주입하는 토큰을 어떤 경로로 받는지는 이번에 `Caddyfile`을 다시 읽지 않아 확인하지 못했다.
 
 사람 계정과 역할 매핑(`release-approver`, `reviewer`)은 비밀 파일(`secrets/gateway-human-auth.caddy`)에 있어 이 문서는 읽지 않았다. 직원 콘솔 계정은 사람 계정과 분리한다. 게이트웨이가 클라이언트가 보낸 `X-Openit-User`를 덮어쓰는 것은 E2E 4g, 7h에서 [확인됨]이다. 운영 인증 방식(SSO, 사내망 제한 등)은 [미정]이다.
 
@@ -721,10 +700,10 @@ flowchart LR
   classDef img fill:#fde7c8,stroke:#b9770e,color:#000
 
   subgraph V["버전 축"]
-    SV1["문진 스키마<br/>CONTRACT_VERSION = 정수 1<br/>정확 일치 · 태그 survey-schema-v1.0.0<br/>(v2 후보를 모아 두는 중, D46 D48)"]:::ver
-    BV["경계 계약<br/>pipeline_schema_version MAJOR.MINOR = 1.3<br/>패키지 태그 v1.3.3 (기준 v1.2.0 이상, D51)<br/>같은 MAJOR이면 MINOR가 필요 이상일 때 읽기 허용"]:::ver
-    TV["turn-engine v0.2.0"]:::ver
-    MV["model-runtime v0.5.1"]:::ver
+    SV1["문진 스키마<br/>CONTRACT_VERSION = 정수 1<br/>정확 일치 · 태그 survey-schema-v1.0.0<br/>(D79: 정수 1 유지, 모델 패키지가 학습된 문항 은행·칸 키의 버전)"]:::ver
+    BV["경계 계약<br/>pipeline_schema_version = 2.0 (MAJOR 2)<br/>패키지 태그 v2.0.2 (D74, D75)<br/>v1 레코드는 UNSUPPORTED_VERSION"]:::ver
+    TV["turn-engine v0.4.0"]:::ver
+    MV["model-runtime v0.7.0"]:::ver
     LV["langgraph 1.2.15 (잠금 파일)"]:::ver
   end
 
@@ -754,18 +733,20 @@ flowchart LR
   LV --> LX
 ```
 
-| 축 | 값(2026-10-26 읽은 기준) | 규칙 | 근거 |
+| 축 | 값(2026-10-27) | 규칙 | 근거 |
 |---|---|---|---|
-| 문진 스키마 | 정수 `1`(`survey-service/schema/CONTRACT_VERSION`), 태그 `survey-schema-v1.0.0` | 정확 일치. 바뀌면 survey-service가 반영(D21). v2 후보(고정 문장 정보, 도움 요청 사유, `pending_id_seed`, 조건 규칙을 oneOf로 표현)는 모아서 한 번에 올림 | D14, D21, D46, D48 |
-| 경계 계약 | 스키마 `1.3`, 패키지 태그 `v1.3.3`(태그 목록 v1.0.0 ~ v1.3.3). deploy `lib.sh`의 기본 태그도 v1.3.3. 단 synthetic-data(호스트 실행)는 v1.2.0을 고정해 쓴다(question-authoring 잠금 파일도 v1.2.0) | MINOR는 추가만. 쓰는 쪽은 엄격, 읽는 쪽은 모르는 필드·열거값 허용. 의미 변경은 새 필드로. 모든 레코드는 불변 | D14, D25, D26, D42, D43, D51, D58, D66, D68 |
-| turn-engine | v0.2.0 (1205 passed, 골든 868쌍 중 806쌍 일치) | 출력이 달라지면 MINOR | D44 |
-| model-runtime | v0.5.1 (태그 v0.2.0, v0.3.0, v0.4.0, v0.5.0, v0.5.1) | 라이브러리와 추론 서버(I9)를 같은 리포가 가짐 | D45, D62 |
-| 라이브러리 설치 | Git 태그. 이미지 빌드 때 태그를 고정하고 의존 버전은 잠금 파일로 고정 | `pip install git+ssh://…@태그`. 별도 패키지 인덱스 서버 없음 | D18, 루트 `CLAUDE.md` |
-| 해시 | JCS(RFC 8785) 정규화 + SHA-256, 기준 구현은 `boundary_contracts.canonical` | 클라이언트가 응답을 읽을 때 해시를 다시 계산 | D20, D34, D49 |
-| 이미지 라벨 | 필수 6개는 해당하는 것만(kiosk-frontend는 turn-engine·model-runtime 라벨 불필요). 추가 라벨 허용 | 존재만 검사 | D50, D63, D66 |
-| 공개 API | `PUBLIC_API.md`(경계 계약 v1.3.2에서 확정, 상태 코드 표 포함) | `turn_id`는 API 봉투 필드. 문진 스키마는 바꾸지 않음 | D55, D58, D66 |
+| 문진 스키마 | 정수 `1`, 태그 `survey-schema-v1.0.0`(`git tag`). 같은 정수 안에서 `SessionStore`, `TurnTrace`, v1 모델 입출력 계약 12개가 삭제·변경됐다(G11) | 정확 일치. 바뀌면 survey-service가 반영(D21). survey-service와 ops-feedback은 같은 잠금으로 함께 배포 | D14, D21, D75, D79 |
+| 경계 계약 | 스키마 `2.0`(MAJOR 2), 패키지 태그 `v2.0.2`(`git tag`: v2.0.0-rc1, v2.0.1, v2.0.2 …). 영역 문서(turn-engine, model-runtime, release-gate, ops-feedback, model-lab, synthetic-data)는 v2.0.2를 적는다 | MINOR는 추가만이나 v1에서 v2로는 병행 없이 MAJOR. 읽는 쪽은 모르는 필드 허용 | D25, D74, D75, D79 |
+| turn-engine | `v0.4.0`(`ENGINE_VERSION`). 유효한 입력 하나라도 출력이 달라지면 MINOR | 정규화·판정·기록·Plan 제거(G07), `validate_extraction`만 제공 | `turn-engine/docs/boundary.md` |
+| model-runtime | `v0.7.0`. `prompt-4`(학습 글자와 같은 직렬화), `protect-2`, `relax-3`(anyOf 펼침). `prompt-3` 제거(G10) | 서버·라이브러리를 같은 리포가 가짐. 릴리스 매니페스트의 MAJOR.MINOR가 같아야 적재 | D77, D80, D82, D83, `model-runtime/docs/boundary.md` |
+| 열차 정렬 | 같은 열차를 모든 영역이 쓴다(현재 bc v2.0.2, turn-engine v0.4.0, model-runtime v0.7.0). 비교는 완전 일치(D80) | 게이트의 `CONTRACT_COMPAT`도 문자열 일치 | D80 |
+| 라이브러리 설치 | Git 태그. 이미지 빌드 때 태그를 고정하고 의존 버전은 잠금 파일로 고정 | `pip install git+ssh://…@태그` | D18, 루트 `CLAUDE.md` |
+| 비밀 | `<이름>_FILE`로 읽음. 환경 변수는 개발·시험용. `boundary_contracts.read_secret` | 값은 로그·`/readyz`·오류에 내지 않음 | D84 |
+| 해시 | JCS(RFC 8785) 정규화 + SHA-256(`boundary_contracts.canonical`). 모델 입력 직렬화는 해시와 달리 JCS가 아니라 학습 글자(`json.dumps(ensure_ascii=False)`)다 | 클라이언트가 응답을 읽을 때 해시를 다시 계산 | D20, D34, D49, D77 |
+| 이미지 라벨 | 필수 6개는 해당하는 것만. 추가 라벨 허용 | 존재만 검사 | D50, D63, D66 |
+| 공개 API | `PUBLIC_API.md`(상태 코드 표 포함). 영향 없음(모델 입출력을 다루지 않음) | `turn_id`는 API 봉투 필드 | D55, D58, D66, `V2_DRAFT.md` 0장 |
 
-참고: `boundary-contracts/README.md`의 설치 예시 태그는 2026-10-26에 `v1.3.3`으로 고쳤다. 루트 `CLAUDE.md`의 예시는 `v1.0.0`으로 남아 있다(이 문서가 고치지 않음, 헤드의 일). 현재 기준 태그는 `v1.3.3`이다(`deploy/scripts/lib.sh`의 `DEPLOY_BC_TAG`, `git tag`). 리포마다 고정한 태그는 다르다(확인: 각 `requirements*`): release-gate v1.3.3, survey-service v1.3.2, ops-feedback·model-lab v1.3.0, question-authoring·synthetic-data v1.2.0(잠금 파일). deploy가 이미지 빌드 때 `v1.3.3`으로 넘긴다.
+참고: 리포마다 고정한 태그는 이번에 다시 모으지 않았다. `survey-service/docs/boundary.md` 3절은 boundary-contracts `v2.0.1`을 적고 있어 같은 열차의 `v2.0.2`와 문서상 어긋난다(커밋 6241d00은 "의존 태그 맞춤"). 어느 쪽이 현재인지는 survey-service의 `requirements`를 읽지 못해 확인하지 못했다. 정렬 점검은 COMPLETION_PLAN의 줄기 R이다. 루트 `CLAUDE.md`의 설치 예시 태그가 옛 값(`v1.3.3`)이면 헤드가 고친다.
 
 ---
 
@@ -779,25 +760,31 @@ flowchart LR
 | 2 | 직원 콘솔·사람 계정의 운영 로그인 | 기본 인증은 개발·E2E용. 운영 방식(SSO, 사내망 제한 등) 미정 | `Caddyfile` 주석, D69 |
 | 3 | CI가 서버 로컬 레지스트리에 닿는 방법 | 후보 (a) self-hosted runner (b) 사설망·VPN (c) SSH 터널. 레지스트리에 인증·TLS 없음 | `deploy/docs/ci.md` 3절, D24 |
 | 4 | 토큰 발급·회전 | 미정 | `PROJECT_STRUCTURE.md` 5절 |
-| 5 | 실제 GPU 추론 (RTX 4090, 컨테이너 안) | gpu-dev의 시험까지. E2E는 fake 백엔드. `E2E_GPU=1` 미검증 | D47, D48, `deploy/docs/STATUS.md` |
+| 5 | 실제 GPU 추론 (RTX 4090, 컨테이너 안) | gpu-dev 12GB의 Qwen3-1.7B까지(2026-10-27, v0.6.5). 24GB급은 미확인(H1). E2E는 fake 백엔드. `E2E_GPU=1` 미검증 | D47, D48, D81, OPEN_GAPS U01·U02·H1 |
 | 6 | 운영 기반 모델 선택 | AI 학습 담당자의 몫, 임시는 Qwen2.5-1.5B 4비트 | D47, D61 |
 | 7 | 실제 브라우저 화면 동작 | 자동 시험은 jsdom·상태 기계·클라이언트까지. 승인 화면, 검토 화면, 키오스크 화면 모두 | `kiosk-frontend`, `admin-console` STATUS, E2E BLOCKED |
 | 8 | 한국어 STT 정확도, 웹 푸시 수신 | STT는 브라우저 Web Speech API 기본이나 정확도 미확인. 푸시는 VAPID 키와 HTTPS 필요 | D65, D64, `survey-service/docs/design.md` 15절 |
 | 9 | 원본 로그 보관 기간과 접근 통제 | 지금은 고려하지 않음(D57). 원문 보존(C안)은 하지 않음 | D55, D57 |
 | 10 | 실패 유형 분류체계, 롤백 기준(실패율·창·최소 턴) | 코드에 기본값 없음, 설정으로만 | `ops-feedback/docs/design.md` 6·9·12절 |
 | 11 | 비식별 기준(남길 키, 정의 목록, 패턴) | 시험·시연용 보수적 예시. 운영 값은 사용자 결정 | `ops-feedback/docs/design.md` 4.1절 |
-| 12 | 승인자가 보는 지표 카탈로그와 통과 기준 | 임계치 없음이 설계. `METRICS.md`는 제안이며 담당자가 다듬음. 금지 표현률 지표는 만들지 않음 | D53, D59 |
+| 12 | 승인자가 보는 지표 카탈로그와 통과 기준 | 임계치 없음이 설계. `METRICS.md`는 제안이며 v1 용어(`risk_signal_*`, `intent_accuracy`)가 남아 있다. v2 변경 목록은 `metrics-v2-proposal.md`(D-C 부분). 금지 표현률 지표는 만들지 않음 | D53, D59, D-C |
 | 13 | 주기 잡의 스케줄 주기 | `config/jobs.yaml`의 모든 `interval_seconds`가 null | `deploy/config/jobs.yaml` |
 | 14 | 백업 설정(간격, 서버 밖 저장 위치), 외부 감시 | 스크립트는 있으나 설정 없음. 백업은 요구된 적 없는 선택 기능 | D10, D56, D59 |
 | 15 | 활성화(`activate`)의 운영 호출 주체 | 게이트웨이가 닫아 둠. 허용 역할은 operator. 누가 언제 호출하는지 문서에 없음 | D70, `release-gate/docs/design.md` 7절 |
 | 16 | 문항 저작 화면 | admin-console의 후속 화면 목록에만 있음. 저작 API와 서비스는 있음 | D8, D68, `admin-console` STATUS |
 | 17 | 모델 기반 실패 탐지기, 사람 신고 경로 | 후속 구간 | `ops-feedback/docs/design.md` 5절 |
-| 18 | 문진 스키마 v2 | 후보만 모아 둠 | D46, D48 |
+| 18 | 문진 스키마 정수 버전 2 | 정수 1을 유지하기로 했다(D79). 별도 TurnTrace 버전 필드는 운영 데이터가 생기기 전에 검토(G11) | D46, D48, D79 |
 | 19 | Trace 크기: Trace가 세션 문서 전체를 담아 턴이 늘수록 커짐 | 스키마가 정한 필드라 줄이지 않았다. 문제가 되면 ops-feedback과 협의 | `survey-service/docs/design.md` 6절 |
 | 20 | gpu-dev에서의 전체 시험 | 해소: 사용자 보고로 서버 검증 완료(doctor 통과, 88 PASS, Docker Desktop 연동). D47의 "Docker 없음"은 이후 변경됨. 리포 기록으로는 [확인 못 함] | 9절 참고 |
-| 21 | LangGraph 그래프의 노드 수 | 해소: `graph.py`가 등록하는 노드는 18개로 설계서 14.1절과 같다("약 20개"는 어림) | 5절 |
+| 21 | LangGraph 그래프의 노드 수 | v1 기준으로는 해소(18개). v2에서 재구성되어 노드 이름·개수는 확인하지 못함 | 5절 |
 | 22 | 서빙 서버의 단일 장애 지점 | 고가용성은 범위 밖 | D10 |
 | 23 | 데이터셋 저장소의 서버 위치 | 데이터셋(I2)은 같은 호스트의 파일 저장소. 운영의 호스트 간 이동 방식 미정(개발은 rsync) | D49, D52 |
 | 24 | GPU 서버가 서빙 서버 model-registry·저작·ops 읽기 면에 닿는 길 | 개발은 SSH 역터널. 운영의 공개 포트·터널 여부 미정 | D52, `deploy/docs/design.md` 1절 |
+| 25 | 직원 알림의 입력원 | v2 A 출력에 위험 신호가 없어 비어 있음. 포트와 알림 경로는 있고 `/readyz`가 비활성을 드러냄. 사용자 결정 대기 | G01, D78, D79 |
+| 26 | 재질문 상한 | `SURVEY_MAX_CONSECUTIVE_REASK` 메커니즘은 있고 기본 꺼짐. 값·의미·정지 이름 재사용은 사용자 결정 대기 | G12 |
+| 27 | 표 찾기 표(`ask` 틀, 칸 설명)와 B 입력 일부 | 학습 데이터에서 역으로 읽은 초안(`DRAFT_UNCONFIRMED`). 데이터셋 담당 확인 필요 | G03, G13 |
+| 28 | GPU 구멍 | 24GB 실측(H1), 학습된 LoRA를 얹은 한 턴·어댑터 교체(H2), 학습 파이프라인 실행(H3), 문법 컴파일 비용·동시 부하(H4) | OPEN_GAPS 3-1절, COMPLETION_PLAN |
+| 29 | synthetic-data의 역할 | 생성 파이프라인이 v1 내용을 만든다. 운영에서 돌리지 않는다. 사용자 결정 대기 | G02 |
+| 30 | 비밀 발급·회전·보관 | 전달 방식은 파일로 정했다(D84). 발급·회전 정책은 미정 | D84, D-A |
 
-이 문서가 읽지 않은 것: 각 영역의 소스 코드(`survey_service/graph.py` 등), `secrets/` 아래 모든 파일, 환경 변수의 값. 도식의 노드·간선은 설계 문서와 STATUS에서 읽은 내용이며, 코드와의 일치는 각 영역의 시험이 보증하는 범위를 넘어 확인하지 않았다.
+이 문서가 읽지 않은 것: 각 영역의 소스 코드(`survey_service/graph.py` 등), `secrets/` 아래 모든 파일, 환경 변수의 값. 2026-10-27 갱신에서는 `survey_service/graph.py`와 `survey-service/docs/design.md`도 읽지 않았다(5절). 도식의 노드·간선은 설계 문서와 STATUS에서 읽은 내용이며, 코드와의 일치는 각 영역의 시험이 보증하는 범위를 넘어 확인하지 않았다.

@@ -1,6 +1,6 @@
 # 문진 시스템 개요 (팀 공유용 입구)
 
-기준일 2026-10-27. 이 문서는 **새로 설명하지 않고 모으기만 한다.** 각 영역의 설명은 그 영역의 `README.md`가 정본이다. 숫자는 이 PC(WSL2 + Docker Desktop) 한 환경에서 확인한 값이고, 깨끗한 두 번째 환경에서는 확인하지 못했다(U12).
+기준일 2026-10-27. 이 문서는 **새로 설명하지 않고 모으기만 한다.** 각 영역의 설명은 그 영역의 `README.md`가 정본이다. 확인은 이 PC와 gpu-dev(둘 다 WSL2 + Docker Desktop) 두 환경에서 했다. 깨끗한 일반 리눅스 서버에서는 확인하지 못했다(U06, U12).
 
 ## 1. 한 문단 요약
 
@@ -22,7 +22,7 @@
 |---|---|---|---|
 | boundary-contracts | 영역 사이 데이터 형식(계약)과 그것을 지키는지 확인하는 공유 패키지. 소유자는 헤드 | [README](../../boundary-contracts/README.md) | v2.0.2 |
 | turn-engine | AI가 낸 "환자 답변 해석"이 말이 되는지 규칙으로 다시 검사하는 작은 라이브러리 | [README](../../turn-engine/README.md) | v0.4.0 |
-| model-runtime | 두 모델(LoRA-A 추출, LoRA-B 응답)을 불러 호출하는 라이브러리 겸 추론 서버 | [README](../../model-runtime/README.md) | v0.7.0 |
+| model-runtime | 두 모델(LoRA-A 추출, LoRA-B 응답)을 불러 호출하는 라이브러리 겸 추론 서버 | [README](../../model-runtime/README.md) | v0.7.1 |
 | survey-service | 환자 발화 한 턴을 받아 저장값으로 바꾸고 다음 말을 돌려주는 HTTP 서비스 | [README](../../survey-service/README.md) | main |
 | release-gate | 문항 세트와 모델 조합을 검사하고 사람이 승인한 조합만 릴리스로 묶는 서비스 | [README](../../release-gate/README.md) | main |
 | ops-feedback | 운영 중 trace를 받아 개인정보를 지우고 실패 사례를 가려내는 영역 | [README](../../ops-feedback/README.md) | main |
@@ -33,7 +33,7 @@
 | kiosk-frontend | 환자용 키오스크 화면과 직원 콘솔 화면 | [README](../../kiosk-frontend/README.md) | 계약 v2.0.2 |
 | admin-console | 출고 승인과 실패 사례 검토 화면 | [README](../../admin-console/README.md) | 계약 v2.0.2 |
 
-서비스 영역의 기준 버전 `main`은 계약 v2.0.2, turn-engine v0.4.0, model-runtime v0.7.0에 맞춰져 있다. `deploy/scripts/check-versions.sh`가 **10개 영역의 28개 표기**가 표와 같은지 확인한다(두 프런트엔드는 오늘 뒤늦게 정렬하고 점검 대상에 넣었다: admin-console은 계약 v1.3.3 기준이라 단위 시험 2건이 실패하고 있었고 고쳐서 42건 모두 통과, kiosk-frontend는 모의 서버의 `pipeline_schema_version`이 "1.0"으로 하드코딩된 것을 고침).
+서비스 영역의 기준 버전 `main`은 계약 v2.0.2, turn-engine v0.4.0, model-runtime v0.7.1에 맞춰져 있다. `deploy/scripts/check-versions.sh`가 **10개 영역의 28개 표기**가 표와 같은지 확인한다(두 프런트엔드는 오늘 뒤늦게 정렬하고 점검 대상에 넣었다: admin-console은 계약 v1.3.3 기준이라 단위 시험 2건이 실패하고 있었고 고쳐서 42건 모두 통과, kiosk-frontend는 모의 서버의 `pipeline_schema_version`이 "1.0"으로 하드코딩된 것을 고침).
 
 ## 4. 지금 확인된 것 (숫자는 주인 문서에서 본다)
 
@@ -54,12 +54,14 @@
 - **실제 모델로 값 추출·저장이 도는 대화 한 턴.** 가짜 모델 E2E는 이제 이 경로를 지나간다(위 4절, 간접 단언). 실제 모델로는 아직 한 턴이 끝까지 통과한 적이 없다.
 - (이어서) **실제 모델로 대화 한 턴이 끝까지 통과하는 것.** 학습 안 된 모델은 문항 세트에 없는 slot key를 지어내서 서비스가 막는다(`UNKNOWN_SLOT`). 이것은 설계대로 동작한 것(값을 지어내지 않음)이다. 학습된 LoRA-A를 얹어 봐야 한다(구멍 H2).
 - **GPU가 필요한 일(구멍)**: 24GB급에서 Qwen3-8B 적재(H1), 학습된 어댑터 얹기와 교체 시험(H2), 학습 파이프라인 실제 실행(H3), 문법 컴파일 비용과 동시 부하(H4). 순서와 명령은 [`deploy/docs/GPU_HOLE.md`](../../deploy/docs/GPU_HOLE.md)에 있다.
-- **학습 서버 접속**이 지금 거부된다(포트 41822 `Connection refused`). 학습 서버 스크립트의 인자 이름을 읽어야 학습 감싸기(G06)의 인자 매핑을 채울 수 있다.
+- **학습 감싸기(G06)**: 학습 서버 스크립트의 인자 이름은 서버에서 읽어 `arg_map`을 채웠다(코드를 읽은 것이고 `--help`는 실행하지 않음). 학습 실제 실행은 H3로 남아 있다.
+- **B 입력 표(G03)**: 데이터셋 담당의 `labels.py` 규칙을 옮겼다. 담당이 그 규칙을 기준으로 확정했다는 기록은 못 찾았다.
+- **gpu-dev 실제 LLM**: 학습 안 된 Qwen3-1.7B로 기동·형식 통과·어댑터 교체까지 확인했다(U07, U08). 정확성은 확인하지 못했다.
 - 실제 기기에서의 마이크·한국어 음성 인식·웹 푸시 구독, 일반 리눅스 서버 설치, 두 번째 독립 환경(U05, U06, U12).
 
 ## 6. 열린 항목 수
 
-[`OPEN_GAPS.md`](OPEN_GAPS.md) 기준. 닫힌 것: 이 문서를 쓰는 시점에 열림 25, 부분 7, 닫힘 4(갱신하면 달라진다). **"완료"가 아니라 "N건 열림"이다.**
+[`OPEN_GAPS.md`](OPEN_GAPS.md) 기준. 상태별 개수는 이 문서에 적지 않는다(표마다 열 구성이 달라 세면 틀린다). 대장의 각 행이 상태를 갖는다. **"완료"가 아니라 "N건 열림"이다.**
 
 ## 7. 역할 분배 제안
 
@@ -73,7 +75,7 @@
 
 학습·데이터셋 담당에게 하는 부탁은 2건이다: 이번에 쓸 학습된 어댑터 A·B 쌍(어댑터는 서버에 이미 있음)과 그 시스템 프롬프트·run 기록 위치를 정해 알려 주기, 데이터셋 증강 담당의 질문 표 확정과 합성 데이터 영역의 v2 대응 의견. 학습 스크립트의 인자 이름은 접속이 되면 헤드가 서버에서 읽는다.
 
-**헤드가 짜는 코드(없다는 근거와 함께 진행 중)**: 어댑터 교체 명령 `demo.sh swap-adapters`(지금은 `reset`이 데모 전체를 다시 만든다, U08), 서빙 진단 도구 `probe-serving`, model-lab의 24GB용 프로파일(`package-adapters`가 24GB 어댑터에 못 쓰임), 승인 화면의 v2 지표 표시. 대기 중: 정정(CORRECT) 흐름 시험, 직원 알림 규칙(사용자 결정), 학습 감싸기 완성(`arg_map`이 비어 있음, 부탁 1번과 서버 접속), 저장된 값을 읽는 경로.
+**헤드가 짠 코드(만들어서 확인함)**: `demo.sh swap-adapters`(가짜 백엔드와 gpu-dev 실제 LLM 데모에서 실행, U08), `probe-serving`, PostgreSQL 전환, 결과 조회·위험 신호 API, 기기·행위자 인증. **남은 것**: 정정(CORRECT) 흐름 시험, 직원 알림 규칙(사용자 결정), model-lab 24GB용 프로파일, 승인 화면의 v2 지표 표시, 병원·외부 감지기가 들어올 내부 입구(미정).
 
 제품이 완성된 뒤의 일: 실제 GPU에서 학습된 어댑터로 한 턴 통과(H1~H3, [`deploy/docs/GPU_HOLE.md`](../../deploy/docs/GPU_HOLE.md)).
 
@@ -84,7 +86,7 @@
 | 이 문서 `OVERVIEW.md` | 입구. 영역 지도, 상태, 역할 분배 | 모두 |
 | 영역별 `README.md` | 그 영역의 정본 설명 | 모두 |
 | [`OPEN_GAPS.md`](OPEN_GAPS.md) | 비워 두었거나 확인하지 못한 것의 대장 | 모두 |
-| [`DECISIONS.md`](DECISIONS.md) | 확정한 결정(D01~D84) | 결정 근거가 필요할 때 |
+| [`DECISIONS.md`](DECISIONS.md) | 확정한 결정(D01~D85) | 결정 근거가 필요할 때 |
 | [`STATUS.md`](STATUS.md) | 진행 기록 | 헤드 |
 | [`COMPLETION_PLAN.md`](COMPLETION_PLAN.md) | 완성까지의 작업줄기와 GPU 구멍 | 헤드, 계획 확인 |
 | [`STRUCTURE.md`](STRUCTURE.md) | 에이전트용 구조 요약이자 영역 작업의 기준 | 에이전트 |

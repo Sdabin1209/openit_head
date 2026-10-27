@@ -60,6 +60,30 @@
 | D-H | admin-console CR-003: 생성된 검증기(`generated/contract-validators.cjs`)를 커밋 대상으로 둘지 | 헤드 | 열림 |
 | D-I | **문진 결과(저장된 답)가 병원으로 나가는 경로**가 정의되어 있지 않은 것으로 보인다. `boundary-contracts/PUBLIC_API.md`와 `INTERFACES.md`, `survey-service/docs/boundary.md`에서 저장 값을 내보내거나 조회하는 인터페이스를 찾지 못했다(이 세 문서만 grep, 다른 문서·코드는 읽지 않음). 의도적으로 범위 밖이면 그렇다고 결정에 적고, 아니면 인터페이스가 필요하다 | 사용자(제품 범위) | 열림 |
 
+## 3-0. 알려진 한계와 사람 몫 (2026-10-28 전수 점검 후, 이유 포함)
+
+전수 점검(`AUDIT_SUMMARY.md`)과 D88의 표준 적용 뒤 남긴 것이다. 코드로 닫지 않은 이유를 함께 적는다. 값은 모두 잠정이고 설정으로 바꾼다.
+
+| ID | 내용 | 이유 / 담당 |
+|---|---|---|
+| L01 | secrets/ 백업과 복호 키 보관(분실 시 가명화 salt·계정 복구 불가) | 키 관리는 서버 밖 사람 일. 구조는 `backup-secrets.sh`(갈래 B) |
+| L02 | 컨테이너가 읽는 비밀 파일이 644(폴더 700 안). Compose 파일 secrets의 uid/mode가 이 Docker/Compose 버전에서 적용되지 않음 | 그룹 읽기(640)+`group_add` 대안 검토 중(갈래 B) |
+| L03 | gateway 로그인 시도 속도 제한 없음 | Caddy 플러그인이 필요해 커스텀 이미지 빌드라는 새 위험. 대안(네트워크 제한, 강한 암호, 실패 로그 감시)을 runbook에 |
+| L04 | 취약점 스캔·SBOM 없음 | 외부 도구 설치·전송 금지 제약. '확인 못 함' |
+| L05 | 서비스 간 내부 TLS 없음 | 컴포즈 내부 네트워크 한정. ADR에 범위와 위험 |
+| L06 | 저장 시 DB 암호화 없음 | 볼륨 암호화는 호스트 계층. 요구·권고만 문서화 |
+| L07 | 위조 Trace가 롤백 요청을 만들 수 있음(S5) | 방어는 호출자별 토큰·서명이 필요(ops-feedback CR-006). `auto_submit` 기본 false로 사람이 마지막 관문 |
+| L08 | OPS_DB_SCHEMA=verify + migrate 분리, DB 계정 분리 | 계정 설계와 E2E 영향이 커서 이번 라운드에서 제외 |
+| L09 | 모든 timeout·상한·한도·자원 값이 측정 없는 잠정값(6초 턴 마감, 3.5초 모델 상한, 소켓 15/30초, 연결 상한 등) | H1(24GB 실측) 뒤 재정. GPU 세션 키트 준비됨 |
+| L10 | STT를 기기 안 처리로 둠. 실기기에서 온디바이스 한국어 인식이 되는지 미확인 | 실기기 필요. 안 되면 글자 입력으로 대체됨 |
+| L11 | 위험 문구 기본 목록은 임상 검토 전 임시(`provisional=true`) | 임상 담당 검토 필요 |
+| L12 | 확정 사례(CONFIRMED)도 180일 뒤 삭제됨(`retention.cases_purge_confirmed`) | 병원 규정에 따라 사용자 결정 |
+| L13 | D30(저자 확인=임상 승인)을 D92(4-eyes)로 대체. 의료인이 한 명뿐이면 막힘 | `QA_REQUIRE_TWO_PERSON=false`로 되돌림 가능. **사용자 확인 필요** |
+| L14 | 알림 DB 장애 때 로컬 재시도 큐 없음(DELIVERY_FAILED 신호로만 대응), 정지 중 반복 발화 알림 중복 제거 없음 | survey-service 후속 |
+| L15 | 학습 서버 스크립트 해시(`configs/train.yaml server.script_sha256`) 값 비어 있음 | 서버에서 `train-doctor` 실행 필요 |
+| L16 | devDependency 취약점 3건(kiosk-frontend: playwright, ajv, fast-uri), admin-console 온라인 감사 미실시 | 런타임 영향 없음(`--omit=dev` 0건). 고치려면 고정 버전 밖 업그레이드 + 시험 이미지 재검증 |
+| L17 | synthetic-data v1 생성 경로 폐기 표시만(D91), 보류 시험 15건 | 시드 경로 분리 뒤 삭제 |
+
 ## 3-1. GPU 구멍 (H, 2026-10-27 신설)
 
 GPU 서버가 열릴 때 할 일이다. 줄기와 계획은 [`COMPLETION_PLAN.md`](COMPLETION_PLAN.md)가 갖는다. GPU 없이 닫을 수 없으므로 열림으로 둔다. 닫을 때 지우지 않는다.

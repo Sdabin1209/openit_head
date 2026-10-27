@@ -111,3 +111,6 @@
 - B 입력 표는 데이터셋 담당의 `labels.py`를 옮겼다(G03 부분, 승인 기록 없음). model-lab `arg_map`을 서버 코드에서 읽어 채웠다(G06, `--help` 미실행).
 - 약속 시각(19:07)을 어겼고 19:39에 끝났다. 이후 시각은 지켰다.
 - 다음: 사용자가 옮기는 서버 자료를 `reference/openit-server/`에서 정본으로 쓰기, 데이터셋 담당에게 `labels.py` 확정과 C1 빌드 상태 확인(사용자 경유), 사람 결정 항목(G01·G04·G12, 병원 연동, 운영 규칙).
+
+- 2026-10-27 22:45 이 PC 전체 모드 E2E 실패 0(수치: `deploy/docs/E2E_RESULTS.md`). 새 단계 5c(정정), 5p(PostgreSQL 재시작)가 전체 모드에서 REAL. model-runtime v0.7.2(태그 push), release-gate·model-lab·survey-service·deploy 핀 정렬, survey-service `/readyz` DB 장애 수정, synthetic-data 게시기, deploy check-all SKIP 원인 문서화를 push했다. gpu-dev에는 반영하지 않았다(데모는 내렸다).
+- 기록: gpu-dev 데모를 "20:30에 끈다"고 해 놓고 21:52에 껐다.

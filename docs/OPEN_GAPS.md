@@ -76,14 +76,18 @@
 | L08 | OPS_DB_SCHEMA=verify + migrate 분리, DB 계정 분리 | 계정 설계와 E2E 영향이 커서 이번 라운드에서 제외 |
 | L09 | 모든 timeout·상한·한도·자원 값이 측정 없는 잠정값(6초 턴 마감, 3.5초 모델 상한, 소켓 15/30초, 연결 상한 등) | H1(24GB 실측) 뒤 재정. GPU 세션 키트 준비됨 |
 | L10 | STT를 기기 안 처리로 둠. 실기기에서 온디바이스 한국어 인식이 되는지 미확인 | 실기기 필요. 안 되면 글자 입력으로 대체됨 |
-| L11 | 위험 문구 기본 목록은 임상 검토 전 임시(`provisional=true`) | 임상 담당 검토 필요 |
+| L11 | 위험 문구 기본 목록은 임상 검토 전 임시(`provisional=true`). 오탐은 학습 발화 A 32,170건에서 20건→4건으로 줄였고(survey-service 문서에 측정 방법), 남은 4건은 경계 사례(군중·만성 증상·가족 이야기). 부정·시제 판정은 표지 기반 근사이고 실제 환자 발화로는 측정하지 않았다 | 임상 담당 검토 필요 |
 | L12 | 확정 사례(CONFIRMED)도 180일 뒤 삭제됨(`retention.cases_purge_confirmed`) | 병원 규정에 따라 사용자 결정 |
 | L13 | D30(저자 확인=임상 승인)을 D92(4-eyes)로 대체. 의료인이 한 명뿐이면 막힘 | `QA_REQUIRE_TWO_PERSON=false`로 되돌림 가능. **사용자 확인 필요** |
-| L14 | 알림 DB 장애 때 로컬 재시도 큐 없음(DELIVERY_FAILED 신호로만 대응), 정지 중 반복 발화 알림 중복 제거 없음 | survey-service 후속 |
+| L14 | 알림 DB 장애 때 로컬 재시도 큐 없음(DELIVERY_FAILED 신호로만 대응). 같은 (세션, 턴)의 알림은 중복 제거됨, 정지 중 서로 다른 턴의 반복 발화는 알림이 여러 건 | survey-service 후속 |
 | L15 | 학습 서버 스크립트 해시(`configs/train.yaml server.script_sha256`) 값 비어 있음 | 서버에서 `train-doctor` 실행 필요 |
 | L16 | devDependency 취약점 3건(kiosk-frontend: playwright, ajv, fast-uri), admin-console 온라인 감사 미실시 | 런타임 영향 없음(`--omit=dev` 0건). 고치려면 고정 버전 밖 업그레이드 + 시험 이미지 재검증 |
 | L17 | synthetic-data v1 생성 경로 폐기 표시만(D91), 보류 시험 15건 | 시드 경로 분리 뒤 삭제 |
 | L18 | 서비스 값 형식 검증(선택지·단위·예/아니오)을 **실제 문항 세트(칸 정의 포함)** 로 학습 정답에 돌려 본 적이 없다. 서버 `question_bank.json`은 문장만 있고 칸 정의가 없다 | 칸 정의가 있는 실제 문항 세트는 의료인이 question-authoring으로 올리는 내용(사람 입력). 올라오면 `scripts/reference_agreement.py`로 재실행 |
+| L19 | 보존 `retention.failed_raw_days`(기본 90일, 실패 상태 원본 삭제 기한)는 D88에 없는 값으로 근거 기록이 없다(ops-feedback ADR 0007) | 병원 규정에 따라 사용자 결정 |
+| L20 | 게이트웨이 CSRF 방어(Sec-Fetch-Site·Origin)의 허용 Origin이 `GATEWAY_HOSTS`와 자동 연동되지 않고 요청의 호스트:포트를 쓴다. 단계 9의 gpg 암호화 백업 실행과 경로 우회 시도(`//`, `%2f`, 청크 본문) 회귀 시험은 없다 | deploy 후속 |
+| L21 | GPU 세션 키트(`model-runtime scripts/gpu_session`)는 가짜 백엔드·가짜 nvidia-smi로만 시험했다. 호출자가 먼저 끊으면 서버가 최대 3.5초 엔진을 잡는다(추정, 미측정) | GPU 사용 가능 시간대 필요 |
+| L22 | ops-feedback 검토 입력의 이메일 탐지는 `@` 뒤 254자까지만 본다. 오래 걸리는 정규식 점검은 입력군 일부(20,000·80,000자)로만 했다 | 알려진 한계 |
 
 ## 3-1. GPU 구멍 (H, 2026-10-27 신설)
 

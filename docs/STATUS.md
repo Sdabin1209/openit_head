@@ -114,3 +114,13 @@
 
 - 2026-10-27 22:45 이 PC 전체 모드 E2E 실패 0(수치: `deploy/docs/E2E_RESULTS.md`). 새 단계 5c(정정), 5p(PostgreSQL 재시작)가 전체 모드에서 REAL. model-runtime v0.7.2(태그 push), release-gate·model-lab·survey-service·deploy 핀 정렬, survey-service `/readyz` DB 장애 수정, synthetic-data 게시기, deploy check-all SKIP 원인 문서화를 push했다. gpu-dev에는 반영하지 않았다(데모는 내렸다).
 - 기록: gpu-dev 데모를 "20:30에 끈다"고 해 놓고 21:52에 껐다.
+
+## 진행 기록 (2026-10-28)
+
+- 전수 점검(`AUDIT_CHECKLIST.md` 63항목, 10개 점검 단위)을 처음으로 했고 `AUDIT_SUMMARY.md`로 종합했다. 높음 7건(원인 기준): 이전 환자 참조 재사용, 추출기 입력 크기 제곱 시간, 음성 외부 전송, 보존 무기한, 위험 경로 단절, TLS 없음, 백업 미동작.
+- 결정 D86~D92: 장애 정책(D86), SSE heartbeat/resync(D87), 감사 결정 항목을 표준으로 적용(D88), 구조 선택에는 '왜'(D89, ADR), 생성 검증기 커밋(D90), v1 생성 경로 폐기 표시(D91), 임상 승인 4-eyes(D92, D30 대체).
+- 영역 수정·ADR 완료: 10개 영역. deploy는 갈래 A·B·C를 병합(중복 구현이 있었다: 분담 메시지가 늦게 도달, PROGRESS.md 참고).
+- 실제 데이터 검증(학습 서버의 최종 데이터 C1 64,459행, 서버와 해시 일치): 서빙 프롬프트 100% 일치, 정답 거부 0, B 입력 100% 일치, A state 97.64% 일치, 합성 데이터 게시기 실제 실행 성공. 이 비교로 서비스 값 검증 규칙의 과한 1건, 평가 누수 판정의 키 문제를 찾아 고쳤다.
+- 실제 결함 발견: 키오스크 기기 2대 이상일 때 게이트웨이 기기 인증 전부 401(Caddy 헤더 매처 오용), 기기별 토큰이 게이트웨이에서 공유 토큰으로 바뀌어 런타임에 안 쓰이던 문제.
+- openit 서버: 탐색·~/dabin 복사/수정은 상시 허가, GPU는 06:00까지 허가(사용 전 다른 프로세스 확인). 데이터셋 담당의 C2 증강이 GPU를 점유해 쓰지 못했다. GPU 세션 키트를 준비했다(model-runtime `docs/GPU_SESSION.md`).
+- 마감 보고용 알려진 한계는 `OPEN_GAPS.md` 3-0절(L01~L18).

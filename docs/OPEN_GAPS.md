@@ -10,7 +10,7 @@
 | ID | 내용 | 영역 | 상태 | 비고 |
 |---|---|---|---|---|
 | G01 | **직원 알림의 입력원이 없다.** v1은 파서의 위험 신호에서 StaffAlert를 만들었는데 v2 LoRA-A 출력에는 위험 신호 필드가 없다. 알림 경로는 코드를 유지하되 입력원이 없으면 **비활성**이며 `/readyz`와 문서에 명시한다(조용히 끄지 않는다) | survey-service | 부분 | **포트 문서화·시험됨, 입력원 미정.** `RiskSource` 포트(`SURVEY_RISK_SOURCE`)와 가짜 입력원 시험이 있다(survey-service 1cfc463, `survey-service/docs/boundary.md` 4절). 입력원은 없고 `/readyz`의 `staff_alert_source.active=false`다. 환자 안전과 닿는다. 입력원을 정하기 전에는 "직원 알림이 동작한다"고 말하지 않는다. 사용자 결정 대기. 사용자 지시(2026-10-27): 일단 빈 채로 만든다 |
-| G02 | synthetic-data의 생성 파이프라인이 v1 내용을 만든다(15개 시험을 건너뜀). 지금 잡을 돌리면 합성 샘플이 전부 걸러지고 시드만 남은 데이터셋이 게시될 수 있다. 운영에서는 돌리지 않는다 | synthetic-data | 열림 | 영역의 역할(학습 서버 파이프라인으로 대체 / 유지하고 v2로 새로 쓰기)을 사용자가 정한다 |
+| G02 | synthetic-data의 생성 파이프라인이 v1 내용을 만든다(15개 시험을 건너뜀). 지금 잡을 돌리면 합성 샘플이 전부 걸러지고 시드만 남은 데이터셋이 게시될 수 있다. 운영에서는 돌리지 않는다 | synthetic-data | 열림 | 영역의 역할(학습 서버 파이프라인으로 대체 / 유지하고 v2로 새로 쓰기)을 사용자가 정한다 | **E2E 사실(2026-10-27)**: 단계 2에서 합성 샘플 6,066건이 모두 v2 스키마 위반으로 제외되어 데이터셋이 게시되지 않는다(NOTHING_TO_DO).
 | G03 | `ask` 문장 틀 표와 칸 설명표는 학습 데이터에서 역으로 읽은 **초안**이다(IO_SPEC 7장 미정) | survey-service | 열림 | 데이터셋 담당 확인 필요 |
 | G04 | respond 대체 문장: 재료가 하나도 없을 때의 문구("죄송합니다. 다시 한 번 말씀해 주세요.")는 잠정이다. 환자에게 가는 문구 | model-runtime | 열림 | 도메인 소유자 확인 |
 | G05 | v1의 G1(응답 숫자가 입력 재료에 있는지 검사)에 해당하는 검사를 v2에서 둘지 정하지 않았다 | model-runtime | 열림 | |
@@ -32,6 +32,7 @@
 | U13 | 학습된 어댑터(Qwen3-4B/8B)의 실제 서빙·평가는 24GB급 GPU 서버가 필요하다. 아직 그런 서버에서 해 보지 않았다 | 열림 | D81. 사용자의 4090 서빙 서버 사용 시점 미정 |
 | U14 | 제약 디코딩이 `values[].key`를 현재 문항의 유효 slot 집합으로 제한하지 못한다(계약 스키마는 key를 패턴 문자열로만 규정). 요청마다 `question_id`에 맞는 slot enum을 문법에 넣으려면 유효 slot 표(survey-service 소유, D76)를 모델 서빙이 알아야 하므로 `ActionExtractionInput` 계약 변경(예: 허용 slot 목록 전달)이 필요하다. 학습된 LoRA-A는 이 key를 맞출 것으로 보이나 미확인 | 열림 | 헤드 판단 대기: 지금 하지 않음(계약 변경, 학습 쪽이 해결할 가능성). 학습된 어댑터를 얹는 시험은 H2 |
 | U15 | model-runtime `pyproject`의 dev extra가 turn-engine v0.3.0(boundary v2.0.0 고정)을 가리킨다. `model-runtime[dev]`로 설치하면 boundary v2.0.1과 충돌. 서비스 이미지·lock 해결에는 영향 없음(model-lab에서 확인). 다음 model-runtime 릴리스(D80 연쇄 때문에 단독 릴리스 안 함)에서 v0.3.1로 고친다 | 닫힘 | 근거: model-runtime 8279847(v0.7.0)이 dev extra의 turn-engine 하드 핀을 없앴다. turn-engine이 필요한 시험은 `importorskip`으로 없으면 건너뛴다(CHANGELOG 0.7.0) |
+| U16 | E2E의 가짜 모델은 A 출력을 `values` 빈 NEXT로만 내서, 환자 말에서 값을 뽑아 저장하는 경로(검증 → 저장 → 응답 재료 조립)가 E2E에서 한 번도 실행되지 않는다. 영역 단위 시험(survey-service 415)에는 있을 수 있으나 이 세션에서 E2E 수준으로는 확인하지 못했다. 가짜 A가 문항별로 값을 내도록 확장해 저장·정정·건너뛰기를 E2E에서 확인해야 한다 | 열림 | model-runtime 가짜 백엔드(`MODEL_RUNTIME_FAKE_FLOW_FILE` 확장) + deploy E2E 단계. 다음 model-runtime 릴리스에 묶는다 |
 | U02 | 24GB(RTX 4090)에서 Qwen3-8B 적재, 실측 | 열림 | |
 | U03 | 서빙 프롬프트와 학습 데이터의 글자 일치: 서버 val 앞 400행씩(A, B)에서 user 메시지·전체 프롬프트 일치 확인(model-runtime v0.6.1 `prompt-4`, 2026-10-27). **남은 것**: transformers `apply_chat_template` 실행과 토큰 ID 대조, 학습 때 쓴 채팅 템플릿 설정(서버 코드 확인), assistant 쪽 `<think>` 처리, val 나머지 행·test | 부분 | D77 |
 | U04 | vLLM 제약 디코딩(xgrammar)이 `ActionExtraction`의 규칙을 어디까지 지키는지. **2026-10-27 gpu-dev, model-runtime v0.6.5(relax-3) + 계약 v2.0.1**: 변형 8개 `anyOf` 문법을 경고·에러 없이 받았고 extract 48회(키오스크 28 + 직접 20) 모두 형식 통과, OUTPUT_INVALID 0건. (이전 v0.6.3: 100%, v0.6.4: pattern 0건이나 의미 규칙 위반 31건.) **남은 것**: 문법 컴파일 비용은 분리해 재지 못함(첫 호출 비교가 오염됨), `minItems`·`maxItems` 강제 여부는 xgrammar 단독 시험 외 실측 없음 | 부분 | D82, D83 |

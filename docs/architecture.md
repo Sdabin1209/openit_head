@@ -2,7 +2,7 @@
 
 이 문서는 문진 시스템 워크스페이스(리포 13개)의 지금까지 알려진 구조를 도식으로 보여 준다. 리포별 목록과 큰 흐름 한 장은 [`PROJECT_STRUCTURE.md`](PROJECT_STRUCTURE.md)가 다룬다. 이 문서는 그것이 다루지 않는 영역 의존 지도, 순환 파이프라인의 단계, 한 턴의 시퀀스, 그래프, 출고 승인, 비식별, 배포, 서버 배치, 버전 관계를 깊이 다룬다. 결정의 근거는 [`DECISIONS.md`](DECISIONS.md)(D01~D84), 계약은 `../../boundary-contracts/`의 `INTERFACES.md`, `HTTP.md`, `PUBLIC_API.md`, `CONVENTIONS.md`, `METRICS.md`에 있다.
 
-> 2026-10-27 갱신(D74~D84): 턴 처리 도식(4절, 5절)과 버전 표(10절), 빈 곳(11절)을 v2 구조로 고쳤다. 정규화·절차·다음 문항은 LoRA-A가 하고 서비스에는 정규화기·판정기·기록기·Plan 코드가 없다. 영향은 `impact-d74.md`. 2·3·6·7·8·9절의 서술 가운데 E2E 수치(87·88 PASS)와 단계 상태는 2026-10-26 기록이며 v2 열차로 다시 확인하지 못했다. 현재 값은 `STATUS.md`를 따른다. 지표 카탈로그 `METRICS.md`는 아직 v1 용어이고 변경 제안은 [`metrics-v2-proposal.md`](metrics-v2-proposal.md)에 있다.
+> 2026-10-27 갱신(D74~D84): 턴 처리 도식(4절, 5절)과 버전 표(10절), 빈 곳(11절)을 v2 구조로 고쳤다. 정규화·절차·다음 문항은 LoRA-A가 하고 서비스에는 정규화기·판정기·기록기·Plan 코드가 없다. 영향은 `impact-d74.md`. 2·3·6·7·8·9절의 서술 가운데 E2E 수치(정본: [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md))와 단계 상태는 2026-10-26 기록이며 v2 열차로 다시 확인하지 못했다. 현재 값은 `STATUS.md`를 따른다. 지표 카탈로그 `METRICS.md`는 아직 v1 용어이고 변경 제안은 [`metrics-v2-proposal.md`](metrics-v2-proposal.md)에 있다.
 
 작성 기준일은 2026-10-26이고 위 갱신 범위만 2026-10-27이다. 이 문서의 모든 도식은 아래 파일을 읽고 그렸다. 서비스와 도커는 실행하지 않았다.
 
@@ -12,7 +12,7 @@
 
 | 표시 | 뜻 |
 |---|---|
-| [확인됨] | 서비스끼리 실제 HTTP로 도는 전체 시험(`deploy/scripts/e2e.sh`, 전체 모드 87 PASS / 0 FAIL, 개발 PC. gpu-dev에서 88 PASS는 사용자 보고)에서 확인 |
+| [확인됨] | 서비스끼리 실제 HTTP로 도는 전체 시험(`deploy/scripts/e2e.sh`, 전체 모드, 개발 PC. gpu-dev 결과는 사용자 보고. 최신 결과: [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md))에서 확인 |
 | [구현됨] | 해당 리포의 단위·스모크 시험으로만 확인. 서비스끼리 E2E로는 확인하지 못함 |
 | [제안/가정] | 설계의 제안이거나 사용자가 가정으로 정한 것. 바뀔 수 있음 |
 | [미정] | 결정이 필요하거나 확인하지 못한 것 |
@@ -20,7 +20,7 @@
 
 도식 아래의 "근거"는 그 도식을 그릴 때 읽은 파일과 결정 번호다. 경로는 워크스페이스 루트 기준이다.
 
-참고: `head/docs/STATUS.md` 상단의 "현재 단계"는 2026-10-26에 갱신했다(리포 13개, 계약 v1.3.3, E2E 87 PASS, 서버 검증 완료). 이 문서는 `deploy/docs/STATUS.md`와 `PROJECT_STRUCTURE.md` 5절의 내용도 따랐다.
+참고: `head/docs/STATUS.md` 상단의 "현재 단계"는 2026-10-26에 갱신했다(리포 13개, 계약 v1.3.3, E2E 통과, 서버 검증 완료). 이 문서는 `deploy/docs/STATUS.md`와 `PROJECT_STRUCTURE.md` 5절의 내용도 따랐다.
 
 ## 1. 한눈에 보는 다이어그램 목록
 
@@ -268,7 +268,7 @@ sequenceDiagram
 | 항목 | 상태 | 근거 |
 |---|---|---|
 | 게이트웨이 경유 공개 API 한 턴, 같은 `turn_id` 재전송 시 같은 응답 | [확인됨] | E2E 5단계, `PUBLIC_API.md` |
-| (v1 기록) parse·generate가 model-serving을 거침 | [확인됨] 고정 출력 "(가짜 응답)", 모델은 [시험용 대체]. v2의 extract·respond 경로로는 가짜 모델 E2E 88 PASS 기록이 있다(deploy 37117d2) | `deploy/docs/STATUS.md` 다섯째 구간 |
+| (v1 기록) parse·generate가 model-serving을 거침 | [확인됨] 고정 출력 "(가짜 응답)", 모델은 [시험용 대체]. v2의 extract·respond 경로로는 가짜 모델 E2E 기록이 있다(최신 결과: [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md)) | `deploy/docs/STATUS.md` 다섯째 구간 |
 | 실제 LLM(Qwen3-1.7B, 학습 안 됨)으로 extract가 형식을 통과 | [확인됨] gpu-dev 2026-10-27 v0.6.5: extract 48회 모두 형식 통과, 키오스크 발화 14턴은 모두 `UNKNOWN_SLOT`으로 턴 실패(학습 안 된 모델이 없는 key를 지어냄, 의도대로의 동작) | OPEN_GAPS U04, U07 |
 | 직원 알림의 입력원 | [미정] 비어 있음. `/readyz` `staff_alert_source.active=false` | G01 |
 | 추론 서버를 멈추면 그 턴만 실패하고 서비스는 살며, 다시 띄우면 다음 턴이 복구 | [확인됨] | 같은 곳 |
@@ -333,7 +333,7 @@ flowchart TB
 | 항목 | 상태 |
 |---|---|
 | 단계 구성(위 그림) | [구현됨 또는 제안] 지시서와 경계 문서에서 읽은 것. 코드로 확인하지 못함 |
-| 그래프가 가짜 모델로 E2E를 통과 | [확인됨] 88 PASS / 0 FAIL(deploy 37117d2, 이 PC 한 환경). 현재 열차로는 재확인하지 못함 |
+| 그래프가 가짜 모델로 E2E를 통과 | [확인됨] 통과 기록은 정본을 따른다(최신 결과: [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md)). 이 PC 한 환경이고 현재 열차로는 재확인하지 못함 |
 | `langgraph` 1.2.15를 잠금 파일에 고정 | [확인됨] `survey-service/docs/boundary.md` 3절 |
 
 근거: `docs/migration-2.0.0.md`, `survey-service/docs/boundary.md`, D62, D63, D74, D75.
@@ -674,10 +674,10 @@ flowchart TB
 
 | 환경 | 사실 | 상태 | 근거 |
 |---|---|---|---|
-| 개발 PC (WSL2, Docker Desktop) | 서비스끼리 실제 HTTP로 도는 E2E 전체 모드 87 PASS / 0 FAIL, `--fast` 59 PASS. 표준 `docker` 경로 하나로 동작(우회 코드 제거, 열셋째 구간) | [확인됨] | `deploy/docs/STATUS.md`, `docs/SETUP.md`, `PROJECT_STRUCTURE.md` 5절 |
-| 임시 서버 형태 점검 | 형제 리포 13개를 임시 폴더에 clone해 `e2e.sh --fast` 통과(60 PASS), 소스 없는 deploy 사본과 digest 이미지만으로 운영 구성 기동 | [확인됨] | `check-relocatable.sh`, `check-standalone.sh` (열한째 구간) |
+| 개발 PC (WSL2, Docker Desktop) | 서비스끼리 실제 HTTP로 도는 E2E 전체 모드와 `--fast` 모두 통과(최신 결과: [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md)). 표준 `docker` 경로 하나로 동작(우회 코드 제거, 열셋째 구간) | [확인됨] | `deploy/docs/STATUS.md`, `docs/SETUP.md`, `PROJECT_STRUCTURE.md` 5절 |
+| 임시 서버 형태 점검 | 형제 리포 13개를 임시 폴더에 clone해 `e2e.sh --fast` 통과(최신 결과: [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md)), 소스 없는 deploy 사본과 digest 이미지만으로 운영 구성 기동 | [확인됨] | `check-relocatable.sh`, `check-standalone.sh` (열한째 구간) |
 | gpu-dev | 개발용 GPU 호스트(Docker 사용 가능, 위 행 참조). 12GB 값은 설정 프로파일(`model-runtime/profiles/gpu-dev-12g.json`)로 뺌. 결과는 파이프라인 검증용. 학습·평가·패키징·게시 한 바퀴와 vLLM(LoRA + 구조화 출력, 두 어댑터)을 직접 확인 | [확인됨] gpu-dev에서. E2E의 일부는 아님(`E2E_GPU=1` 경로는 미검증) | D47, D48, `model-runtime/docs/design.md` 11절 |
-| gpu-dev에서의 Docker와 전체 시험 | 사용자 보고(2026-10-26): gpu-dev는 Docker Desktop 연동으로 Docker를 쓰고, 서버에서 `doctor.sh` 통과, E2E 88 PASS. D47(2026-10-15)의 "Docker 없음"은 그 시점의 사실이며 **이후 변경됨**. 88건은 개발 PC의 87건과 1건 다르고 그 이유는 확인하지 못했다 | [확인됨] 사용자 보고. 리포의 기록 파일로는 [확인 못 함] | 사용자 보고, D47, `PROJECT_STRUCTURE.md` 5절 |
+| gpu-dev에서의 Docker와 전체 시험 | 사용자 보고(2026-10-26): gpu-dev는 Docker Desktop 연동으로 Docker를 쓰고, 서버에서 `doctor.sh` 통과, E2E 통과(수치는 [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md)의 과거 기록 표). D47(2026-10-15)의 "Docker 없음"은 그 시점의 사실이며 **이후 변경됨**. 서버 결과가 개발 PC 결과와 다르다면 그 이유는 확인하지 못했다 | [확인됨] 사용자 보고. 리포의 기록 파일로는 [확인 못 함] | 사용자 보고, D47, `PROJECT_STRUCTURE.md` 5절 |
 | 서빙·백 서버 | RTX 4090 24GB 1장, Compose 서비스 + 추론 컨테이너. 프로파일 `rtx4090-24g.json`은 잠정. 기반 모델 크기와 배치에서만 쓰임 | [제안/가정] 사용자가 맞다고 확인(D59), 실물 실측 없음 | D54, D59, `model-runtime/profiles/` |
 | 학습·평가 서버 | A6000 48GB. 학습은 워커 방식으로 서빙 서버의 model-registry에 게시. 서빙 서버는 외부 호출을 받지 않음 | [제안/가정] | D40, D54 |
 | 추론 서버 컨테이너 | CPU/fake 변형은 E2E에 사용. GPU 변형 이미지는 개발 PC에서 빌드됨(13.1GB). 컨테이너 안 GPU 추론은 이 문서가 읽은 파일에서 확인하지 못함 | CPU/fake [확인됨], GPU [구현됨] 또는 [미정] | `model-runtime/docs/STATUS.md` 8차, `deploy/docs/STATUS.md` |
@@ -775,7 +775,7 @@ flowchart LR
 | 17 | 모델 기반 실패 탐지기, 사람 신고 경로 | 후속 구간 | `ops-feedback/docs/design.md` 5절 |
 | 18 | 문진 스키마 정수 버전 2 | 정수 1을 유지하기로 했다(D79). 별도 TurnTrace 버전 필드는 운영 데이터가 생기기 전에 검토(G11) | D46, D48, D79 |
 | 19 | Trace 크기: Trace가 세션 문서 전체를 담아 턴이 늘수록 커짐 | 스키마가 정한 필드라 줄이지 않았다. 문제가 되면 ops-feedback과 협의 | `survey-service/docs/design.md` 6절 |
-| 20 | gpu-dev에서의 전체 시험 | 해소: 사용자 보고로 서버 검증 완료(doctor 통과, 88 PASS, Docker Desktop 연동). D47의 "Docker 없음"은 이후 변경됨. 리포 기록으로는 [확인 못 함] | 9절 참고 |
+| 20 | gpu-dev에서의 전체 시험 | 해소: 사용자 보고로 서버 검증 완료(doctor 통과, E2E 통과는 [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md), Docker Desktop 연동). D47의 "Docker 없음"은 이후 변경됨. 리포 기록으로는 [확인 못 함] | 9절 참고 |
 | 21 | LangGraph 그래프의 노드 수 | v1 기준으로는 해소(18개). v2에서 재구성되어 노드 이름·개수는 확인하지 못함 | 5절 |
 | 22 | 서빙 서버의 단일 장애 지점 | 고가용성은 범위 밖 | D10 |
 | 23 | 데이터셋 저장소의 서버 위치 | 데이터셋(I2)은 같은 호스트의 파일 저장소. 운영의 호스트 간 이동 방식 미정(개발은 rsync) | D49, D52 |

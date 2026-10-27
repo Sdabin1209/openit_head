@@ -10,7 +10,7 @@
 - **v0.7.0 열차**(D80의 완전 일치 정렬): boundary-contracts `v2.0.2`, turn-engine `v0.4.0`(23973fc, v1 폐기 모듈 제거), model-runtime `v0.7.0`(8279847, 비밀 파일화·`prompt-3` 제거·golden 제거·dev 핀 제거). survey-service 6241d00과 deploy 85e2d27이 이 태그로 맞췄다(`git log`). 문진 스키마 정수 버전은 1이다(D79, 태그 `survey-schema-v1.0.0`).
 - 결정 D82(제약 디코딩이 `pattern`·`minItems`를 지킴), D83(`allOf`/`if-then`을 `anyOf` 변형으로 펼침), D84(비밀은 `<이름>_FILE` 파일로 받음, compose secrets)를 기록했다.
 - gpu-dev 측정(2026-10-27, **model-runtime v0.6.5 + 계약 v2.0.1 기준**이며 v0.7.0으로는 재측정하지 않았다): U01 Qwen3-1.7B 적재 약 10.1GB, `/readyz` 200. U04 extract 48회 모두 형식 통과, OUTPUT_INVALID 0건. U07 키오스크 발화 14턴은 모두 실패했다(학습 안 된 1.7B가 없는 slot key를 지어내 `UNKNOWN_SLOT`에서 걸림, 의도대로의 동작). 세부는 `OPEN_GAPS.md`.
-- 가짜 모델로 서비스끼리 도는 E2E는 이전 기록으로 88 PASS / 0 FAIL(deploy 37117d2, 이 PC 한 환경)이다. v0.7.0 정렬 뒤의 재실행 결과는 이 갱신에서 확인하지 못했다.
+- 가짜 모델로 서비스끼리 도는 E2E는 이전 기록이 있다(이 PC 한 환경. 최신 결과: [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md)). v0.7.0 정렬 뒤의 재실행 결과는 이 갱신에서 확인하지 못했다.
 - 남은 구멍: GPU가 필요한 일 H1~H4(`OPEN_GAPS.md` 3-1절, `COMPLETION_PLAN.md`). GPU 없이 닫을 수 있는 일은 줄기 R, E, D, T, A에 있다.
 - 사용자 결정 대기: G01 직원 알림 입력원, G12 재질문 상한 값과 의미, G02 synthetic-data 역할, D-A 운영 정책(도메인·HTTPS, 직원 로그인, 토큰 발급·회전, 원본 보관 기간). 모아서 한 번에 묻는다.
 - 확인하지 못한 것(변함 없음): 실제 브라우저 화면, 한국어 STT, 웹 푸시 수신, 24GB GPU 실측, 일반 Linux 서버 설치.
@@ -45,10 +45,10 @@
 - 2026-10-15: survey-service 후속 확인(pytest 통과, 스모크 OK, 라벨 model-runtime v0.3.0·turn-engine v0.2.0·boundary v1.1.0) 후 push, 태그 survey-schema-v1.0.0(문진 스키마 패키지, 설치: git+ssh://git@github.com/Sdabin1209/openit_survey-service.git@survey-schema-v1.0.0#subdirectory=schema). model-runtime v0.3.0(D45). 완료 영역: model-runtime, turn-engine, question-authoring, ops-feedback, release-gate, synthetic-data, survey-service. 남은 것: deploy(시작 가능), model-lab(GPU 서버 필요)
 - 2026-10-15: gpu-dev 접속 확인(RTX 4070급 12GB, 12코어, RAM 15GB, 디스크 954GB, Ubuntu 24.04 WSL2, Python 3.12, pip·Docker 없음, HF·PyPI 접속 가능, GitHub SSH 불가). D47(사용 규칙). 사용자 조치 필요: gpu-dev에 python3-pip·python3-venv 설치(sudo). model-lab 시작, model-runtime vLLM 시험 지시
 - 2026-10-15: model-runtime vLLM 시험 완료(pytest 81, GPU 확인: LoRA+구조화 출력, 한계: allOf/if/then/not 무시). D48(vLLM 확정, 어댑터 PEFT 형식, 재현성 범위). 후속: rank 사전 검사, 0.4.0 태그. deploy 시작(사용자 허락: 관리 여유가 되면). 실행 중: model-lab, deploy
-- 2026-10-15: deploy 첫 구간(E2E 62 PASS, 1·4a·6수집·8a·9 실제, 3 대신, 나머지 막힘). 막힘의 원인: 영역끼리 이어지는 원격 클라이언트·읽기 면 없음(CR-D01). D49(영역 사이 호출은 HTTP, HTTP.md, boundary_contracts.clients), D50(SQLite 볼륨 소유 서비스만, 이웃은 HTTP, 라벨 통일, O10 닫음). 진행: 클라이언트 라이브러리(v1.1.1 예정), 각 영역 서버 읽기 면. 열린 것: D08 모델 추론 GPU의 서빙 서버 위치(사용자 확인)
+- 2026-10-15: deploy 첫 구간(E2E 통과 수는 [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md)의 과거 기록 표, 1·4a·6수집·8a·9 실제, 3 대신, 나머지 막힘). 막힘의 원인: 영역끼리 이어지는 원격 클라이언트·읽기 면 없음(CR-D01). D49(영역 사이 호출은 HTTP, HTTP.md, boundary_contracts.clients), D50(SQLite 볼륨 소유 서비스만, 이웃은 HTTP, 라벨 통일, O10 닫음). 진행: 클라이언트 라이브러리(v1.1.1 예정), 각 영역 서버 읽기 면. 열린 것: D08 모델 추론 GPU의 서빙 서버 위치(사용자 확인)
 - 2026-10-15: model-lab 완료 확인(pytest 61, GPU 실제 학습·평가·패키징·게시 한 바퀴: Qwen2.5-1.5B 4비트 r=16 3스텝, 어댑터 PEFT), push. release-gate 후속(135, 스모크 OK) push. boundary-contracts v1.2.0 태그·push(클라이언트 6종 + 읽기 관대 모드 + base_model.id 완화, D51). 다음: 소비 영역이 v1.2.0·클라이언트로 전환, deploy가 연결·E2E 재실행. 확인 못 한 것: model-lab의 재개 결정성
 - 2026-10-15: deploy 재검증(E2E 직접 재실행: PASS 전부, FAIL 0, 정리 완료, 남은 컨테이너 없음) 후 push. 소비 영역 전환 지시(v1.2.0·클라이언트): survey-service, synthetic-data, ops-feedback, question-authoring, release-gate, model-lab(진행). 이후 deploy가 연결·E2E 재실행
-- 2026-10-15: deploy E2E 직접 재검증(73 PASS/0 FAIL, 정리 완료). 소비 영역 v1.2.0 전환과 D52(ops-feedback 검토 POST, release-gate 정책 스키마·실행기 규약·운영 모드 거부, model-lab 회귀 평가·파일 저장소, question-authoring 개선 신호) 모두 확인·push. deploy 재실행 지시. 발견: 비식별 기본이 자유 문자열 전부 마스킹이라 환류가 구조 수준(O19 권고안 B 기록). 사용자 결정 대기: O11, O06, O16, O19, 서빙 GPU 추론 위치와 GPU 서버 접근, 도메인·TLS·외부 감시·스케줄 주기, 정답 예시 오류 검토
+- 2026-10-15: deploy E2E 직접 재검증(통과 수는 [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md)의 과거 기록 표, 정리 완료). 소비 영역 v1.2.0 전환과 D52(ops-feedback 검토 POST, release-gate 정책 스키마·실행기 규약·운영 모드 거부, model-lab 회귀 평가·파일 저장소, question-authoring 개선 신호) 모두 확인·push. deploy 재실행 지시. 발견: 비식별 기본이 자유 문자열 전부 마스킹이라 환류가 구조 수준(O19 권고안 B 기록). 사용자 결정 대기: O11, O06, O16, O19, 서빙 GPU 추론 위치와 GPU 서버 접근, 도메인·TLS·외부 감시·스케줄 주기, 정답 예시 오류 검토
 - 2026-10-27: 구조 문서를 v2로 정렬(`PROJECT_STRUCTURE.md`, `STRUCTURE.md`, `architecture.md` 4·5·10·11절), `metrics-v2-proposal.md` 작성, OPEN_GAPS 갱신. 영역 쪽 완료: turn-engine v0.4.0(G07), model-runtime v0.7.0(G09·G10·U15, 비밀 파일화), survey-service 재질문 상한 메커니즘(G12)과 직원 알림 포트(G01), D82~D84 기록.
 - 워크스페이스 루트 `CLAUDE.md`는 `head/shared/CLAUDE.root.md`의 링크. 공통 규칙에 `../survey-service/schema` 읽기 허용을 추가
 
@@ -82,7 +82,7 @@
 
 ## 진행 기록 (2026-10-26 갱신)
 
-- 구현·검증: 리포 13개, 계약 v1.3.3. 개발 PC에서 전체 시험 87건, 서버(gpu-dev)에서 88 PASS / 0 FAIL(옵션 없이 처음부터).
+- 구현·검증: 리포 13개, 계약 v1.3.3. 개발 PC와 서버(gpu-dev, 옵션 없이 처음부터)에서 전체 시험을 돌렸다(최신 결과: [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md); 서버 쪽은 당시 사용자 보고).
 - 서버 설치 정리(D62 이후): WSL 전용 분기·자격증명 우회를 모두 제거하고 표준 docker 경로만 쓴다. 사전 점검 `deploy/scripts/doctor.sh`, 설치 문서 `deploy/docs/SETUP.md`, 실행 안내 `deploy/docs/RUN.md`, 수명주기 `down.sh` `status.sh`, 사람이 써 보는 `demo.sh`.
 - 지금 진행 중: **데모에 실제 LLM**(D72, D73). ① model-runtime: 작은 GPU 프로파일, 효과 없는 LoRA 패키지 생성 도구, 단독 실행 안내(코드·테스트·문서까지). ② deploy: 추론 서버 외부 주소 모드·단독 추론 서버 컴포즈·위치 독립 시험(작업 16). ③ 그다음: 서버에 GPU 이미지(약 13GB)를 내려받아 `demo.sh up --llm`을 연결하고 서버에서 확인.
 - 확인 못 한 것: 실제 브라우저(화면·음성 인식·웹 푸시 수신), RTX 4090 실측, 일반 리눅스 서버(WSL이 아닌 곳)에서의 설치, GPU 컨테이너의 서버(gpu-dev) 실행.
@@ -98,7 +98,7 @@
 
 - 2026-10-27 계약 `v2.0.0` push. 1단계 영역 이전 병합: turn-engine v0.3.0, model-runtime v0.6.0(태그), release-gate, ops-feedback, synthetic-data. model-lab은 브랜치에서 진행 중, survey-service 이전 진행 중. 결정 D75, D76. 지시서 `docs/migration-2.0.0.md`.
 
-- 2026-10-27 D81: `gpu-12g`는 Qwen3-1.7B(파이프라인 데모용). model-runtime v0.6.3(스모크 통과, 태그 push) 후 survey-service(fa86fb7), release-gate(9286300), model-lab(21a05bb), deploy(1f0cb64)를 v0.6.3으로 맞춰 push. deploy E2E 88 PASS / 0 FAIL(헤드가 직접 재실행, 이 PC 한 환경). 확인 못 한 것: gpu-dev에서 Qwen3-1.7B 적재·두 어댑터 동시 적재(U01), 실제 LLM 데모. 다음: gpu-dev 켜서 실제 LLM 데모 → U01/U04/U07 갱신.
+- 2026-10-27 D81: `gpu-12g`는 Qwen3-1.7B(파이프라인 데모용). model-runtime v0.6.3(스모크 통과, 태그 push) 후 survey-service(fa86fb7), release-gate(9286300), model-lab(21a05bb), deploy(1f0cb64)를 v0.6.3으로 맞춰 push. deploy E2E 통과(헤드가 직접 재실행, 이 PC 한 환경. 통과 수는 [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md)의 과거 기록 표). 확인 못 한 것: gpu-dev에서 Qwen3-1.7B 적재·두 어댑터 동시 적재(U01), 실제 LLM 데모. 다음: gpu-dev 켜서 실제 LLM 데모 → U01/U04/U07 갱신.
 
 ## 진행 기록 (2026-10-27 저녁)
 

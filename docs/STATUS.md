@@ -4,13 +4,16 @@
 
 ## 현재 단계
 
-(2026-10-26 갱신. 근거는 각 항목에 적었다. 이전 문구 "구조 확정 단계"는 2026-10-14 시점이라 낡았다.)
+(2026-10-27 갱신. 근거는 각 항목에 적었다. 이전 문구는 2026-10-26의 v1 기준이라 아래로 대체했다.)
 
-- 리포 13개가 모두 있다(`ls`: head, boundary-contracts, turn-engine, model-runtime, survey-service, question-authoring, synthetic-data, model-lab, release-gate, ops-feedback, deploy, kiosk-frontend, admin-console). 결정은 D71까지 기록했다(`DECISIONS.md`).
-- 경계 계약 패키지는 `v1.3.3`이다(`git -C boundary-contracts tag`, `pyproject.toml` version 1.3.3). 파이프라인 스키마 버전은 1.3, 문진 스키마는 정수 1(`survey-schema-v1.0.0`). turn-engine `v0.2.0`, model-runtime `v0.5.1`.
-- 서비스끼리 실제 HTTP로 도는 전체 시험(`deploy/scripts/e2e.sh`)은 개발 PC에서 87 PASS / 0 FAIL(`deploy/docs/STATUS.md` 여덟째 구간, 모델은 가짜 백엔드).
-- 서버 검증 완료(사용자 보고, 2026-10-26): gpu-dev에서 `doctor.sh` 통과, 전체 시험 88 PASS. gpu-dev는 Docker Desktop 연동으로 Docker를 쓴다(D47의 "Docker 없음"은 이후 변경됨). 리포 기록으로는 확인하지 못했다.
-- 남은 일(확인하지 못했거나 미정, 자세한 목록은 `architecture.md` 11절): 운영 도메인·HTTPS, 직원 콘솔·사람 계정의 운영 로그인, CI가 서버 로컬 레지스트리에 닿는 방법, 토큰 발급·회전, 주기 잡의 실행 주기(`config/jobs.yaml`의 `interval_seconds`가 모두 null), 백업 설정과 외부 감시, 원본 로그 보관 기간, 롤백 기준과 실패 유형 분류체계, 실제 브라우저 화면·한국어 STT·웹 푸시 수신, RTX 4090 실측과 GPU 모델 E2E(`E2E_GPU=1` 미검증), 문진 스키마 v2 후보 정리, 문항 저작 화면.
+- 구조는 학습 데이터셋 v2(D74)다. 세션 시작은 B만 부르고, 발화는 LoRA-A extract -> 사후 검증(`validate_extraction`) -> 저장 -> 표 조회로 B 입력 조립 -> LoRA-B respond 순이다. 서비스에 정규화기·Plan 코드는 없다. 도식은 `PROJECT_STRUCTURE.md` 2절, `architecture.md` 4절.
+- **v0.7.0 열차**(D80의 완전 일치 정렬): boundary-contracts `v2.0.2`, turn-engine `v0.4.0`(23973fc, v1 폐기 모듈 제거), model-runtime `v0.7.0`(8279847, 비밀 파일화·`prompt-3` 제거·golden 제거·dev 핀 제거). survey-service 6241d00과 deploy 85e2d27이 이 태그로 맞췄다(`git log`). 문진 스키마 정수 버전은 1이다(D79, 태그 `survey-schema-v1.0.0`).
+- 결정 D82(제약 디코딩이 `pattern`·`minItems`를 지킴), D83(`allOf`/`if-then`을 `anyOf` 변형으로 펼침), D84(비밀은 `<이름>_FILE` 파일로 받음, compose secrets)를 기록했다.
+- gpu-dev 측정(2026-10-27, **model-runtime v0.6.5 + 계약 v2.0.1 기준**이며 v0.7.0으로는 재측정하지 않았다): U01 Qwen3-1.7B 적재 약 10.1GB, `/readyz` 200. U04 extract 48회 모두 형식 통과, OUTPUT_INVALID 0건. U07 키오스크 발화 14턴은 모두 실패했다(학습 안 된 1.7B가 없는 slot key를 지어내 `UNKNOWN_SLOT`에서 걸림, 의도대로의 동작). 세부는 `OPEN_GAPS.md`.
+- 가짜 모델로 서비스끼리 도는 E2E는 이전 기록으로 88 PASS / 0 FAIL(deploy 37117d2, 이 PC 한 환경)이다. v0.7.0 정렬 뒤의 재실행 결과는 이 갱신에서 확인하지 못했다.
+- 남은 구멍: GPU가 필요한 일 H1~H4(`OPEN_GAPS.md` 3-1절, `COMPLETION_PLAN.md`). GPU 없이 닫을 수 있는 일은 줄기 R, E, D, T, A에 있다.
+- 사용자 결정 대기: G01 직원 알림 입력원, G12 재질문 상한 값과 의미, G02 synthetic-data 역할, D-A 운영 정책(도메인·HTTPS, 직원 로그인, 토큰 발급·회전, 원본 보관 기간). 모아서 한 번에 묻는다.
+- 확인하지 못한 것(변함 없음): 실제 브라우저 화면, 한국어 STT, 웹 푸시 수신, 24GB GPU 실측, 일반 Linux 서버 설치.
 
 ## 완료
 
@@ -46,6 +49,7 @@
 - 2026-10-15: model-lab 완료 확인(pytest 61, GPU 실제 학습·평가·패키징·게시 한 바퀴: Qwen2.5-1.5B 4비트 r=16 3스텝, 어댑터 PEFT), push. release-gate 후속(135, 스모크 OK) push. boundary-contracts v1.2.0 태그·push(클라이언트 6종 + 읽기 관대 모드 + base_model.id 완화, D51). 다음: 소비 영역이 v1.2.0·클라이언트로 전환, deploy가 연결·E2E 재실행. 확인 못 한 것: model-lab의 재개 결정성
 - 2026-10-15: deploy 재검증(E2E 직접 재실행: PASS 전부, FAIL 0, 정리 완료, 남은 컨테이너 없음) 후 push. 소비 영역 전환 지시(v1.2.0·클라이언트): survey-service, synthetic-data, ops-feedback, question-authoring, release-gate, model-lab(진행). 이후 deploy가 연결·E2E 재실행
 - 2026-10-15: deploy E2E 직접 재검증(73 PASS/0 FAIL, 정리 완료). 소비 영역 v1.2.0 전환과 D52(ops-feedback 검토 POST, release-gate 정책 스키마·실행기 규약·운영 모드 거부, model-lab 회귀 평가·파일 저장소, question-authoring 개선 신호) 모두 확인·push. deploy 재실행 지시. 발견: 비식별 기본이 자유 문자열 전부 마스킹이라 환류가 구조 수준(O19 권고안 B 기록). 사용자 결정 대기: O11, O06, O16, O19, 서빙 GPU 추론 위치와 GPU 서버 접근, 도메인·TLS·외부 감시·스케줄 주기, 정답 예시 오류 검토
+- 2026-10-27: 구조 문서를 v2로 정렬(`PROJECT_STRUCTURE.md`, `STRUCTURE.md`, `architecture.md` 4·5·10·11절), `metrics-v2-proposal.md` 작성, OPEN_GAPS 갱신. 영역 쪽 완료: turn-engine v0.4.0(G07), model-runtime v0.7.0(G09·G10·U15, 비밀 파일화), survey-service 재질문 상한 메커니즘(G12)과 직원 알림 포트(G01), D82~D84 기록.
 - 워크스페이스 루트 `CLAUDE.md`는 `head/shared/CLAUDE.root.md`의 링크. 공통 규칙에 `../survey-service/schema` 읽기 허용을 추가
 
 - 전체 설계서 작성(`ARCHITECTURE_FULL.md`, 내보낸 파일)
@@ -54,20 +58,18 @@
 
 ## 다음 작업(순서)
 
-(2026-10-14 시점의 계획이다. 현재 단계는 위 "현재 단계"를 따른다.)
+(2026-10-27 갱신. 2026-10-14 시점의 옛 계획은 `완료`의 기록으로 갈음했다.)
 
-1. 경계 계약과 명세는 확정 상태(사용자가 논의 생략). 변경은 `CONVENTIONS.md`의 진화 규칙 안에서만 한다.
-2. 영역 에이전트를 시작할 준비가 끝났다. 시작은 사용자 지시 후.
-2. (완료) contracts 읽기와 STRUCTURE.md 점검. 어긋난 곳은 메모 참조.
-4. O06은 Frontend 팀과의 협의 항목으로 따로 정리한다.
-5. 경계 계약 세트를 JSON Schema로 쓴다. TurnTrace의 릴리스 ID 필드 추가, ReleaseManifest, GateDecision을 먼저 확정하고 나머지 신규 계약 7개를 잇는다.
-6. 공통 규약(오류 분류, ID·버전 규칙, 시간·인코딩, 턴 ID 추적, 인증)을 쓴다.
-7. 영역 브리프를 쓰고(`briefs/`), `scripts/new-area.sh`로 영역 리포지토리를 만들고, 브리프를 `docs/brief.md`로 배치한다.
-8. 모델 영역의 도메인 정의(지표, 통과 임계치, 평가셋 구성, 실패 유형 분류체계)는 사용자와 함께 정한다(O11).
+1. 사용자 결정 모으기: G01, G12, G02, D-A. 질문은 한 번에 하나씩, 질문 전 알림.
+2. D-C: 학습 담당과 `metrics-v2-proposal.md`의 [학습 담당 확인] 항목을 확인한 뒤 `boundary-contracts/METRICS.md`를 고친다. model-lab에 평가 구현 변경 요청(U11 지표, `OUTPUT_INVALID` 지표)을 낸다.
+3. 문서 정리의 남은 부분: `architecture.md` 5절의 LangGraph 노드 이름은 survey-service 설계서로 확인하지 못해 단계 수준으로만 그렸다. survey-service 쪽 확인 뒤 노드 이름을 채운다.
+4. 줄기 R(태그 정렬 점검), C(model-lab `tests/golden/` 확인), E(헤드리스 브라우저, 깨끗한 두 번째 환경), T(학습 실행 래퍼, G06), A(어댑터 올리는 한 명령과 런북). `COMPLETION_PLAN.md` 참고.
+5. GPU 서버가 열리면 H1~H4. v0.7.0으로 gpu-dev 재측정(U01·U04·U07 갱신)도 여기에 든다.
+6. 사용자가 시키기 전에는 실제 문진 서비스 구축을 시작하지 않는다(메모리 기록: LangGraph 검토 보류).
 
 ## 진행 중인 것
 
-없음
+- 헤드: 구조 문서 v2 정렬(D-C의 도식 부분, 이번 커밋), 지표 v2 제안서. 영역 세션에서 진행 중인 일은 이 갱신에서 확인하지 못했다.
 
 ## 메모
 
@@ -97,3 +99,8 @@
 - 2026-10-27 계약 `v2.0.0` push. 1단계 영역 이전 병합: turn-engine v0.3.0, model-runtime v0.6.0(태그), release-gate, ops-feedback, synthetic-data. model-lab은 브랜치에서 진행 중, survey-service 이전 진행 중. 결정 D75, D76. 지시서 `docs/migration-2.0.0.md`.
 
 - 2026-10-27 D81: `gpu-12g`는 Qwen3-1.7B(파이프라인 데모용). model-runtime v0.6.3(스모크 통과, 태그 push) 후 survey-service(fa86fb7), release-gate(9286300), model-lab(21a05bb), deploy(1f0cb64)를 v0.6.3으로 맞춰 push. deploy E2E 88 PASS / 0 FAIL(헤드가 직접 재실행, 이 PC 한 환경). 확인 못 한 것: gpu-dev에서 Qwen3-1.7B 적재·두 어댑터 동시 적재(U01), 실제 LLM 데모. 다음: gpu-dev 켜서 실제 LLM 데모 → U01/U04/U07 갱신.
+
+## 진행 기록 (2026-10-27 저녁)
+
+- v0.7.0 열차 정렬, D82~D84 기록, 구조 문서 v2 정렬(`PROJECT_STRUCTURE.md`, `STRUCTURE.md`, `architecture.md`), `metrics-v2-proposal.md` 신설, OPEN_GAPS 갱신(G07·G09·G10·U15 닫힘, G01·G12·D-C 부분, H1~H4 신설).
+- 메모: 위 "메모"와 "진행 기록 (2026-10-26 갱신)"의 낡은 줄(계약 v1.3.3, 영역 시작 전 계획 등)은 기록으로 남겼다. 현재 값은 "현재 단계"가 우선한다.

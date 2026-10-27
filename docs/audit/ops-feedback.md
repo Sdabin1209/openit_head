@@ -126,7 +126,7 @@
 
 | 항목 | 판정 | 근거 / 제안 |
 | --- | --- | --- |
-| H1 핵심 경로 | 문제 L | 이번 실행: **295 통과, 110 건너뜀**(PG 없음, 64초). 실제 HTTP 서버와 실제 `boundary_contracts.clients`를 쓴 가짜 상류로 롤백·읽기 장애 시험(`tests/test_upstream_faults.py`, `test_http_clients.py`), 비식별은 실제 스키마 걷기 시험. 실제 release-gate·survey-service와는 연결 안 함(E2E는 deploy). |
+| H1 핵심 경로 | 문제 L | 이번 실행: **(통과 개수는 영역 README의 시험 상태 절을 따른다), 110 건너뜀**(PG 없음, 64초). 실제 HTTP 서버와 실제 `boundary_contracts.clients`를 쓴 가짜 상류로 롤백·읽기 장애 시험(`tests/test_upstream_faults.py`, `test_http_clients.py`), 비식별은 실제 스키마 걷기 시험. 실제 release-gate·survey-service와는 연결 안 함(E2E는 deploy). |
 | H2 간헐 실패 | OK | 서버는 포트 0(임시 포트)(`tests/test_api_read.py:23` 등), 시계는 주입, 실제 sleep은 상류 무응답 모사(`test_upstream_faults.py:58`). 이번 실행 한 번 통과(반복 실행은 안 함). |
 | H3 건너뛰는 시험 | 문제 M | 110건이 `TEST_DATABASE_URL` 없으면 건너뜀(`tests/conftest.py:100`, `test_postgres_timeout.py:33-37`). 건너뛰는 사유는 출력되고 대체는 SQLite 적합성 시험이지만, **운영 백엔드가 PostgreSQL**이라 기본 실행으로는 운영 경로가 시험되지 않는다. README의 PG 통과(405)는 한 환경에서 한 번의 기록. 제안: CI에서 PG를 필수로. |
 | H4 부정 시험 | OK | 토큰 없음/다른 종류 토큰 403, 잘못된 본문 400, 비밀 인라인 거부, 원본 접근 차단 시험 존재(`tests/test_api.py`, `test_api_read.py`, `test_api_review.py`, `test_secrets.py`, `test_raw_access.py`; `pytest.raises`/403 단언 수는 파일별 grep으로 확인). 위 B4의 두 입력(중첩 JSON, 비ASCII 헤더)은 시험에 없다. |

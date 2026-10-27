@@ -88,6 +88,11 @@
 | L20 | 게이트웨이 CSRF 방어(Sec-Fetch-Site·Origin)의 허용 Origin이 `GATEWAY_HOSTS`와 자동 연동되지 않고 요청의 호스트:포트를 쓴다. 단계 9의 gpg 암호화 백업 실행과 경로 우회 시도(`//`, `%2f`, 청크 본문) 회귀 시험은 없다 | deploy 후속 |
 | L21 | GPU 세션 키트(`model-runtime scripts/gpu_session`)는 가짜 백엔드·가짜 nvidia-smi로만 시험했다. 호출자가 먼저 끊으면 서버가 최대 3.5초 엔진을 잡는다(추정, 미측정) | GPU 사용 가능 시간대 필요 |
 | L22 | ops-feedback 검토 입력의 이메일 탐지는 `@` 뒤 254자까지만 본다. 오래 걸리는 정규식 점검은 입력군 일부(20,000·80,000자)로만 했다 | 알려진 한계 |
+| L23 | **직원 호출 전달 실패(DELIVERY_FAILED) 때 키오스크가 직원을 다시 부를 수 없다.** 알림을 다시 보내는 API와 서버에 '알림이 안 닿았다'를 남기는 계약이 없다. 지금은 "직접 알리셨나요?"를 묻고 세션을 끝내지 않는 데서 멈춘다(kiosk-frontend `docs/design.md`) | **환자 안전.** boundary-contracts 변경 요청(재알림 API, 실패 기록)을 헤드가 처리해야 한다. 임상 현장 흐름 확인 필요 |
+| L24 | PostgreSQL에서 question-authoring의 업로드와 purge가 동시에 도는 스레드 경쟁 시험이 없다(SQL 구조 확인과 SQLite 경쟁 시험만) | 후속 시험 |
+| L25 | survey-service의 DB 장애 시험(`test_readyz_db_outage.py` 등)이 `io.openit.dev-postgres=1` 라벨의 모든 컨테이너를 `docker pause`한다. 같은 서버의 다른 세션과 겹치면 서로 영향을 준다. 독립 재현 중 원인 불명의 시험 멈춤이 1회 있었으나 재현하지 못했다 | survey-service 후속 |
+| L26 | 영역 README의 시험 개수 8곳이 오래된 값이다(실제가 더 많음). 워크스페이스 규칙(영역 시험 상태는 그 영역 README 5절)에 어긋난다 | 각 영역이 갱신 |
+| L27 | deploy `scripts/test-inference-location.sh`가 게이트웨이 HTTPS 필수 이후 평문 포트로 호출해 통과하지 못한다(원인은 에이전트 추정, 미확정). 이 시험은 `e2e.sh`가 쓰지 않아 전체 E2E에는 안 들어간다. `check-standalone.sh`도 이번에 실행하지 못했다 | deploy 후속: TLS 구성(HTTPS 포트, 시험용 CA 신뢰)으로 적응 |
 
 ## 3-1. GPU 구멍 (H, 2026-10-27 신설)
 

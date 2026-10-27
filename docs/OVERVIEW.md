@@ -35,16 +35,19 @@
 
 서비스 영역의 기준 버전 `main`은 계약 v2.0.2, turn-engine v0.4.0, model-runtime v0.7.0에 맞춰져 있다. `deploy/scripts/check-versions.sh`가 **10개 영역의 28개 표기**가 표와 같은지 확인한다(두 프런트엔드는 오늘 뒤늦게 정렬하고 점검 대상에 넣었다: admin-console은 계약 v1.3.3 기준이라 단위 시험 2건이 실패하고 있었고 고쳐서 42건 모두 통과, kiosk-frontend는 모의 서버의 `pipeline_schema_version`이 "1.0"으로 하드코딩된 것을 고침).
 
-## 4. 지금 확인된 것
+## 4. 지금 확인된 것 (숫자는 주인 문서에서 본다)
 
-| 무엇 | 결과 | 어디서 확인 |
-|---|---|---|
-| 서비스 간 연결(가짜 모델) | 전체 모드로 통과(정적 점검 10규칙 FAIL 0 뒤에 실행. 최신 결과: [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md)). 가짜 A가 값을 내고(model-runtime v0.7.1) 서비스를 거친 값 있는 3턴이 실패 신호 없이 통과하며, 릴리스 교체 전후로 다른 6개 서비스의 컨테이너가 재시작되지 않음을 확인한다(5g, 5s). 저장된 값 자체를 읽는 공개 경로는 없어 간접 단언이다. 정정(CORRECT)은 시험하지 못했다. 그 전의 설명: **증명한 것은 배선뿐이다**: 문항 → 패키지 → 검사 → 승인 → 릴리스 → 서빙 적재 → 턴 → Trace → 실패 사례 → 롤백이 HTTP로 이어진다. 모델은 가짜(A는 `values`가 빈 NEXT, B는 고정 문장)라 **환자 말에서 값을 뽑아 저장하는 경로는 지나가지 않는다**. 단계 2(합성 데이터)는 BLOCKED(샘플 6,066건이 v2 스키마 위반으로 제외되어 데이터셋 미게시, G02), 단계 3은 학습이 아닌 시험용 어댑터, 승인은 스크립트가 대신함, 브라우저·음성·푸시는 범위 밖 | deploy `scripts/e2e.sh`, 이 PC |
-| 데모 띄우기(가짜 모델) | 성공, 비밀 노출 점검 통과 | `deploy/scripts/demo.sh up`, 이 PC |
-| 비밀이 환경 변수로 읽히지 않음 | 통과(컨테이너 9개, 비밀 파일 42개) | `deploy/scripts/check-secrets-hidden.sh` |
-| 실제 LLM(Qwen3-1.7B)이 12GB GPU에 올라감 | 확인, 약 10.1GB 사용, 기동 166초 | gpu-dev, model-runtime v0.6.5 |
-| LoRA-A 출력이 제약 디코딩으로 형식을 지킴 | 48회 모두 통과(OUTPUT_INVALID 0) | gpu-dev, v0.6.5 |
-| 키오스크 화면 브라우저 시험 | 9/9 통과, 호스트 설치 없이 컨테이너로 | kiosk-frontend `npm run test:e2e`, 이 PC |
+사실은 그것을 아는 영역이 한 곳에서만 쓴다. 이 문서는 복사하지 않고 가리킨다.
+
+| 무엇 | 주인 문서 |
+|---|---|
+| 서비스 사이 연결(가짜 모델 E2E). **배선만 증명한다**: 모델은 가짜, 승인은 스크립트, 합성 데이터 단계는 BLOCKED. 가짜 A가 값을 내는 경로와 릴리스 교체 때 다른 서비스가 재시작되지 않는 것도 이 시험이 본다 | [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md) |
+| 영역마다 자기 시험이 통과하는지 | 각 영역 README의 "현재 상태" 절 ([영역 지도](#3-영역-지도)의 링크) |
+| 계약·turn-engine·model-runtime 버전이 영역 사이 일치하는지 | `deploy/scripts/check-versions.sh`, 기준표는 `deploy/scripts/lib.sh` |
+| 영역 사이 정적 일관성(10규칙) | `deploy/scripts/check-all.sh` (실행하면 규칙별 검증됨/대상 아님/검증 안 함 분모가 나온다) |
+| 비밀이 컨테이너 환경 변수로 읽히지 않는지 | `deploy/scripts/check-secrets-hidden.sh` (E2E 단계에도 있음) |
+| 실제 LLM이 12GB GPU에 올라가는지, 출력 형식 | [`OPEN_GAPS.md`](OPEN_GAPS.md) U01, U04, U07 (gpu-dev 측정 기록) |
+| 키오스크 화면 브라우저 시험(컨테이너) | [`kiosk-frontend/README.md`](../../kiosk-frontend/README.md) |
 
 ## 5. 아직 안 되는 것
 

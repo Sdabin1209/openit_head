@@ -95,3 +95,5 @@
 - 다음: 형식 확정(boundary-contracts 새 스키마·예시)부터. 12GB 적재, 두 어댑터 동시 적재, 정규화 담당자의 수정 시점은 미확인.
 
 - 2026-10-27 계약 `v2.0.0` push. 1단계 영역 이전 병합: turn-engine v0.3.0, model-runtime v0.6.0(태그), release-gate, ops-feedback, synthetic-data. model-lab은 브랜치에서 진행 중, survey-service 이전 진행 중. 결정 D75, D76. 지시서 `docs/migration-2.0.0.md`.
+
+- 2026-10-27 D81: `gpu-12g`는 Qwen3-1.7B(파이프라인 데모용). model-runtime v0.6.3(스모크 통과, 태그 push) 후 survey-service(fa86fb7), release-gate(9286300), model-lab(21a05bb), deploy(1f0cb64)를 v0.6.3으로 맞춰 push. deploy E2E 88 PASS / 0 FAIL(헤드가 직접 재실행, 이 PC 한 환경). 확인 못 한 것: gpu-dev에서 Qwen3-1.7B 적재·두 어댑터 동시 적재(U01), 실제 LLM 데모. 다음: gpu-dev 켜서 실제 LLM 데모 → U01/U04/U07 갱신.

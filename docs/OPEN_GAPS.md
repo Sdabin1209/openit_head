@@ -39,7 +39,7 @@
 | U05 | 실제 브라우저 화면, 한국어 음성 인식(STT), 웹 푸시 수신 | 열림 | 키오스크 프런트 |
 | U06 | 일반 Linux 서버에서의 설치(지금은 WSL2 + Docker Desktop 두 환경) | 열림 | |
 | U07 | 새 구조(v2)의 **실제 LLM** 데모(Qwen3, GPU). 가짜 모델 E2E 통과 수는 정본을 따른다(최신 결과: [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md)). **gpu-dev 실제 LLM(2026-10-27, v0.6.5)**: 기동 166초(엔진 준비 약 80초), 시작 응답 정상, extract 형식 통과 100%. **그러나 키오스크 발화 14턴 모두 실패**: 학습 안 된 1.7B가 문항 세트에 없는 slot key(`Q1.D01.akan` 등)를 지어내서 survey-service `UNKNOWN_SLOT` 검증(D75)에서 걸리고 `turn_failure_signal`(NOT_COMMITTED)로 끝남. 의도대로의 동작(값을 지어내지 않음)이며 모델 내용 문제라 학습된 LoRA-A가 와야 한 턴이 통과할 것으로 추정(미확인). 건너뜀: 단계 2(G02), 직원 알림 화면(G01), 브라우저·STT·푸시(U05) | 부분 | 모델 정확성은 학습 쪽 몫(사용자 정리 대기). 학습 없이 한 턴을 통과시키려면 key를 현재 문항의 유효 slot enum으로 제약해야 하나 계약 변경이 필요(U14) |
-| U08 | LoRA 교체 시험: 같은 기반 모델의 두 번째 어댑터로 model-serving만 바꿔 나머지가 그대로 동작하는지(D72) | 열림 | |
+| U08 | LoRA 교체 시험: 같은 기반 모델의 두 번째 어댑터로 model-serving만 바꿔 나머지가 그대로 동작하는지(D72) | 부분 | | **진행(2026-10-27)**: `deploy`에 `demo.sh swap-adapters`를 만들어 가짜 백엔드 데모에서 실제로 돌렸다(교체 후 model-serving을 포함한 7개 컨테이너의 StartedAt 불변, 새 release_id LOADED, 기반 모델 불일치 어댑터는 거부되고 활성 릴리스 그대로; deploy 3a4d688). **남은 것**: vLLM(`--llm`) 데모에서의 교체는 GPU와 진짜 어댑터가 없어 코드를 읽은 것뿐.
 | U09 | 정규화 쪽을 다른 담당자가 수정 중이다(`~/WS/AGENTS.md`). 확정 시점과 범위 모름 | 열림 | 학습 서버 쪽 |
 | U10 | 평가가 가짜 모델로만 돌았다. 실제 모델 평가 값 없음 | 열림 | |
 | U11 | A 출력의 의미 위반율 지표(`validate_extraction` 기반)를 평가에 넣지 않았다 | 열림 | boundary 규칙과 충돌, 허락 필요. 지표 정의와 처분 제안은 `metrics-v2-proposal.md` 3절(학습 담당 확인 필요) |

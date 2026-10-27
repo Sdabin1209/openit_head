@@ -30,10 +30,10 @@
 | model-lab | 어댑터를 모델 패키지로 묶어 보관·제공(model-registry), 학습 서버 코드 감싸기 | [README](../../model-lab/README.md) | main |
 | synthetic-data | 학습·검증 데이터를 만들어 게시하는 run-once 잡(역할은 결정 대기, G02) | [README](../../synthetic-data/README.md) | main |
 | deploy | 여러 영역의 이미지를 한 서버에 묶어 띄우고 되돌리고 끝에서 끝까지 시험하는 영역 | [README](../../deploy/README.md) | main |
-| kiosk-frontend | 환자용 키오스크 화면과 직원 콘솔 화면 | [README](../../kiosk-frontend/README.md) | 계약 정렬 진행 중 |
-| admin-console | 출고 승인과 실패 사례 검토 화면 | [README](../../admin-console/README.md) | 계약 정렬 진행 중 |
+| kiosk-frontend | 환자용 키오스크 화면과 직원 콘솔 화면 | [README](../../kiosk-frontend/README.md) | 계약 v2.0.2 |
+| admin-console | 출고 승인과 실패 사례 검토 화면 | [README](../../admin-console/README.md) | 계약 v2.0.2 |
 
-서비스 영역의 기준 버전 `main`은 계약 v2.0.2, turn-engine v0.4.0, model-runtime v0.7.0에 맞춰져 있다(`deploy/scripts/check-versions.sh`가 8개 영역의 26개 표기가 표와 같은지 확인한다. 두 프런트엔드는 아직 이 점검 대상이 아니었고, 지금 맞추는 중이다).
+서비스 영역의 기준 버전 `main`은 계약 v2.0.2, turn-engine v0.4.0, model-runtime v0.7.0에 맞춰져 있다. `deploy/scripts/check-versions.sh`가 **10개 영역의 28개 표기**가 표와 같은지 확인한다(두 프런트엔드는 오늘 뒤늦게 정렬하고 점검 대상에 넣었다: admin-console은 계약 v1.3.3 기준이라 단위 시험 2건이 실패하고 있었고 고쳐서 42건 모두 통과, kiosk-frontend는 모의 서버의 `pipeline_schema_version`이 "1.0"으로 하드코딩된 것을 고침).
 
 ## 4. 지금 확인된 것
 
@@ -92,15 +92,16 @@
 
 `STRUCTURE.md`, `PROJECT_STRUCTURE.md`, `architecture.md`는 내용이 겹친다. 하나로 합칠지는 정하지 않았고, 우선은 위 표처럼 역할만 구분해 둔다.
 
-## 9. 문서 정리 목록 (README를 쓰면서 영역들이 찾은 어긋남)
+## 9. 문서 정리 결과와 남은 것
 
-코드 문제가 아니라 낡은 문서다. 영역이 각자 고친다.
+영역들이 README를 쓰며 찾은 낡은 문서(STATUS의 시험 개수·태그 상태, `brief.md`의 v1 서술, 계약 버전 표기, 비밀을 환경 변수로 주는 예시, `V2_DRAFT.md`의 검토 대기 문구 등)는 10개 영역에서 문서만 고쳐 push했다(코드 변경 없음). 남은 것은 코드나 헤드의 판단이 필요한 것이다.
 
-- **여러 영역**: STATUS에 적힌 시험 개수가 실제 수집 개수와 다르다(ops-feedback, survey-service, synthetic-data, model-lab, kiosk-frontend). 과거 시점 문구가 남은 `brief.md`(model-runtime, turn-engine, release-gate, question-authoring).
-- **boundary-contracts**: `V2_DRAFT.md`가 "브랜치, 검토 대기"로 낡았다. `HTTP.md`에는 I2(DatasetStore) 절이 없다. `METRICS.md`는 v1 지표(D-C, 제안: `metrics-v2-proposal.md`).
-- **model-runtime**: `profiles/gpu-12g.json`의 `loadable`이 `unverified`인데 gpu-dev에서 적재를 확인했다. runbook이 `gpu-dev-12g.json`이라 적은 곳이 있다.
-- **turn-engine**: `STATUS.md`가 브랜치·태그 없음으로 적혀 있으나 실제로는 main에 `v0.4.0`이 있다. 계약 문서(`INTERFACES.md`)에 제거된 `SUPPORTED_RUNTIME_CONTRACT_VERSION`이 남아 있다.
-- **survey-service**: `design.md` 1~15절이 v1 내용이다(머리말에 폐기 표시). `boundary.md`가 계약 v2.0.1이라 적었다.
-- **deploy**: `boundary.md`가 계약 v1.1.0, 서비스 6개로 적었으나 실제는 서비스 9개와 잡 2개이고 계약 v2.0.2다. STATUS는 v0.6.2에서 멈춰 있다.
-- **ops-feedback**: README 한 곳이 비밀을 환경 변수로 주는 예시를 보여 준다(`OPS_INGEST_TOKEN=...`). `NAME_FILE` 예시로 바꿔야 한다.
-- **OPEN_GAPS**: G09(model-lab 쪽 제거 완료)를 닫힘으로 바꿔야 한다. CR-010, O11, O16처럼 영역 문서에 있지만 대장에 ID가 없는 항목이 있다.
+| 남은 것 | 이유 | 누가 |
+|---|---|---|
+| model-runtime `make_neutral_package.py` 도움말 "gpu-12g는 Qwen3-4B" (실제 1.7B), `profiles/gpu-12g.json`의 `loadable: unverified`에 측정값 반영 | 코드 영역 | 다음 model-runtime 릴리스에 묶음 |
+| model-lab `configs/gpu-dev-fixture-*.yaml` 주석 "golden에서 만든", `pyproject` 0.1.0 vs CHANGELOG 0.2.3 | 코드 영역 | model-lab |
+| turn-engine CR-010(QuestionBank에서 표를 만드는 변환 함수), `docs/rules/` 삭제 여부 | 헤드 결정 | 헤드 |
+| I2(DatasetStore)를 HTTP로 정할지 | 계약 설계 결정 | 헤드 |
+| admin-console CR-003(생성물 커밋 정책) | 헤드 결정 | 헤드 |
+| `METRICS.md` v1 지표 | [`metrics-v2-proposal.md`](metrics-v2-proposal.md) 참고 | 헤드 + 학습 담당 |
+| `STRUCTURE.md`, `PROJECT_STRUCTURE.md`, `architecture.md` 겹침 | 합칠지 결정 안 함 | 헤드 |

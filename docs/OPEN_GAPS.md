@@ -54,6 +54,9 @@
 | D-C | `METRICS.md`의 v1 지표(`risk_signal_*`, `intent_accuracy`)를 v2 용어로 바꾸는 일 | 헤드 + 학습 담당 | 부분 (근거: `metrics-v2-proposal.md`가 폐기·대체·신설 목록을 정리했다. `METRICS.md` 본문은 아직 v1이고 학습 담당 확인 뒤 반영) |
 | D-D | 데이터셋 담당에게 보내는 정리 요청(`dataset-requests.md`) | 사용자 전달 | 보류(구조 완성 뒤) |
 | D-E | 회귀 평가가 읽는 v2 TurnTrace 입력 키 이름(`extract_input` 등은 추정) | survey-service 확정 후 | 열림 |
+| D-F | turn-engine CR-010: QuestionBank에서 `QuestionFlowTable`을 만드는 변환 함수를 더할지, `docs/rules/` 삭제 여부 | 헤드 | 열림 |
+| D-G | I2(DatasetStore)를 HTTP로 정할지(경로, 클라이언트, 참조 서버). 지금은 SDK 프로토콜과 INTERFACES.md뿐 | 헤드 | 열림 |
+| D-H | admin-console CR-003: 생성된 검증기(`generated/contract-validators.cjs`)를 커밋 대상으로 둘지 | 헤드 | 열림 |
 
 ## 3-1. GPU 구멍 (H, 2026-10-27 신설)
 

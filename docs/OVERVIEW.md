@@ -1,6 +1,6 @@
 # 문진 시스템 개요 (팀 공유용 입구)
 
-기준일 2026-10-27. 이 문서는 **새로 설명하지 않고 모으기만 한다.** 각 영역의 설명은 그 영역의 `README.md`가 정본이다. 확인은 이 PC와 gpu-dev(둘 다 WSL2 + Docker Desktop) 두 환경에서 했다. 깨끗한 일반 리눅스 서버에서는 확인하지 못했다(U06, U12).
+기준일 2026-10-28. 이 문서는 **새로 설명하지 않고 모으기만 한다.** 각 영역의 설명은 그 영역의 `README.md`가 정본이다. 확인은 이 PC와 gpu-dev(둘 다 WSL2 + Docker Desktop) 두 환경에서 했다. 깨끗한 일반 리눅스 서버에서는 확인하지 못했다(U06, U12).
 
 ## 1. 한 문단 요약
 
@@ -22,7 +22,7 @@
 |---|---|---|---|
 | boundary-contracts | 영역 사이 데이터 형식(계약)과 그것을 지키는지 확인하는 공유 패키지. 소유자는 헤드 | [README](../../boundary-contracts/README.md) | v2.0.2 |
 | turn-engine | AI가 낸 "환자 답변 해석"이 말이 되는지 규칙으로 다시 검사하는 작은 라이브러리 | [README](../../turn-engine/README.md) | v0.4.0 |
-| model-runtime | 두 모델(LoRA-A 추출, LoRA-B 응답)을 불러 호출하는 라이브러리 겸 추론 서버 | [README](../../model-runtime/README.md) | v0.7.2 |
+| model-runtime | 두 모델(LoRA-A 추출, LoRA-B 응답)을 불러 호출하는 라이브러리 겸 추론 서버 | [README](../../model-runtime/README.md) | v0.7.3 |
 | survey-service | 환자 발화 한 턴을 받아 저장값으로 바꾸고 다음 말을 돌려주는 HTTP 서비스 | [README](../../survey-service/README.md) | main |
 | release-gate | 문항 세트와 모델 조합을 검사하고 사람이 승인한 조합만 릴리스로 묶는 서비스 | [README](../../release-gate/README.md) | main |
 | ops-feedback | 운영 중 trace를 받아 개인정보를 지우고 실패 사례를 가려내는 영역 | [README](../../ops-feedback/README.md) | main |
@@ -33,7 +33,7 @@
 | kiosk-frontend | 환자용 키오스크 화면과 직원 콘솔 화면 | [README](../../kiosk-frontend/README.md) | 계약 v2.0.2 |
 | admin-console | 출고 승인과 실패 사례 검토 화면 | [README](../../admin-console/README.md) | 계약 v2.0.2 |
 
-서비스 영역의 기준 버전 `main`은 계약 v2.0.2, turn-engine v0.4.0, model-runtime v0.7.2에 맞춰져 있다. `deploy/scripts/check-versions.sh`가 **10개 영역의 28개 표기**가 표와 같은지 확인한다(두 프런트엔드는 오늘 뒤늦게 정렬하고 점검 대상에 넣었다: admin-console은 계약 v1.3.3 기준이라 단위 시험 2건이 실패하고 있었고 고쳐서 42건 모두 통과, kiosk-frontend는 모의 서버의 `pipeline_schema_version`이 "1.0"으로 하드코딩된 것을 고침).
+서비스 영역의 기준 버전 `main`은 계약 v2.0.2, turn-engine v0.4.0, model-runtime v0.7.3에 맞춰져 있다. `deploy/scripts/check-versions.sh`가 **10개 영역의 28개 표기**가 표와 같은지 확인한다(두 프런트엔드는 오늘 뒤늦게 정렬하고 점검 대상에 넣었다: admin-console은 계약 v1.3.3 기준이라 단위 시험 2건이 실패하고 있었고 고쳐서 42건 모두 통과, kiosk-frontend는 모의 서버의 `pipeline_schema_version`이 "1.0"으로 하드코딩된 것을 고침).
 
 ## 4. 지금 확인된 것 (숫자는 주인 문서에서 본다)
 
@@ -41,23 +41,27 @@
 
 | 무엇 | 주인 문서 |
 |---|---|
-| 서비스 사이 연결(가짜 모델 E2E). **배선만 증명한다**: 모델은 가짜, 승인은 스크립트, 합성 데이터 단계는 BLOCKED. 가짜 A가 값을 내는 경로와 릴리스 교체 때 다른 서비스가 재시작되지 않는 것도 이 시험이 본다 | [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md) |
+| 서비스 사이 연결(가짜 모델 E2E, 이 PC와 gpu-dev 두 환경). **배선만 증명한다**: 모델은 가짜, 승인은 스크립트 | [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md) |
+| 장애 상황(서비스 중지·멈춤, DB 중지·멈춤, 모델 서버 멈춤)에서 환자 턴이 어떻게 끝나는가 | [`FAULT_POLICY.md`](FAULT_POLICY.md)(기준), [`FAULT_MATRIX.md`](FAULT_MATRIX.md)(칸별 정의·시험 여부, 분모 포함), E2E 단계 5q·5w·5p·5m·5u |
+| 보안·개인정보·운영·배포·구조 근거를 표준 체크리스트로 점검한 결과 | [`AUDIT_CHECKLIST.md`](AUDIT_CHECKLIST.md), [`AUDIT_SUMMARY.md`](AUDIT_SUMMARY.md), 영역별 원문 `audit/*.md` |
+| 구조 선택의 '왜'(저장소·프로토콜·한도·보존·인증 등) | 영역마다 `docs/adr/`(영역 README가 목록 링크), 시스템 수준은 [`adr/`](adr/README.md). 규칙은 D89 |
 | 영역마다 자기 시험이 통과하는지 | 각 영역 README의 "현재 상태" 절 ([영역 지도](#3-영역-지도)의 링크) |
 | 계약·turn-engine·model-runtime 버전이 영역 사이 일치하는지 | `deploy/scripts/check-versions.sh`, 기준표는 `deploy/scripts/lib.sh` |
-| 영역 사이 정적 일관성(10규칙) | `deploy/scripts/check-all.sh` (실행하면 규칙별 검증됨/대상 아님/검증 안 함 분모가 나온다) |
-| 비밀이 컨테이너 환경 변수로 읽히지 않는지 | `deploy/scripts/check-secrets-hidden.sh` (E2E 단계에도 있음) |
+| 영역 사이 정적 일관성(10규칙) | `deploy/scripts/check-all.sh` (규칙별 검증됨/대상 아님/검증 안 함 분모가 나온다) |
+| 영역 하나가 바뀌었을 때 전체 E2E 없이 확인하는 법 | `deploy/scripts/verify-area.sh <영역>` (영역→E2E 단계 대응표 `deploy/config/verify-areas.yaml`) |
+| 비밀이 컨테이너 환경 변수로 읽히지 않는지, 컨테이너가 비root·읽기 전용인지 | `deploy/scripts/check-secrets-hidden.sh`, `deploy/scripts/check-containers.sh` |
+| 서빙 프롬프트와 학습 데이터의 글자 일치, 서비스 표·값 검증이 실제 학습 데이터에서 정답을 거부하는지 | [`OPEN_GAPS.md`](OPEN_GAPS.md) U03, G02, G03, G13 (2026-10-28 학습 서버의 최종 데이터 C1 전체 대조) |
 | 실제 LLM이 12GB GPU에 올라가는지, 출력 형식 | [`OPEN_GAPS.md`](OPEN_GAPS.md) U01, U04, U07 (gpu-dev 측정 기록) |
+| 실제 GPU(openit 서버)를 짧은 시간에 안전하게 쓰는 키트 | [`model-runtime/docs/GPU_SESSION.md`](../../model-runtime/docs/GPU_SESSION.md) |
 | 키오스크 화면 브라우저 시험(컨테이너) | [`kiosk-frontend/README.md`](../../kiosk-frontend/README.md) |
 
 ## 5. 아직 안 되는 것
 
-- **실제 모델로 값 추출·저장이 도는 대화 한 턴.** 가짜 모델 E2E는 이제 이 경로를 지나간다(위 4절, 간접 단언). 실제 모델로는 아직 한 턴이 끝까지 통과한 적이 없다.
-- (이어서) **실제 모델로 대화 한 턴이 끝까지 통과하는 것.** 학습 안 된 모델은 문항 세트에 없는 slot key를 지어내서 서비스가 막는다(`UNKNOWN_SLOT`). 이것은 설계대로 동작한 것(값을 지어내지 않음)이다. 학습된 LoRA-A를 얹어 봐야 한다(구멍 H2).
-- **GPU가 필요한 일(구멍)**: 24GB급에서 Qwen3-8B 적재(H1), 학습된 어댑터 얹기와 교체 시험(H2), 학습 파이프라인 실제 실행(H3), 문법 컴파일 비용과 동시 부하(H4). 순서와 명령은 [`deploy/docs/GPU_HOLE.md`](../../deploy/docs/GPU_HOLE.md)에 있다.
-- **학습 감싸기(G06)**: 학습 서버 스크립트의 인자 이름은 서버에서 읽어 `arg_map`을 채웠다(코드를 읽은 것이고 `--help`는 실행하지 않음). 학습 실제 실행은 H3로 남아 있다.
-- **B 입력 표(G03)**: 데이터셋 담당의 `labels.py` 규칙을 옮겼다. 담당이 그 규칙을 기준으로 확정했다는 기록은 못 찾았다.
-- **gpu-dev 실제 LLM**: 학습 안 된 Qwen3-1.7B로 기동·형식 통과·어댑터 교체까지 확인했다(U07, U08). 정확성은 확인하지 못했다.
-- 실제 기기에서의 마이크·한국어 음성 인식·웹 푸시 구독, 일반 리눅스 서버 설치, 두 번째 독립 환경(U05, U06, U12).
+- **실제 GPU와 학습된 모델로 환자 한 턴.** 가짜 모델 E2E는 배선을 증명한다. 모든 시간 한도(턴 마감, 모델 서버 상한, 소켓·연결 한도)는 **측정 없는 초기값**이고 24GB급 실측(H1~H4) 뒤 다시 정해야 한다. 키트와 절차는 준비됐다. openit 서버의 GPU는 데이터셋 담당의 증강 작업이 점유 중이라 쓰지 못했다.
+- **실제 기기**: 마이크·한국어 온디바이스 음성 인식·웹 푸시, 일반 리눅스 서버 설치(U05, U06, U12).
+- **학습 데이터와 담당 확정**: `labels.py`를 B 입력의 기준으로 담당이 확정했는지(G03), 합성 데이터 게시기를 실제 데이터에 쓰도록 담당이 허락했는지(G02).
+- **알려진 한계와 그 이유**는 [`OPEN_GAPS.md`](OPEN_GAPS.md) 3-0절(L01~L18)에 한 표로 있다. 코드로 안 닫은 것(로그인 속도 제한, 취약점 스캔, 서비스 간 TLS 등)과 병원 정보가 필요한 값(도메인·인증서, 보존 규정, 위험 문구의 임상 검토)을 구분한다.
+- **전수 점검의 범위**: 점검은 체크리스트 63항목 안에서만 완전하다. 영역마다 '확인 못 함'이 남아 있고(점검 보고 참고), 이 목록 밖의 문제는 보장하지 않는다.
 
 ## 6. 열린 항목 수
 
@@ -65,19 +69,18 @@
 
 ## 7. 역할 분배 제안
 
-코드는 헤드(에이전트)가 짠다. 팀원은 **입력을 주고, 결정하고, 서버·접근을 열고, 내용을 확정하는 일**을 맡는다. 프레임워크는 사용자 포함 3명이고, 학습(LoRA-A, LoRA-B)과 데이터셋 증강 담당 3명은 이미 자기 일이 있어 부탁만 한다. 누구에게 줄지는 사용자가 정한다.
+코드는 헤드(에이전트)가 짠다. 팀원은 **입력을 주고, 결정하고, 서버·접근을 열고, 내용을 확정하는 일**을 맡는다. 프레임워크는 사용자 포함 3명이고, 학습(LoRA-A, LoRA-B)과 데이터셋 증강 담당 3명은 이미 자기 일이 있어 부탁만 한다. 누구에게 줄지는 사용자가 정한다. 값은 모두 잠정 기본값이라(D88) 병원 정보가 오면 설정만 바꾼다.
 
-| 담당 | 사람이 할 일 (코드가 끝나길 기다리지 않고 지금 시작) | 코드 완성 뒤에 할 일 |
+| 담당 | 사람이 할 일 | 코드 완성 뒤에 할 일 |
 |---|---|---|
-| **A: 서빙·인프라** | 이 PC에서 학습 서버(`openit`)가 왜 거부되는지 확인(주소·키 설정은 있음, 지금 포트 41822 거부), 24GB급 GPU 서버 확보 | 깨끗한 리눅스 서버에서 문서대로 설치 확인(U06, U12) |
-| **B: 서비스·화면** | 질문 표 확정(데이터셋 담당과, G03·G13·G04), 직원 알림·재질문 규칙의 도메인 근거 모으기 | 실제 기기에서 마이크·음성 인식·푸시 확인(U05), 승인·검토 화면을 승인자 입장에서 써 보기 |
-| **사용자: 결정과 창구** | 결정: 직원 알림 입력원(G01), 재질문 상한 값(G12), synthetic-data 역할(G02), 운영 정책(D-A), 문진 결과가 병원으로 나가는 경로 확인(공개 API 문서와 `INTERFACES.md`에서 찾지 못함) | — |
+| **A: 서빙·인프라** | 24GB급 GPU를 쓸 수 있는 시간대 확보(openit은 증강 작업이 점유 중), 운영 도메인과 인증서 방식 결정(내부 CA 기본, [`deploy/docs/runbook.md`](../../deploy/docs/runbook.md) 9절), 백업 대상(서버 밖)과 복호 키를 서버 밖에 2곳 이상 보관(runbook 4절. **키를 잃으면 백업을 복구할 수 없다**) | 깨끗한 리눅스 서버에서 문서대로 설치 확인(U06, U12), 내부 CA 루트를 키오스크·직원 PC에 배포 |
+| **B: 서비스·화면** | 위험 문구 기본 목록(`provisional`)의 임상 검토, 직원 호출 기준, 환자 대체 문구, 재질문·유휴 초기화·재시도 값의 현장 적합성(U10) | 실기기에서 마이크·음성 인식·푸시 확인(U05), 승인·검토 화면을 승인자 입장에서 써 보기 |
+| **사용자: 결정과 창구** | **D92 확인**: 임상 승인을 저자≠검수자(4-eyes)로 바꿨다(이전 D30은 저자의 확인이 임상 승인). 의료인이 한 명뿐이면 막히므로 `QA_REQUIRE_TWO_PERSON=false`로 되돌릴 수 있다. 보존 기간(원본 30일, 세션 90일, 사례 180일, 백업 14일은 잠정), 확정 사례를 180일 뒤 지울지, 접수 연동 방식(환자마다 참조값이 오는가), 병원 연동, 외부 STT 허용 여부(기본 꺼짐) | — |
+| **학습·데이터셋 담당(부탁)** | `labels.py`를 B 입력 기준으로 확정, 최종 데이터(C1)를 서비스 검증에 써도 되는지, 학습 서버 스크립트 해시 값 채우기 | 새 학습 결과의 어댑터 쌍과 시스템 프롬프트·run 기록 위치 알리기 |
 
-학습·데이터셋 담당에게 하는 부탁은 2건이다: 이번에 쓸 학습된 어댑터 A·B 쌍(어댑터는 서버에 이미 있음)과 그 시스템 프롬프트·run 기록 위치를 정해 알려 주기, 데이터셋 증강 담당의 질문 표 확정과 합성 데이터 영역의 v2 대응 의견. 학습 스크립트의 인자 이름은 접속이 되면 헤드가 서버에서 읽는다.
+**헤드가 짠 코드(만들어서 확인함)**: 이전 목록에 더해, 장애 정책 구현(턴 마감·멱등·게이트웨이 503/504·키오스크 재시도), 위험 감지 fail-safe, 기기별 토큰, 4-eyes, 보존 잡, 백업·복원, TLS, 영역별 빠른 검증 스크립트, GPU 세션 키트.
 
-**헤드가 짠 코드(만들어서 확인함)**: `demo.sh swap-adapters`(가짜 백엔드와 gpu-dev 실제 LLM 데모에서 실행, U08), `probe-serving`, PostgreSQL 전환, 결과 조회·위험 신호 API, 기기·행위자 인증. **남은 것**: 정정(CORRECT) 흐름 시험, 직원 알림 규칙(사용자 결정), model-lab 24GB용 프로파일, 승인 화면의 v2 지표 표시, 병원·외부 감지기가 들어올 내부 입구(미정).
-
-제품이 완성된 뒤의 일: 실제 GPU에서 학습된 어댑터로 한 턴 통과(H1~H3, [`deploy/docs/GPU_HOLE.md`](../../deploy/docs/GPU_HOLE.md)).
+제품이 완성된 뒤의 일: 실제 GPU에서 학습된 어댑터로 한 턴 통과와 시간 한도 재정(H1~H3, [`deploy/docs/GPU_HOLE.md`](../../deploy/docs/GPU_HOLE.md)).
 
 ## 8. 문서 지도 (head/docs)
 
@@ -85,8 +88,11 @@
 |---|---|---|
 | 이 문서 `OVERVIEW.md` | 입구. 영역 지도, 상태, 역할 분배 | 모두 |
 | 영역별 `README.md` | 그 영역의 정본 설명 | 모두 |
-| [`OPEN_GAPS.md`](OPEN_GAPS.md) | 비워 두었거나 확인하지 못한 것의 대장 | 모두 |
-| [`DECISIONS.md`](DECISIONS.md) | 확정한 결정(D01~D85) | 결정 근거가 필요할 때 |
+| [`OPEN_GAPS.md`](OPEN_GAPS.md) | 비워 두었거나 확인하지 못한 것, 알려진 한계(L01~L18)의 대장 | 모두 |
+| [`DECISIONS.md`](DECISIONS.md) | 확정한 결정(D01~D92)과 근거 보강 | 결정 근거가 필요할 때 |
+| [`adr/`](adr/README.md) | 시스템 수준 구조 결정의 '왜'(영역 내부 결정은 각 영역 `docs/adr/`) | 구조 근거가 필요할 때 |
+| [`FAULT_POLICY.md`](FAULT_POLICY.md), [`FAULT_MATRIX.md`](FAULT_MATRIX.md) | 장애 대응 기준과 칸별 확인 표 | 장애 대응을 다룰 때 |
+| [`AUDIT_CHECKLIST.md`](AUDIT_CHECKLIST.md), [`AUDIT_SUMMARY.md`](AUDIT_SUMMARY.md), `audit/` | 전수 점검 기준·종합·영역별 원문 | 점검 결과가 필요할 때 |
 | [`STATUS.md`](STATUS.md) | 진행 기록 | 헤드 |
 | [`COMPLETION_PLAN.md`](COMPLETION_PLAN.md) | 완성까지의 작업줄기와 GPU 구멍 | 헤드, 계획 확인 |
 | [`STRUCTURE.md`](STRUCTURE.md) | 에이전트용 구조 요약이자 영역 작업의 기준 | 에이전트 |
@@ -98,14 +104,12 @@
 
 ## 9. 문서 정리 결과와 남은 것
 
-영역들이 README를 쓰며 찾은 낡은 문서(STATUS의 시험 개수·태그 상태, `brief.md`의 v1 서술, 계약 버전 표기, 비밀을 환경 변수로 주는 예시, `V2_DRAFT.md`의 검토 대기 문구 등)는 10개 영역에서 문서만 고쳐 push했다(코드 변경 없음). 남은 것은 코드나 헤드의 판단이 필요한 것이다.
+영역들이 README를 쓰며 찾은 낡은 문서는 영역 쪽에서 고쳤고, 오늘 전수 점검에서 나온 문서 불일치도 영역 에이전트가 고쳤다. 남은 것은 코드나 헤드의 판단이 필요한 것이다.
 
 | 남은 것 | 이유 | 누가 |
 |---|---|---|
-| model-runtime `make_neutral_package.py` 도움말 "gpu-12g는 Qwen3-4B" (실제 1.7B), `profiles/gpu-12g.json`의 `loadable: unverified`에 측정값 반영 | 코드 영역 | 다음 model-runtime 릴리스에 묶음 |
-| model-lab `configs/gpu-dev-fixture-*.yaml` 주석 "golden에서 만든", `pyproject` 0.1.0 vs CHANGELOG 0.2.3 | 코드 영역 | model-lab |
 | turn-engine CR-010(QuestionBank에서 표를 만드는 변환 함수), `docs/rules/` 삭제 여부 | 헤드 결정 | 헤드 |
 | I2(DatasetStore)를 HTTP로 정할지 | 계약 설계 결정 | 헤드 |
-| admin-console CR-003(생성물 커밋 정책) | 헤드 결정 | 헤드 |
 | `METRICS.md` v1 지표 | [`metrics-v2-proposal.md`](metrics-v2-proposal.md) 참고 | 헤드 + 학습 담당 |
 | `STRUCTURE.md`, `PROJECT_STRUCTURE.md`, `architecture.md` 겹침 | 합칠지 결정 안 함 | 헤드 |
+| synthetic-data v1 생성 경로 삭제(D91) | 시드 경로 분리 뒤 | synthetic-data |

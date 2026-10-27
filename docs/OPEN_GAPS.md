@@ -83,6 +83,7 @@
 | L15 | 학습 서버 스크립트 해시(`configs/train.yaml server.script_sha256`) 값 비어 있음 | 서버에서 `train-doctor` 실행 필요 |
 | L16 | devDependency 취약점 3건(kiosk-frontend: playwright, ajv, fast-uri), admin-console 온라인 감사 미실시 | 런타임 영향 없음(`--omit=dev` 0건). 고치려면 고정 버전 밖 업그레이드 + 시험 이미지 재검증 |
 | L17 | synthetic-data v1 생성 경로 폐기 표시만(D91), 보류 시험 15건 | 시드 경로 분리 뒤 삭제 |
+| L18 | 서비스 값 형식 검증(선택지·단위·예/아니오)을 **실제 문항 세트(칸 정의 포함)** 로 학습 정답에 돌려 본 적이 없다. 서버 `question_bank.json`은 문장만 있고 칸 정의가 없다 | 칸 정의가 있는 실제 문항 세트는 의료인이 question-authoring으로 올리는 내용(사람 입력). 올라오면 `scripts/reference_agreement.py`로 재실행 |
 
 ## 3-1. GPU 구멍 (H, 2026-10-27 신설)
 

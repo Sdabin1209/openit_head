@@ -57,6 +57,7 @@
 | D-F | turn-engine CR-010: QuestionBank에서 `QuestionFlowTable`을 만드는 변환 함수를 더할지, `docs/rules/` 삭제 여부 | 헤드 | 열림 |
 | D-G | I2(DatasetStore)를 HTTP로 정할지(경로, 클라이언트, 참조 서버). 지금은 SDK 프로토콜과 INTERFACES.md뿐 | 헤드 | 열림 |
 | D-H | admin-console CR-003: 생성된 검증기(`generated/contract-validators.cjs`)를 커밋 대상으로 둘지 | 헤드 | 열림 |
+| D-I | **문진 결과(저장된 답)가 병원으로 나가는 경로**가 정의되어 있지 않은 것으로 보인다. `boundary-contracts/PUBLIC_API.md`와 `INTERFACES.md`, `survey-service/docs/boundary.md`에서 저장 값을 내보내거나 조회하는 인터페이스를 찾지 못했다(이 세 문서만 grep, 다른 문서·코드는 읽지 않음). 의도적으로 범위 밖이면 그렇다고 결정에 적고, 아니면 인터페이스가 필요하다 | 사용자(제품 범위) | 열림 |
 
 ## 3-1. GPU 구멍 (H, 2026-10-27 신설)
 

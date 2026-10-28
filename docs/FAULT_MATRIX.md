@@ -262,7 +262,7 @@
 
 ## 2. 간선을 찾은 방법 (재현 가능, 닫힌 목록의 한계)
 
-간선 = 호출자 -> 대상 중 런타임에 일어나는 것(HTTP, DB 연결, 볼륨 공유, 스케줄러 실행, 외부 서비스 호출). 아래 순서로 찾았고, **여기서 놓친 간선은 이 문서에도 없다.** 다시 돌려서 새로 나오는 줄이 있으면 이 문서에 보탠다. 경로는 모두 `/home/user/sdabin/healthKiosk` 기준. 2026-10-28 갱신에서 간선 1개(G8)를 보탰다.
+간선 = 호출자 -> 대상 중 런타임에 일어나는 것(HTTP, DB 연결, 볼륨 공유, 스케줄러 실행, 외부 서비스 호출). 아래 순서로 찾았고, **여기서 놓친 간선은 이 문서에도 없다.** 다시 돌려서 새로 나오는 줄이 있으면 이 문서에 보탠다. 경로는 모두 워크스페이스 루트 기준. 2026-10-28 갱신에서 간선 1개(G8)를 보탰다.
 
 1. Compose 구조: `deploy/compose*.yaml`, `deploy/test/compose.fake-model.yaml`을 통째로 읽음(networks, volumes, secrets, depends_on, env_file, ports, profiles jobs).
 2. 환경 변수 URL: `grep -nE '_URL|FACTORY|TIMEOUT|POLL' deploy/config/*.env`(비밀 파일 `secrets/`와 토큰 값은 열지 않았다. `cat config/*.env` 형태는 도구가 거부해 URL·타임아웃 줄만 grep).

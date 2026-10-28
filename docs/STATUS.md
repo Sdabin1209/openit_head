@@ -4,6 +4,14 @@
 
 ## 현재 단계
 
+**(2026-10-29 06:33 갱신)** 열차: boundary-contracts `v2.2.1`, model-runtime `v0.9.0`, 문진 스키마 `survey-schema-v1.1.0`, turn-engine `v0.4.3`(D109로 동결, 버전 열차 밖). 모두 GitHub에 태그·main push 완료. gpu-dev E2E(`--changed-only`, 사실상 대부분 단계) 146 PASS / 0 FAIL(06:30). GitHub 태그로 새 clone `setup-env.sh` 확인(survey-service).
+- 끝난 단위: 1(계약 v2.2.0 열차, 401/403·서버 발급 세션·시간 예산·ImageLabels), 2(ADR 0010: LoRA-A 출력 규칙은 model-runtime 서버가 `check_action_extraction`으로 보증, survey-service는 `ExtractRequest{input, flow}` 전송·중복 재검증 제거, turn-engine 코드 의존 제거 D109), 3(10개 영역이 손코드 검증을 계약 경계 스키마 49개로 교체, D107·D108·D110).
+- 다음: 단위 4(단계 C, 표준 인프라 교체: WSGI/waitress, Caddy 정적, yoyo 마이그레이션, systemd 타이머, restic, Prometheus, 기기 인증서 mTLS ADR 0012). 사용자 결정 대기 5건(릴리스 무결성 해시 vs 서명, 감시·스케줄러 교체 범위, model-lab 학습 도구, KF-11 직원 호출 실패 화면, QA-15 4인 검토 기본값).
+- 작은 후속: deploy build-images가 영역 내부 파일 두 곳(model-runtime pyproject version, kiosk-frontend package.json version)을 직접 읽음 — 영역이 빌드 산출물로 값을 내게. OPEN_GAPS U20~U27.
+- 영역 에이전트: Sonnet 팀원 11개(이름 *-sonnet, 2026-10-29 생성). 이전 Opus 실행 에이전트 10개는 지우지 않고 두되 재개하지 않는다.
+
+### 이전 기록
+
 (2026-10-27 갱신. 근거는 각 항목에 적었다. 이전 문구는 2026-10-26의 v1 기준이라 아래로 대체했다.)
 
 - 구조는 학습 데이터셋 v2(D74)다. 세션 시작은 B만 부르고, 발화는 LoRA-A extract -> 사후 검증(`validate_extraction`) -> 저장 -> 표 조회로 B 입력 조립 -> LoRA-B respond 순이다. 서비스에 정규화기·Plan 코드는 없다. 도식은 `PROJECT_STRUCTURE.md` 2절, `architecture.md` 4절.

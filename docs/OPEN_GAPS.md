@@ -19,9 +19,9 @@
 | G08 | release-gate의 기본 태그를 turn-engine v0.3.0, model-runtime v0.6.1로 올림 | release-gate | 닫힘 | 시험 209 통과, 스모크 통과, release-gate 7139123 |
 | G10 | `prompt-3`(JCS)은 폐기 예정으로 남겼다. 제거 시점은 다음 MINOR로 제안 | model-runtime | 닫힘 | 근거: model-runtime 8279847 / 태그 v0.7.0이 `prompt-3`을 제거했다(`model-runtime/docs/boundary.md` 호출자 절, CHANGELOG 0.7.0). `prompt-3` `serving_config`는 `UnsupportedServingConfig`로 거부된다. 이전 계열로 만든 릴리스는 거부된다(깨지는 변경으로 기록됨) |
 | G11 | 문진 스키마 정수 버전 1 안에서 비호환 변경이 있었다(`SessionStore`, `TurnTrace`, v1 모델 입출력 계약 12개 삭제). survey-service와 ops-feedback은 반드시 같은 잠금으로 함께 배포해야 한다 | survey-service, ops-feedback | 열림 | D79. 운영 데이터가 생기기 전에 TurnTrace 별도 버전 필드 검토 |
-| G12 | v2에서는 A가 REASK/CONFIRM을 계속 내도 서비스가 끊지 않는다(v1의 반복 물음 상한·못 알아들음 상한은 사라짐). 환자가 같은 질문을 무한히 받을 수 있다 | survey-service | 부분 | **메커니즘 구현됨, 값·의미는 사용자 결정 대기.** `SURVEY_MAX_CONSECUTIVE_REASK`(기본 0=끔)를 켜면 상한을 넘는 REASK·CONFIRM 대신 기존 직원 호출 경로(정지 `PAUSED_RISK`, `CALL_STAFF` 알림)를 쓴다(survey-service 5705632, `survey-service/docs/boundary.md` 4절). 정할 것: 값 N, 의미(N번 되묻고 N+1번째에 직원을 부른다), 정지 이름 `PAUSED_RISK` 재사용 여부. 기본이 꺼짐이라 지금은 환자가 같은 질문을 무한히 받을 수 있다. CR-012 | **갱신(D95, 2026-10-28)**: N=3 확정. 기본 3은 `survey-service/docs/boundary.md` 66행(ADR-0014)에서 확인했다. 같은 문서 43행의 '기본 0=끔·값은 미정'은 낡았으므로 survey-service가 정정한다. 이 행은 정정 확인 전까지 `부분`으로 둔다
+| G12 | v2에서는 A가 REASK/CONFIRM을 계속 내도 서비스가 끊지 않는다(v1의 반복 물음 상한·못 알아들음 상한은 사라짐). 환자가 같은 질문을 무한히 받을 수 있다 | survey-service | 닫힘 | **메커니즘 구현됨, 값·의미는 사용자 결정 대기.** `SURVEY_MAX_CONSECUTIVE_REASK`(기본 0=끔)를 켜면 상한을 넘는 REASK·CONFIRM 대신 기존 직원 호출 경로(정지 `PAUSED_RISK`, `CALL_STAFF` 알림)를 쓴다(survey-service 5705632, `survey-service/docs/boundary.md` 4절). 정할 것: 값 N, 의미(N번 되묻고 N+1번째에 직원을 부른다), 정지 이름 `PAUSED_RISK` 재사용 여부. 기본이 꺼짐이라 지금은 환자가 같은 질문을 무한히 받을 수 있다. CR-012 | **갱신(D95, 2026-10-28)**: N=3 확정. 기본 3은 `survey-service/docs/boundary.md` 66행(ADR-0014)에서 확인했다. 같은 문서 43행의 '기본 0=끔·값은 미정'은 낡았으므로 survey-service가 정정한다. 이 행은 정정 확인 전까지 `부분`으로 둔다 **닫힘 표시 2026-10-28**: survey-service 35052ab, `survey-service/docs/adr/ADR-0020.md`, 근거 D95. 기본 N=3, 합산 연속 REASK/CONFIRM, 4번째에 직원 호출. 값은 측정하지 않았다. (에이전트 보고 근거, 새 clone 재현 전)
 | G13 | 표는 `DATASET_RULES_UNCONFIRMED`(데이터셋 담당 규칙을 옮김, 승인 기록 미확인; G03). 57행 문제 처리용 새 `next.text`(남은 칸만 묻기)는 학습 분포에 없어 B 모델이 어떻게 다루는지 확인하지 못했다. A 입력 state의 묶음 순서는 서버 val 549행 중 536행(97.6%)이 서비스 규칙과 글자 단위로 같고 13행이 다르다. 원인(확인, `prev_state.py`): 학습 데이터는 원래 시나리오 state에 있던 값이 먼저, 그 뒤에 흐름 생성기가 더한 직전·참조 문항이 오는 구조라 "직전이 먼저"라는 단일 규칙이 아니다. 서비스는 이 시나리오 정보를 모르므로 완전히 재현할 수 없다. 영향은 드문 키 순서 차이이며 성능 영향은 미측정. B 입력은 `next.text`만 다르다(데이터는 같은 문항도 문장이 제각각, 서비스는 문항 은행 문장) | survey-service | 열림 | 서버 val 대조(in-sample) · **2026-10-28 C1 전체로 재측정(survey-service b9ba3d8): A 입력 state 일치 31,411/32,170(97.64%), 불일치 759행은 모두 칸 집합·값이 같고 순서만 다름(문항 묶음 순서 623, 칸 순서 136). 순서 차이가 모델 출력에 영향을 주는지는 GPU에서만 확인 가능. 값 검증이 정상 정답을 거부한 2행(OUT_OF_CURRENT_ITEM, 규칙이 과했음)은 규칙을 고쳐 0행. 칸 값 형식 규칙(선택지·단위·예/아니오)은 실제 문항 세트(칸 정의 포함)가 없어 시험용 세트로만 확인** |
-| G14 | ops-feedback 탐지 규칙 `REASK_STREAK`(연속 REASK)은 임계값이 자리표시자(예시 설정 `enabled:false`, threshold 3)다. `EXTRACT_FAILED`가 값 없는 HOLD·SKIP을 실패로 볼지, `extract_protections` 건수를 비식별에서 남길지도 미정 | ops-feedback | 열림 | G12(반복 물음 상한)와 함께 사용자가 정한다 |
+| G14 | ops-feedback 탐지 규칙 `REASK_STREAK`(연속 REASK)은 임계값이 자리표시자(예시 설정 `enabled:false`, threshold 3)다. `EXTRACT_FAILED`가 값 없는 HOLD·SKIP을 실패로 볼지, `extract_protections` 건수를 비식별에서 남길지도 미정 | ops-feedback | 닫힘 | G12(반복 물음 상한)와 함께 사용자가 정한다 **닫힘 표시 2026-10-28**: ops-feedback 7c9309d, `ops-feedback/docs/adr/0012-reask-streak-and-empty-values.md`(G12와 같은 정의). (에이전트 보고 근거, 새 clone 재현 전) |
 | G09 | `tests/golden/`(model-runtime, model-lab)은 v1 정적 예시라 시험이 쓰지 않는다. 삭제 여부 미정 | model-lab, model-runtime | 닫힘 | 근거: model-runtime 8279847(v0.7.0)이 `tests/golden/`(정적 예시 216개)와 `prompt-3` 골든 2개를 제거했고 어떤 시험·스크립트도 읽지 않는 것을 grep으로 확인했다(CHANGELOG 0.7.0). **model-lab 쪽 `tests/golden/`은 이번에 읽지 못해 제거 여부를 확인하지 못했다.** 남아 있으면 model-lab 세션이 처리한다 | **정정(헤드 확인 2026-10-27)**: model-lab `tests/golden/`은 git에 210개가 남아 있다. 사용처 확인 후 제거하는 일이 남았다. **닫힘 근거(2026-10-27)**: model-lab b1f57e3가 `tests/golden/` 210개를 제거(읽는 곳 없음 grep, pytest 150 통과, 스모크 통과).
 
 ## 2. 미확인 (해 보지 않음)
@@ -81,8 +81,8 @@
 | L13 | D30(저자 확인=임상 승인)을 D92(4-eyes)로 대체. 의료인이 한 명뿐이면 막힘 | `QA_REQUIRE_TWO_PERSON=false`로 되돌림 가능. **사용자 확인 필요** |
 | L14 | 알림 DB 장애 때 로컬 재시도 큐 없음(DELIVERY_FAILED 신호로만 대응). 같은 (세션, 턴)의 알림은 중복 제거됨, 정지 중 서로 다른 턴의 반복 발화는 알림이 여러 건 | survey-service 후속 |
 | L15 | 학습 서버 스크립트 해시(`configs/train.yaml server.script_sha256`) 값 비어 있음 | 서버에서 `train-doctor` 실행 필요 |
-| L16 | devDependency 취약점 3건(kiosk-frontend: playwright, ajv, fast-uri), admin-console 온라인 감사 미실시 | 런타임 영향 없음(`--omit=dev` 0건). 고치려면 고정 버전 밖 업그레이드 + 시험 이미지 재검증 |
-| L17 | synthetic-data v1 생성 경로 폐기 표시만(D91), 보류 시험 15건 | 시드 경로 분리 뒤 삭제 |
+| L16 | devDependency 취약점 3건(kiosk-frontend: playwright, ajv, fast-uri), admin-console 온라인 감사 미실시 | 런타임 영향 없음(`--omit=dev` 0건). 고치려면 고정 버전 밖 업그레이드 + 시험 이미지 재검증 **[닫힘 표시 2026-10-28: kiosk-frontend 49fe49c(`docs/adr/0012-devDependency-취약점-3건-최소-범위-상향.md`), admin-console a0918e8(`docs/adr/0011-devDependency-취약점-최소-범위-상향.md`). 전후 개수는 각 ADR 참조. 런타임 영향 없음. (에이전트 보고 근거, 새 clone 재현 전)]** |
+| L17 | synthetic-data v1 생성 경로 폐기 표시만(D91), 보류 시험 15건 | 시드 경로 분리 뒤 삭제 **[닫힘 표시 2026-10-28: synthetic-data 3c435ba/167083b, `synthetic-data/docs/adr/0010-v1-생성-경로를-제거하고-시드-경로를-남긴다.md`. 시드 run은 deploy 단계 7이 의존해 유지. (에이전트 보고 근거, 새 clone 재현 전)]** |
 | L18 | 서비스 값 형식 검증(선택지·단위·예/아니오)을 **실제 문항 세트(칸 정의 포함)** 로 학습 정답에 돌려 본 적이 없다. 서버 `question_bank.json`은 문장만 있고 칸 정의가 없다 | 칸 정의가 있는 실제 문항 세트는 의료인이 question-authoring으로 올리는 내용(사람 입력). 올라오면 `scripts/reference_agreement.py`로 재실행 |
 | L19 | 보존 `retention.failed_raw_days`(기본 90일, 실패 상태 원본 삭제 기한)는 D88에 없는 값으로 근거 기록이 없다(ops-feedback ADR 0007) | 병원 규정에 따라 사용자 결정 |
 | L20 | 게이트웨이 CSRF 방어(Sec-Fetch-Site·Origin)의 허용 Origin이 `GATEWAY_HOSTS`와 자동 연동되지 않고 요청의 호스트:포트를 쓴다. 단계 9의 gpg 암호화 백업 실행과 경로 우회 시도(`//`, `%2f`, 청크 본문) 회귀 시험은 없다 | deploy 후속 |
@@ -90,9 +90,10 @@
 | L22 | ops-feedback 검토 입력의 이메일 탐지는 `@` 뒤 254자까지만 본다. 오래 걸리는 정규식 점검은 입력군 일부(20,000·80,000자)로만 했다 | 알려진 한계 |
 | L23 | **직원 호출 전달 실패(DELIVERY_FAILED) 때 키오스크가 직원을 다시 부를 수 없다.** 알림을 다시 보내는 API와 서버에 '알림이 안 닿았다'를 남기는 계약이 없다. 지금은 "직접 알리셨나요?"를 묻고 세션을 끝내지 않는 데서 멈춘다(kiosk-frontend `docs/design.md`) | **환자 안전.** boundary-contracts 변경 요청(재알림 API, 실패 기록)을 헤드가 처리해야 한다. 임상 현장 흐름 확인 필요 |
 | L24 | PostgreSQL에서 question-authoring의 업로드와 purge가 동시에 도는 스레드 경쟁 시험이 없다(SQL 구조 확인과 SQLite 경쟁 시험만) | 후속 시험 |
-| L25 | survey-service의 DB 장애 시험(`test_readyz_db_outage.py` 등)이 `io.openit.dev-postgres=1` 라벨의 모든 컨테이너를 `docker pause`한다. 같은 서버의 다른 세션과 겹치면 서로 영향을 준다. 독립 재현 중 원인 불명의 시험 멈춤이 1회 있었으나 재현하지 못했다 | survey-service 후속 |
+| L25 | survey-service의 DB 장애 시험(`test_readyz_db_outage.py` 등)이 `io.openit.dev-postgres=1` 라벨의 모든 컨테이너를 `docker pause`한다. 같은 서버의 다른 세션과 겹치면 서로 영향을 준다. 독립 재현 중 원인 불명의 시험 멈춤이 1회 있었으나 재현하지 못했다 | survey-service 후속 **[닫힘 표시 2026-10-28: survey-service 6ba56a6, `survey-service/docs/adr/ADR-0019.md`. 원인은 라벨 탐색 범위와 포트 부분 문자열 비교. (에이전트 보고 근거, 새 clone 재현 전)]** |
 | L26 | 영역 README의 시험 개수 8곳이 오래된 값이다(실제가 더 많음). 워크스페이스 규칙(영역 시험 상태는 그 영역 README 5절)에 어긋난다 | 각 영역이 갱신 |
 | L27 | deploy `scripts/test-inference-location.sh`가 게이트웨이 HTTPS 필수 이후 평문 포트로 호출해 통과하지 못한다(원인은 에이전트 추정, 미확정). 이 시험은 `e2e.sh`가 쓰지 않아 전체 E2E에는 안 들어간다. `check-standalone.sh`도 이번에 실행하지 못했다 | deploy 후속: TLS 구성(HTTPS 포트, 시험용 CA 신뢰)으로 적응 |
+| L28 | **위험 정지와 되묻기 한도 정지를 구분할 수 없다.** 둘 다 `PAUSED_RISK`이고 `GET /v1/sessions/{id}/state`와 `turn_failure_signal`의 모양이 같다. 구분은 환자에게 가는 고정 문장(`RISK_NOTICE`/`CALL_STAFF`)뿐이라 직원 콘솔·운영 지표가 사유를 가를 수 없다. 근거: survey-service ADR-0020 보고(새 clone 재현 전) | 정지 사유 필드를 계약에 더하는 변경 요청 초안 [`CR-H002`](change-requests/CR-H002-pause-reason.md). 사용자 결정 전 |
 
 ## 3-1. GPU 구멍 (H, 2026-10-27 신설)
 
@@ -116,3 +117,8 @@ GPU 서버가 열릴 때 할 일이다. 줄기와 계획은 [`COMPLETION_PLAN.md
 | G09 | 정적 golden 제거(model-lab 쪽은 미확인, 1절 행 참고) | model-runtime 8279847, v0.7.0 |
 | G10 | `prompt-3` 제거 | model-runtime 8279847, v0.7.0 |
 | U15 | model-runtime dev 하드 핀 제거 | model-runtime 8279847, v0.7.0 |
+| L17 | synthetic-data v1 생성 경로 제거(D91) | synthetic-data 3c435ba/167083b, ADR 0010 (에이전트 보고 근거, 새 clone 재현 전) |
+| G12 | 되묻기 한도(기본 N=3) | survey-service 35052ab, ADR-0020, D95 (에이전트 보고 근거, 새 clone 재현 전) |
+| G14 | ops-feedback REASK_STREAK 정의 | ops-feedback 7c9309d, ADR 0012 (에이전트 보고 근거, 새 clone 재현 전) |
+| L16 | devDependency 취약점 상향 | kiosk-frontend 49fe49c, admin-console a0918e8 (에이전트 보고 근거, 새 clone 재현 전) |
+| L25 | 시험의 다른 컨테이너 pause | survey-service 6ba56a6, ADR-0019 (에이전트 보고 근거, 새 clone 재현 전) |

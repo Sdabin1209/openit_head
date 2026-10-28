@@ -9,7 +9,7 @@
 
 ## 모든 세션의 규칙
 
-- 자기 리포지토리 안에서만 일한다. 다른 폴더를 수정하지 않는다. 읽는 것도 `../survey-service/schema`와 `../boundary-contracts`(둘 다 읽기 전용)만 허용한다. survey-service는 자기 `schema/`를 소유한다. 이웃 영역의 데이터는 그 영역이 배포한 읽기 SDK로만 읽는다.
+- 자기 리포지토리 안에서만 일한다. 다른 폴더를 수정하지 않는다. 읽는 것도 `../survey-service/schema`, `../boundary-contracts`, `../head/shared/areas.json`(영역 목록의 정본)만 허용한다(모두 읽기 전용). survey-service는 자기 `schema/`를 소유한다. 이웃 영역의 데이터는 그 영역이 배포한 읽기 SDK로만 읽는다.
 - 문진 스키마와 `boundary-contracts`를 직접 수정하지 않는다(survey-service는 자기 `schema/`를 수정할 수 있다). 부족하거나 틀렸다고 판단하면 `docs/change-requests/`에 변경 요청을 써서 헤드에게 넘긴다.
 - 영역 리포지토리끼리 코드를 가져오지 않는다. 의존할 수 있는 것은 문진 스키마, boundary-contracts, turn-engine, model-runtime과 이웃의 SDK뿐이다.
 - 문서는 **자기 영역의 사실만** 쓴다. 이웃 영역의 사실(시험 개수, 결과, 상태, 버전)은 복사하지 않고 그 영역의 문서를 링크한다. 한 사실은 그것을 아는 영역이 한 곳에서만 쓴다(E2E 결과는 `deploy/docs/E2E_RESULTS.md`, 영역 시험 상태는 그 영역 README 5절, 버전 기준표는 `deploy/scripts/lib.sh`). 복사하면 서로 다른 시점의 값이 문서마다 남아 어긋난다.

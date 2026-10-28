@@ -127,7 +127,7 @@ flowchart TB
 
 | 소유 | 내용 | 소유자 |
 |---|---|---|
-| 계약 스키마(영역 사이) | `boundary-contracts`(v2.0.2). 태그로 설치, 복사본 금지 | head |
+| 계약 스키마(영역 사이) | `boundary-contracts`(현재 기준은 `deploy/scripts/lib.sh`). 태그로 설치, 복사본 금지 | head |
 | 문진 스키마(정수 버전 1), 문항 순서·건너뛰기 표(`QuestionFlowTable`), 표 찾기 표(`ask` 틀·칸 설명, 초안) | `survey-service/schema/` | survey-service |
 | A 출력의 의미 검증 함수 | turn-engine | turn-engine |
 | 제약 디코딩, 프롬프트 직렬화, 추론 서버 | model-runtime | model-runtime |
@@ -149,6 +149,6 @@ flowchart TB
 - 서버(`gpu-dev`, RTX 4070 SUPER 12GB, WSL2의 Docker Desktop 연동)에서 `doctor.sh` 통과와 전체 시험 통과를 사용자가 보고했다(2026-10-26, 당시 사용자 보고이며 수치는 [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md)의 과거 기록 표를 따른다). 리포의 기록 파일에서는 확인하지 못했고, 개발 PC 결과와 차이가 있었다면 그 이유도 확인하지 못했다. D47("Docker 없음", 2026-10-15)은 그 시점의 사실이고 이후 바뀌었다.
 - 실제 LLM 데모(D72): gpu-dev에서 vLLM(Qwen2.5-1.5B + 중립 LoRA)으로 문진 응답이 나오는 것을 확인했다(2026-10-26). survey-service의 릴리스 적재 재시도 수정(8e0ba7e)과 deploy `llm-demo`가 main에 병합됐다. 응답 품질은 학습 전이라 판단하지 않는다.
 - 구조(D74, 2026-10-27): 학습 데이터셋 v2에 맞춰 정규화·절차·다음 문항을 LoRA-A가 하고 서비스는 표 찾기·저장·안전장치만 한다. 이 문서의 그림과 표는 2026-10-27에 v2 기준으로 고쳤다. 영향 목록은 `impact-d74.md`.
-- 계약 패키지 현재 태그는 `v2.0.2`, turn-engine `v0.4.0`, model-runtime `v0.7.0`(`git tag`로 확인, 2026-10-27). 이 절 앞쪽의 E2E 결과와 LLM 데모 값은 2026-10-26(v1 구조) 기록이다. v2 가짜 모델 E2E 기록은 [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md)에 있고, 현재 열차로 다시 돌린 결과는 이 문서 갱신에서 확인하지 못했다. 현재 값은 `STATUS.md`를 따른다.
+- 현재 기준 태그(계약 패키지, turn-engine, model-runtime)는 `deploy/scripts/lib.sh`의 표가 정본이다. 이 절 앞쪽의 E2E 결과와 LLM 데모 값은 2026-10-26(v1 구조) 기록이다. v2 가짜 모델 E2E 기록은 [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md)에 있고, 현재 열차로 다시 돌린 결과는 이 문서 갱신에서 확인하지 못했다. 현재 값은 `STATUS.md`를 따른다.
 - 실제 브라우저 화면, 한국어 음성 인식, 웹 푸시 수신, RTX 4090 실측은 확인하지 못했다.
 - 미정: 운영 도메인·HTTPS, 직원 콘솔 로그인, CI가 서버 레지스트리에 닿는 방법, 토큰 발급·회전, 원본 보관 기간.

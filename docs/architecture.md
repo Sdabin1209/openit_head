@@ -701,7 +701,7 @@ flowchart LR
 
   subgraph V["버전 축"]
     SV1["문진 스키마<br/>CONTRACT_VERSION = 정수 1<br/>정확 일치 · 태그 survey-schema-v1.0.0<br/>(D79: 정수 1 유지, 모델 패키지가 학습된 문항 은행·칸 키의 버전)"]:::ver
-    BV["경계 계약<br/>pipeline_schema_version = 2.0 (MAJOR 2)<br/>패키지 태그 v2.0.2 (D74, D75)<br/>v1 레코드는 UNSUPPORTED_VERSION"]:::ver
+    BV["경계 계약<br/>pipeline_schema_version = 2.1 (MAJOR 2)<br/>패키지 태그 v2.1.0 (D74, D75, D93~D103)<br/>v1 레코드는 UNSUPPORTED_VERSION"]:::ver
     TV["turn-engine v0.4.0"]:::ver
     MV["model-runtime v0.7.0"]:::ver
     LV["langgraph 1.2.15 (잠금 파일)"]:::ver
@@ -736,17 +736,17 @@ flowchart LR
 | 축 | 값(2026-10-27) | 규칙 | 근거 |
 |---|---|---|---|
 | 문진 스키마 | 정수 `1`, 태그 `survey-schema-v1.0.0`(`git tag`). 같은 정수 안에서 `SessionStore`, `TurnTrace`, v1 모델 입출력 계약 12개가 삭제·변경됐다(G11) | 정확 일치. 바뀌면 survey-service가 반영(D21). survey-service와 ops-feedback은 같은 잠금으로 함께 배포 | D14, D21, D75, D79 |
-| 경계 계약 | 스키마 `2.0`(MAJOR 2), 패키지 태그 `v2.0.2`(`git tag`: v2.0.0-rc1, v2.0.1, v2.0.2 …). 영역 문서(turn-engine, model-runtime, release-gate, ops-feedback, model-lab, synthetic-data)는 v2.0.2를 적는다 | MINOR는 추가만이나 v1에서 v2로는 병행 없이 MAJOR. 읽는 쪽은 모르는 필드 허용 | D25, D74, D75, D79 |
+| 경계 계약 | 스키마 `2.1`(MAJOR 2), 패키지 태그 `v2.1.0`(`git tag`: v2.0.0-rc1, v2.0.1, v2.0.2, v2.1.0 …). 영역 문서는 기준 표(`deploy/scripts/lib.sh`)의 값을 적는다 | MINOR는 추가만이나 v1에서 v2로는 병행 없이 MAJOR. 읽는 쪽은 모르는 필드 허용 | D25, D74, D75, D79 |
 | turn-engine | `v0.4.0`(`ENGINE_VERSION`). 유효한 입력 하나라도 출력이 달라지면 MINOR | 정규화·판정·기록·Plan 제거(G07), `validate_extraction`만 제공 | `turn-engine/docs/boundary.md` |
 | model-runtime | `v0.7.0`. `prompt-4`(학습 글자와 같은 직렬화), `protect-2`, `relax-3`(anyOf 펼침). `prompt-3` 제거(G10) | 서버·라이브러리를 같은 리포가 가짐. 릴리스 매니페스트의 MAJOR.MINOR가 같아야 적재 | D77, D80, D82, D83, `model-runtime/docs/boundary.md` |
-| 열차 정렬 | 같은 열차를 모든 영역이 쓴다(현재 bc v2.0.2, turn-engine v0.4.0, model-runtime v0.7.0). 비교는 완전 일치(D80) | 게이트의 `CONTRACT_COMPAT`도 문자열 일치 | D80 |
+| 열차 정렬 | 같은 열차를 모든 영역이 쓴다(현재 기준은 `deploy/scripts/lib.sh`: 계약 v2.1.0, turn-engine v0.4.1, model-runtime v0.7.5). 비교는 완전 일치(D80) | 게이트의 `CONTRACT_COMPAT`도 문자열 일치 | D80 |
 | 라이브러리 설치 | Git 태그. 이미지 빌드 때 태그를 고정하고 의존 버전은 잠금 파일로 고정 | `pip install git+ssh://…@태그` | D18, 루트 `CLAUDE.md` |
 | 비밀 | `<이름>_FILE`로 읽음. 환경 변수는 개발·시험용. `boundary_contracts.read_secret` | 값은 로그·`/readyz`·오류에 내지 않음 | D84 |
 | 해시 | JCS(RFC 8785) 정규화 + SHA-256(`boundary_contracts.canonical`). 모델 입력 직렬화는 해시와 달리 JCS가 아니라 학습 글자(`json.dumps(ensure_ascii=False)`)다 | 클라이언트가 응답을 읽을 때 해시를 다시 계산 | D20, D34, D49, D77 |
 | 이미지 라벨 | 필수 6개는 해당하는 것만. 추가 라벨 허용 | 존재만 검사 | D50, D63, D66 |
 | 공개 API | `PUBLIC_API.md`(상태 코드 표 포함). 영향 없음(모델 입출력을 다루지 않음) | `turn_id`는 API 봉투 필드 | D55, D58, D66, `V2_DRAFT.md` 0장 |
 
-참고: 리포마다 고정한 태그는 이번에 다시 모으지 않았다. `survey-service/docs/boundary.md` 3절은 boundary-contracts `v2.0.1`을 적고 있어 같은 열차의 `v2.0.2`와 문서상 어긋난다(커밋 6241d00은 "의존 태그 맞춤"). 어느 쪽이 현재인지는 survey-service의 `requirements`를 읽지 못해 확인하지 못했다. 정렬 점검은 COMPLETION_PLAN의 줄기 R이다. 루트 `CLAUDE.md`의 설치 예시 태그가 옛 값(`v1.3.3`)이면 헤드가 고친다.
+참고: 리포마다 고정한 태그는 `deploy/scripts/check-versions.sh`가 기준 표(`deploy/scripts/lib.sh`)와 매번 대조한다(어긋나면 파일:줄을 말하고 실패).
 
 ---
 

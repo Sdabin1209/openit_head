@@ -5,6 +5,19 @@
 > **버전(D14, D19).** 문진 스키마는 정수 버전(`CONTRACT_VERSION`, 현재 1)에 정확히 일치해야 한다. 경계 계약은 `MAJOR.MINOR`이며 값은 `boundary-contracts`가 정한다. 불변 산출물은 `ArtifactRef`(id, version, content_hash)로 가리킨다.
 > **업무 규칙.** 이 영역이 구현하거나 의존하는 업무 요구는 `docs/rules/`에 있다(헤드가 전달, 출처는 `docs/rules/SOURCE.md`). 규칙 문서에 없는 정책은 임의로 만들지 말고 `docs/change-requests/`에 쓴다.
 
+## 0. 따라야 할 계약과 정본 위치 (모든 영역 공통, 2.1.0 기준)
+- 규칙의 정본: 워크스페이스 루트 `CLAUDE.md`(자기 리포 안에서만 수정, 이웃 사실을 복사하지 않고 링크, 구조 선택마다 ADR의 '왜', 비밀은 `NAME_FILE`, 커밋 단위, 변경 요청 절차).
+- 버전 열차(계약, turn-engine, model-runtime)의 값은 **`deploy/scripts/lib.sh`의 표**가 정본이다. 이 문서에 숫자를 적지 않는다.
+- 계약 정본(`boundary-contracts`, 읽기 전용): `INTERFACES.md`(I1~I10 무엇을 내놓고 받는가), `HTTP.md`(HTTP 면), `PUBLIC_API.md`(I10, 직원 호출 G절, 정지 사유 H절), `CONVENTIONS.md`(오류·멱등·버전·인증·`/readyz` 총 2초·환자 턴 시간 상한 사슬), `METRICS.md`와 `boundary_contracts/metrics.json`(평가 지표 이름), `boundary_contracts/schemas`(JSON 스키마), 문진 스키마 `survey-service/schema`.
+- 표준 결정: `head/docs/DECISIONS.md`(D88 표준 기본값, D89 '왜', D92 작성자≠검수자, D93~D103), 장애 정책 `head/docs/FAULT_POLICY.md`.
+- 계약이 모자라거나 틀리면 직접 고치지 말고 `docs/change-requests/`에 변경 요청을 써서 헤드에게 넘긴다.
+- 영역 목록의 정본: `head/shared/areas.json`.
+
+### 이 영역이 따르는 계약
+- **제공 I3 ModelRegistry**(`INTERFACES.md` I3, `HTTP.md` I3): `ModelPackageManifest`(어댑터 해시, 시스템 프롬프트 파일과 해시 D75), 어댑터 디렉터리, `EvaluationReport`.
+- **읽음**: I2 DatasetStore(HTTP 클라이언트), I1, I4, I7, I9(모델 서버로 평가).
+- 평가 지표 이름은 `boundary_contracts/metrics.json`의 ACTIVE 항목만 쓴다(폐기 이름 금지). 학습의 정본은 학습 서버 코드(D78)이고 이 영역의 trainer는 그것을 감싸는 구성이다. `package_id`의 옛 이름은 설정 해시 때문에 유지한다(ADR).
+
 ## 1. 목적과 범위
 
 - 목적: Parser의 LoRA-A와 Generator의 LoRA-B를 학습·평가하고, 서빙 가능한 패키지로 모델 레지스트리에 올린다. 프로젝트에서 사용자가 가장 집중하려는 영역이다.

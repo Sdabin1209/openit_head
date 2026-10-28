@@ -4,6 +4,19 @@
 > **읽기.** `../boundary-contracts`와 `../survey-service/schema`는 문진 서비스의 데이터 스키마(스키마만 남긴 최소 구성)다. 구현이 가져가는 계약은 `schemas/<계약명>.json`(JSON Schema Draft 2020-12), 컴포넌트별 입력·출력 대응은 `COMPONENTS.yaml`, 정수 버전은 `CONTRACT_VERSION`이다. 둘 다 읽기 전용이다.
 > **버전(D14, D19).** 문진 스키마는 정수 버전(`CONTRACT_VERSION`, 현재 1)에 정확히 일치해야 한다. 경계 계약은 `MAJOR.MINOR`이며 값은 `boundary-contracts`가 정한다. 불변 산출물은 `ArtifactRef`(id, version, content_hash)로 가리킨다.
 
+## 0. 따라야 할 계약과 정본 위치 (모든 영역 공통, 2.1.0 기준)
+- 규칙의 정본: 워크스페이스 루트 `CLAUDE.md`(자기 리포 안에서만 수정, 이웃 사실을 복사하지 않고 링크, 구조 선택마다 ADR의 '왜', 비밀은 `NAME_FILE`, 커밋 단위, 변경 요청 절차).
+- 버전 열차(계약, turn-engine, model-runtime)의 값은 **`deploy/scripts/lib.sh`의 표**가 정본이다. 이 문서에 숫자를 적지 않는다.
+- 계약 정본(`boundary-contracts`, 읽기 전용): `INTERFACES.md`(I1~I10 무엇을 내놓고 받는가), `HTTP.md`(HTTP 면), `PUBLIC_API.md`(I10, 직원 호출 G절, 정지 사유 H절), `CONVENTIONS.md`(오류·멱등·버전·인증·`/readyz` 총 2초·환자 턴 시간 상한 사슬), `METRICS.md`와 `boundary_contracts/metrics.json`(평가 지표 이름), `boundary_contracts/schemas`(JSON 스키마), 문진 스키마 `survey-service/schema`.
+- 표준 결정: `head/docs/DECISIONS.md`(D88 표준 기본값, D89 '왜', D92 작성자≠검수자, D93~D103), 장애 정책 `head/docs/FAULT_POLICY.md`.
+- 계약이 모자라거나 틀리면 직접 고치지 말고 `docs/change-requests/`에 변경 요청을 써서 헤드에게 넘긴다.
+- 영역 목록의 정본: `head/shared/areas.json`.
+
+### 이 영역이 따르는 계약
+- **제공 I1 QuestionReader**(`INTERFACES.md` I1, `HTTP.md` I1): 문항 세트는 불변 버전, `ReviewRecord`(`clinical_basis_approved`), `ChangeClassification`. `ref.version == str(question_bank.version)`.
+- **읽음**: I4 ReleaseReader(활성 릴리스), I7 FailureStore(실패 사례). 현행 TurnTrace의 `extract_input.question_id`로 문항 신호를 만든다(v1 trace 형식은 읽지 않는다).
+- 지킬 규칙: 임상 근거 승인은 작성자≠검수자(D92, `QA_REQUIRE_TWO_PERSON`), 문항 값의 정본은 문진 스키마 `QuestionBank`.
+
 ## 1. 목적과 범위
 
 - 목적: 관리자가 문항을 추가·수정하고 검수받아, 게이트가 검사할 수 있는 불변 문항 버전으로 만든다.

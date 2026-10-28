@@ -2,6 +2,19 @@
 
 > **계약 상태.** 이 리포지토리는 계약을 소비하거나 생산하지 않는다. 각 리포지토리가 게시한 이미지 digest만 입력으로 받는다. 일부 서비스(gateway, ingest-api, gate-service, authoring-app)의 최종 형태는 각 영역의 설계에 따라 정해지므로, 이 브리프의 서비스 목록은 시드다.
 
+## 0. 따라야 할 계약과 정본 위치 (모든 영역 공통, 2.1.0 기준)
+- 규칙의 정본: 워크스페이스 루트 `CLAUDE.md`(자기 리포 안에서만 수정, 이웃 사실을 복사하지 않고 링크, 구조 선택마다 ADR의 '왜', 비밀은 `NAME_FILE`, 커밋 단위, 변경 요청 절차).
+- 버전 열차(계약, turn-engine, model-runtime)의 값은 **`deploy/scripts/lib.sh`의 표**가 정본이다. 이 문서에 숫자를 적지 않는다.
+- 계약 정본(`boundary-contracts`, 읽기 전용): `INTERFACES.md`(I1~I10 무엇을 내놓고 받는가), `HTTP.md`(HTTP 면), `PUBLIC_API.md`(I10, 직원 호출 G절, 정지 사유 H절), `CONVENTIONS.md`(오류·멱등·버전·인증·`/readyz` 총 2초·환자 턴 시간 상한 사슬), `METRICS.md`와 `boundary_contracts/metrics.json`(평가 지표 이름), `boundary_contracts/schemas`(JSON 스키마), 문진 스키마 `survey-service/schema`.
+- 표준 결정: `head/docs/DECISIONS.md`(D88 표준 기본값, D89 '왜', D92 작성자≠검수자, D93~D103), 장애 정책 `head/docs/FAULT_POLICY.md`.
+- 계약이 모자라거나 틀리면 직접 고치지 말고 `docs/change-requests/`에 변경 요청을 써서 헤드에게 넘긴다.
+- 영역 목록의 정본: `head/shared/areas.json`.
+
+### 이 영역이 따르는 계약
+- 자체 계약은 없다. **모든 영역의 이미지·구성을 조립**하고(compose, gateway Caddyfile, 비밀 `NAME_FILE`, 네트워크 분리, 백업), 영역 사이 계약이 실제로 맞는지 **전체 E2E**로 확인한다.
+- 정본: 버전 열차 표 `scripts/lib.sh`, 영역 목록 `head/shared/areas.json`, E2E 단계 선언은 `scripts/e2e_steps.py`의 `@step` 데코레이터 한 곳.
+- 지킬 규칙: 게이트웨이는 내부 전용 서비스(dataset-store 등)를 노출하지 않는다, 비밀은 이미지·설정·로그·`/readyz`에 넣지 않는다, `FAULT_POLICY.md`의 시간 상한 사슬 값과 compose 상한이 같다, 전체 E2E는 최종 관문 1회.
+
 ## 1. 목적과 범위
 
 - 목적: 단일 서버에서 Docker Compose로 시스템을 합치고, 코드 축(이미지 digest)을 되돌릴 수 있게 한다.

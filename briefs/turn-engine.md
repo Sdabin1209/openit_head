@@ -5,6 +5,19 @@
 > **버전(D14, D19).** 문진 스키마 정수 버전(`CONTRACT_VERSION`)에 정확히 일치해야 한다.
 > **업무 규칙.** 이 영역이 구현하거나 의존하는 업무 요구는 `docs/rules/`에 있다(헤드가 전달, 출처는 `docs/rules/SOURCE.md`). 규칙 문서에 없는 정책은 임의로 만들지 말고 `docs/change-requests/`에 쓴다.
 
+## 0. 따라야 할 계약과 정본 위치 (모든 영역 공통, 2.1.0 기준)
+- 규칙의 정본: 워크스페이스 루트 `CLAUDE.md`(자기 리포 안에서만 수정, 이웃 사실을 복사하지 않고 링크, 구조 선택마다 ADR의 '왜', 비밀은 `NAME_FILE`, 커밋 단위, 변경 요청 절차).
+- 버전 열차(계약, turn-engine, model-runtime)의 값은 **`deploy/scripts/lib.sh`의 표**가 정본이다. 이 문서에 숫자를 적지 않는다.
+- 계약 정본(`boundary-contracts`, 읽기 전용): `INTERFACES.md`(I1~I10 무엇을 내놓고 받는가), `HTTP.md`(HTTP 면), `PUBLIC_API.md`(I10, 직원 호출 G절, 정지 사유 H절), `CONVENTIONS.md`(오류·멱등·버전·인증·`/readyz` 총 2초·환자 턴 시간 상한 사슬), `METRICS.md`와 `boundary_contracts/metrics.json`(평가 지표 이름), `boundary_contracts/schemas`(JSON 스키마), 문진 스키마 `survey-service/schema`.
+- 표준 결정: `head/docs/DECISIONS.md`(D88 표준 기본값, D89 '왜', D92 작성자≠검수자, D93~D103), 장애 정책 `head/docs/FAULT_POLICY.md`.
+- 계약이 모자라거나 틀리면 직접 고치지 말고 `docs/change-requests/`에 변경 요청을 써서 헤드에게 넘긴다.
+- 영역 목록의 정본: `head/shared/areas.json`.
+
+### 이 영역이 따르는 계약
+- **제공 I8**(`INTERFACES.md` I8): `validate_extraction`(스키마 검사 뒤 의미 검사)과 `QuestionFlowTable`. **라이브러리라서 HTTP·서비스·이미지가 없다.**
+- **받음**: 계약 스키마(`ActionExtractionInput`, `ActionExtraction`). 순서 표는 호출자(survey-service)가 문항 세트에서 만들어 넘기고 `DATASET_V2_FLOW`는 시험용이다(D99).
+- 하지 않는 것: 판단(정규화, 판정, 계획은 LoRA-A가 한다), 모델 호출, 저장소 접근, 네트워크.
+
 ## 1. 목적과 범위
 
 - 목적: 한 턴의 판단 로직을 서비스·평가·합성 데이터·게이트가 같은 코드로 재현하게 하는 순수 라이브러리다. 모델은 해석과 문장만, 판단은 코드가 한다는 역할 분리의 코드 쪽이다.

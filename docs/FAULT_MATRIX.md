@@ -15,7 +15,7 @@
 | -- | 해당 없음(이유는 3절 간선 설명) |
 | `*` (E 뒤) | **두 환경 확인**: 오늘(2026-10-28) 이 PC(02:56, deploy f8c2649)와 gpu-dev(02:48, deploy 7355791)의 전체 모드 E2E가 모두 실패 0으로 끝났고(수치는 정본 `deploy/docs/E2E_RESULTS.md`), 해당 단계(5, 5p, 5q, 5w, 5f, 5r, 7, 9)가 두 로그에서 모두 REAL/PASS였다. 정본 `deploy/docs/E2E_RESULTS.md` |
 
-**주의 1.** 시험 코드는 '그 시험이 저장소에 있는가'를 뜻한다. E 칸의 통과는 위 정본과 두 환경의 로그(둘 다 FAIL 0, POLICY-PENDING 0. 수치는 정본)로 확인했다. **U 칸의 통과는 이 조사에서 실행하지 않았다**(시험 파일과 영역 문서를 읽었을 뿐이다). **주의 2.** 'E'로 표시한 칸도 보는 범위가 좁을 수 있다. 예: 5p는 postgres를 stop하지 pause하지 않고, 환자 턴은 위험 신호가 없는 발화 하나다. 한계는 3절 설명에 적었다. **주의 3.** 두 환경 확인은 E 칸에 한정된다. U 칸 중 영역 문서가 '이 PC에서 측정'이라고만 적은 것(DB 대기 상한 4개 영역)은 한 환경 확인이다(아래 별도 표). **주의 4.** 두 환경의 E2E는 fake 모델 백엔드이고 두 로그의 deploy 커밋이 다르다(7355791, f8c2649: 뒤의 것은 E2E 기록 문서 커밋으로 읽었으나 diff를 열어 보지 않았다). **주의 5.** 조사 도중(03:10) 다른 세션이 `deploy/scripts/e2e_steps.py`를 수정 중이었다(미커밋, 단계 2를 import 모드로 바꾸는 변경으로 읽음, 실패 주입 단계 5q·5w·5p는 건드리지 않음). 그래서 이 파일은 `e2e_steps.py`를 줄 번호가 아니라 함수 이름으로 인용하고, E 칸의 근거는 위 두 환경의 실행 로그(그 변경 이전)다. 다른 파일의 줄 번호는 2026-10-28 03:14 작업 트리 기준이다.
+**주의 1.** 시험 코드는 '그 시험이 저장소에 있는가'를 뜻한다. E 칸의 통과는 위 정본과 두 환경의 로그(둘 다 FAIL 0, POLICY-PENDING 0. 수치는 정본)로 확인했다. **U 칸의 통과는 초안 조사에서는 실행하지 않았고, 4차 대조(1-1절)에서 새 clone과 일회용 PostgreSQL로 실행해 확인했다.** **주의 2.** 'E'로 표시한 칸도 보는 범위가 좁을 수 있다. 예: 5p는 postgres를 stop하지 pause하지 않고, 환자 턴은 위험 신호가 없는 발화 하나다. 한계는 3절 설명에 적었다. **주의 3.** 두 환경 확인은 E 칸에 한정된다. U 칸 중 영역 문서가 '이 PC에서 측정'이라고만 적은 것(DB 대기 상한 4개 영역)은 한 환경 확인이다(아래 별도 표). **주의 4.** 두 환경의 E2E는 fake 모델 백엔드이고 두 로그의 deploy 커밋이 다르다(7355791, f8c2649: 뒤의 것은 E2E 기록 문서 커밋으로 읽었으나 diff를 열어 보지 않았다). **주의 5.** 조사 도중(03:10) 다른 세션이 `deploy/scripts/e2e_steps.py`를 수정 중이었다(미커밋, 단계 2를 import 모드로 바꾸는 변경으로 읽음, 실패 주입 단계 5q·5w·5p는 건드리지 않음). 그래서 이 파일은 `e2e_steps.py`를 줄 번호가 아니라 함수 이름으로 인용하고, E 칸의 근거는 위 두 환경의 실행 로그(그 변경 이전)다. 다른 파일의 줄 번호는 2026-10-28 03:14 작업 트리 기준이다.
 
 장애 방식: F1 중지(연결 거부), F2 멈춤(연결은 되나 무응답), F3 느림, F4 재시작, F5 5xx 응답, F6 잘못된/깨진 응답 본문, F7 인증 실패(401/403), F8 네트워크 분리. 볼륨·정적 파일처럼 네트워크 호출이 아닌 간선은 해당 없는 칸에 이유를 적었다.
 
@@ -32,20 +32,20 @@
 | 기대 D (정의됨) | 119 | 140 | +21 |
 | 기대 P (부분) | 59 | 65 | +6 |
 | 기대 ? (미정의) | 89 | 63 | -26 |
-| 시험 E (E2E) | 26 | 31 | +5 |
+| 시험 E (E2E) | 26 | 28 | +2 (4차 대조로 31에서 -3) |
 | 시험 U (영역 단위만) | 85 | 107 | +22 |
-| 시험 N (안 함) | 156 | 130 | -26 |
+| 시험 N (안 함) | 156 | 133 | -23 (4차 대조로 130에서 +3) |
 
 - 간선 41개 x 장애 방식 8 = **328칸**. 그중 해당 없음 60칸, **해당 있는 칸 268**(이하 비율의 분모). 분모가 267에서 268으로 1 늘었다(신규 간선 G8의 F1 한 칸).
 - **재집계(헤드 문서 정리, 2026-10-28 3차 점검 뒤).** 3절 행렬의 실제 칸을 다시 세었다(41행 x 8 = 328칸; 해당 없음 `--` 60, 해당 있음 268). 결과는 위 표·아래 줄과 모두 같다(어긋남 없음). 한 칸 안의 상태를 세 가지로 묶어 적는다.
-  - **확인(시험으로 통과를 본 칸, 코드 E)**: 268칸 중 **31칸**. 오늘 02:48~02:56 두 환경 전체 모드 E2E 기록을 읽은 것이다. 이 칸들은 2차·3차 수정 뒤의 E2E로 다시 확인하지 않았다(정본 [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md)의 최신 행이 이 칸의 단계를 지금도 포함하는지는 이 정리에서 대조하지 못했다).
-  - **정책 정의(기대 동작이 영역 문서에 있음, 코드 D)**: 268칸 중 **140칸**. 그중 시험까지 본 것은 위 31칸이고, **107칸(U)은 시험 파일이 있다는 것만 읽었고 실행하지 않았다**(통과를 확인했다고 말하지 않는다), 6칸(DN)은 시험 없음, 부분 정의(P)는 별도 65칸.
+  - **확인(시험으로 통과를 본 칸, 코드 E)**: 268칸 중 **31칸**(당시 값). 오늘 02:48~02:56 두 환경 기록을 읽은 것이었고, 4차 대조(1-1절)에서 최신 로그 `progress/e2e-pc-final-gate.log`와 단계명을 대조해 28칸으로 바로잡았다(정본 [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md)).
+  - **정책 정의(기대 동작이 영역 문서에 있음, 코드 D)**: 268칸 중 **140칸**. 그중 시험까지 본 것은 위 E 칸(4차 대조 뒤 28칸)이고, **107칸(U)은 4차 대조(1-1절)에서 새 clone과 일회용 PostgreSQL로 인용 시험을 실행해 통과를 확인했다**(당시에는 파일 존재만 읽었다), 6칸(DN)은 시험 없음, 부분 정의(P)는 별도 65칸.
   - **미정(기대 동작을 문서에서 찾지 못함, 코드 ?)**: 268칸 중 **63칸**(전부 시험도 없음, ?N). 35개 간선에 퍼져 있다(위 '미정 칸 목록' 합 63과 일치).
-  - 시험 N(안 함) 130칸은 미정 63 + 부분 61 + 정의 6의 합이다.
-  - 3차 점검의 알림 변경(전달 실패 알림은 재시도 때 다시 전달, 멱등 키에 종류 포함; `AUDIT_SUMMARY.md` 3차 절)과 L23(키오스크의 재알림 수단 없음)은 A9·A10 칸의 코드를 바꾸지 않았다. 이 행렬은 3차 수정 뒤 해당 영역 문서를 다시 읽지 않았으므로 A9·A10 칸이 낡았을 수 있다. 계약이 없어 정의할 수 없는 '재알림'은 칸이 아니라 [`change-requests/CR-H001-staff-call-redelivery.md`](change-requests/CR-H001-staff-call-redelivery.md) 초안으로 둔다.
+  - 시험 N(안 함) 133칸은 미정 63 + 부분 61 + 정의 9의 합이다(G2 F1·F4, G3 F1을 E에서 N으로 내림: 4차 대조).
+  - 3차 점검의 알림 변경(전달 실패 알림은 재시도 때 다시 전달, 멱등 키에 종류 포함; `AUDIT_SUMMARY.md` 3차 절)과 L23(키오스크의 재알림 수단 없음)은 A9·A10 칸의 코드를 바꾸지 않았다. 이 행렬은 3차 수정 뒤 해당 영역 문서를 다시 읽지 않았으므로 A9·A10 칸이 낡았을 수 있다(4차 대조에서 A9 F1·A10 F4를 재확인해 통과). 계약이 없어 정의할 수 없는 '재알림'은 칸이 아니라 [`change-requests/CR-H001-staff-call-redelivery.md`](change-requests/CR-H001-staff-call-redelivery.md) 초안으로 둔다.
 - 기대 동작: 정의됨(D) 140/268, 부분(P) 65/268, **미정의(?) 63/268**. (초안: D 119 / P 59 / ? 89 of 267)
-- 시험: E2E 시험함(E) 31/268, 영역 단위 시험만(U) 107/268, 안 함(N) 130/268. (초안: E 26 / U 85 / N 156 of 267) E 칸 31개는 전부 두 환경 확인(`*`)이다.
-- 조합(기대+시험): DU 103, ?N 63, PN 61, DE 31, DN 6, PU 4 (합 268). 초안: ?N 89, DU 84, PN 58, DE 26, DN 9, PU 1 (합 267).
+- 시험: E2E 시험함(E) 28/268, 영역 단위 시험만(U) 107/268, 안 함(N) 133/268. (초안: E 26 / U 85 / N 156 of 267) E 칸 28개는 2026-10-28 02시대 두 환경 확인(`*`)이었고, 최신 E2E 단계와는 아래 '4차 근거 대조'에서 다시 대조했다.
+- 조합(기대+시험): DU 103, ?N 63, PN 61, DE 28, DN 9, PU 4 (합 268). 초안: ?N 89, DU 84, PN 58, DE 26, DN 9, PU 1 (합 267).
 - 비기능 칸(4절) 22행(초안 20행에 N21·N22 추가): 기대 D 9, P 9, ? 4; 시험 E 5, U 9, N 8. 초안: 기대 D 6 / P 5 / ? 9; 시험 E 2 / U 5 / N 13. 타임아웃 일람은 5절.
 - 바뀐 칸 34개('갱신 내역' 표). 시험 N -> U 22, N -> E 5, U -> E 0, 시험 그대로 7; 기대 ? -> D/P 27, P -> D 4.
 - 한 줄 결론: 장애를 일부러 일으키는 E2E는 이제 **다섯 가지**다: model-serving 중지·기동(단계 5), **survey-service 중지·기동(5q)**, **survey-service 무응답 pause(5w)**, PostgreSQL 중지·기동(5p; 이제 **중지 중 환자 턴도 본다**), 백업·복구(단계 9). 환자 경로의 gateway-survey 구간(A2)과 서버 턴 총 마감·DB 대기 상한(A5·C4·D1·D4·E1)은 정의되고 시험되었다. 남은 큰 구멍은 직원 알림 경로(A9·A10, 입력원 비활성), 위험 신호가 있는 턴의 확정 실패(사용자 결정), DB pause의 E2E 부재, 깨진 응답 본문, 디스크 가득의 서비스 쪽 처리, 점검(check-health)을 주기로 부르는 주체 부재다.
@@ -97,7 +97,7 @@
 
 ### 갱신 내역: 바뀐 칸과 근거
 
-이전에 N이던 칸이 U/E로 바뀐 근거를 칸마다 적었다. 근거는 문서·시험 파일을 직접 읽어 확인한 것이고(경로:줄), U 칸의 시험은 실행하지 않았다. 기대만 바뀌고 시험이 그대로인 칸도 포함한다.
+이전에 N이던 칸이 U/E로 바뀐 근거를 칸마다 적었다. 근거는 문서·시험 파일을 직접 읽어 확인한 것이고(경로:줄), U 칸의 시험은 작성 당시 실행하지 않았다(4차 대조 1-1절에서 실행). 기대만 바뀌고 시험이 그대로인 칸도 포함한다.
 
 | 간선 | 장애 | 이전 | 지금 | 근거 |
 | --- | --- | --- | --- | --- |
@@ -120,7 +120,7 @@
 | A5 | F3 | ?N | DU | F2와 같은 상한(문장 2s, 접속 2s, 재접속 유예 1s)이 느림도 덮는다(boundary.md:53,55). 서버 쪽 statement_timeout이 발동하는 느린 문장(pg_sleep) 직접 시험은 survey에서 찾지 못했고 pause(얼음)와 설정 시험으로 갈음(test_turn_db_outage_bounds.py:42) |
 | A5 | F5 | ?N | DU | 정정(초안이 놓침): 쓰기 확정 실패는 NOT_COMMITTED 신호(boundary.md:82 Session Store 오류 행; test_orchestrator.py:334 FaultyStore). 실제 PostgreSQL이 내는 SQL 오류가 아니라 가짜 저장소 시험 |
 | A5 | F7 | ?N | PU | 운영 중 접속 실패는 원인이 인증이든 거부든 한 경로(pg.py:93-96 except Exception -> OperationalError -> 503 UNAVAILABLE). 인증 실패를 직접 일으키는 시험은 없음(test_turn_db_outage_bounds.py:49는 연결 거부 주소) |
-| A10 | F4 | ?N | PU | 정정+신규: SSE가 끊긴 뒤 Last-Event-ID(재시작 뒤 포함)로 이어 받는 단위 시험이 있다(survey tests/test_staff_alerts.py:472; alerts.py:203). survey SIGTERM 때 SSE 종료는 boundary.md:114에 있으나 그 시험은 찾지 못함. gateway 경유 실제 재시작 E2E 없음 |
+| A10 | F4 | ?N | PU | 정정+신규: SSE가 끊긴 뒤 Last-Event-ID(재시작 뒤 포함)로 이어 받는 단위 시험이 있다(survey tests/test_staff_alerts.py:475; alerts.py:203). survey SIGTERM 때 SSE 종료는 boundary.md:114에 있으나 그 시험은 찾지 못함. gateway 경유 실제 재시작 E2E 없음 |
 | C4 | F2 | ?N | DU | release-gate boundary.md:40,43-53: 접속·문장 3s(+얼면 1s), /readyz 2s 안 503, 잡은 종료 코드 75. tests/test_pg_timeouts.py:193,216,231(docker pause) |
 | C4 | F3 | ?N | DU | F2와 같은 상한. 서버 쪽 statement_timeout 설정 확인 test_pg_timeouts.py:172(느린 문장을 일부러 만드는 시험은 아님) |
 | C6 | F1 | DN | DU | 스케줄러가 안 돌면 마지막 시작이 주기의 2배(+60초)를 넘어 CRIT(deploy docs/runbook.md:90-104; scripts/check_health.py 스케줄러 절). 자체 시험 scripts/test-check-health.sh:25. 점검을 주기로 부르는 주체(cron/timer)는 아직 없음(runbook 5-1 '아직 하지 않은 것') |
@@ -140,7 +140,7 @@
 
 ### 두 환경 확인 칸과 한 환경 확인 칸
 
-**두 환경 확인(오늘 이 PC와 gpu-dev 전체 E2E 통과)** — E 칸 31개 전부. 칸과 확인한 단계:
+**두 환경 확인(오늘 이 PC와 gpu-dev 전체 E2E 통과)** — 당시 E 칸 31개. 4차 대조에서 G2 F1·F4, G3 F1은 장애를 일으키는 단계가 없어 N으로 내렸다(아래 표의 취소선 대신 '(내림)' 표시). 칸과 확인한 단계:
 
 | 간선 | 칸 | 확인한 E2E 단계 |
 | --- | --- | --- |
@@ -149,15 +149,15 @@
 | A5 | F1, F4, F8 | 5p(+환자 턴) |
 | A10 | F7 | 5f/5r(직원 경로 인증) |
 | C4 | F1, F4, F8 | 5p |
-| C7 | F7 | 5f |
-| C8 | F7 | 5f |
+| C7 | F7 | 5f가 아니라 4g(승인 화면 경로 401)·4b(operator 승인 403)·5(역할 분리) |
+| C8 | F7 | 5f가 아니라 5(operator 계정만 activate·rollback, 다른 역할 403) |
 | D1 | F1, F4, F8 | 5p |
 | D4 | F1, F4, F8 | 5p |
 | D6 | F7 | 7 |
 | E1 | F1, F4, F8 | 5p |
 | G1 | F4 | 5p(단계 9 복구) |
-| G2 | F1, F4 | 9(레지스트리 기동·digest 잠금 롤백) |
-| G3 | F1 | 9 |
+| G2 | F1, F4 | (내림) 9는 레지스트리를 멈추지 않는다 |
+| G3 | F1 | (내림) 9는 백업 중 postgres를 멈추지 않는다 |
 | G7 | F7 | 5r |
 
 확인 근거: 이 PC 로그 `e2e-full7.log`(02:57, FAIL 0, `POLICY-PENDING` 0건)과 gpu-dev 로그 `e2e-gpudev7.log`(02:48, 같은 결과)에서 5q·5w·5p 줄과 정책 단언 5건이 모두 REAL이었음을 읽었다(로그는 헤드 scratchpad에 있어 리포지토리에는 없다). 정본 기록은 `deploy/docs/E2E_RESULTS.md`의 두 줄(02:56 f8c2649 이 PC, 02:48 7355791 gpu-dev, 각 116/0/0). 두 환경의 5w 실측은 클라이언트 8.51s / 8.5s, gateway 접근 로그 8.5s로 같았고, 5p의 DB 중지 중 환자 턴은 4.0s / 3.7s였다. 단계 5·5f·5r·7·9의 각 줄이 두 로그에 있음은 단계 제목과 REAL/PASS 줄로 확인했고, 이 단계들의 내용(어떤 장애를 일으키는가)은 e2e_steps.py·e2e.sh를 읽은 것이다.
@@ -238,6 +238,28 @@
 | 원칙 13: 디스크 가득 경보·쓰기 거부 503 | 경보만 단위, 쓰기 거부 미구현 | check-health 자체 시험(디스크 한계를 0%로 낮춤)만. 서비스 쓰기 거부는 runbook이 각 영역의 몫으로 남김 |
 | 원칙 14: 서버 밖에서 gateway /readyz 감시, 스케줄러 실패 노출 | 부분 | check-health 시험·E2E는 gateway /healthz를 대상으로 하고(/readyz 아님), 실패 상태는 가짜 상태 파일 단위 시험만, E2E는 정상 상태 OK 3 SKIP 2. 호출 주체 없음(G8) |
 
+## 1-1. 4차 근거 대조 (2026-10-28 14시대, 헤드 조사)
+
+범위와 방법: E 칸의 단계명을 `deploy/scripts/e2e_steps.py`의 `title(...)`과 대조하고, 가장 최근 전체 E2E 로그 `progress/e2e-pc-final-gate.log`(이 PC, 정본 `deploy/docs/E2E_RESULTS.md` 마지막 행)에서 단계별 `[REAL]`/`[PASS]` 줄을 읽었다. U 칸은 인용된 시험 파일·함수 존재를 grep으로 확인하고, 새 clone 재현 로그(`final-ws/logs/*.log`의 `-rs` 건너뜀 목록)와 같은 새 clone에서 해당 파일만 다시 돌려(TEST_DATABASE_URL 없이) 건너뜀 여부를 읽었다. 시험·E2E 통과 개수는 쓰지 않는다(정본). 단계 PASS/FAIL 여부만 적는다.
+
+**E 칸 28칸(내림 3 반영)의 대조.** 단계명 8개(5, 5p, 5q, 5w, 5f, 5r, 7, 9)는 모두 `e2e_steps.py`에 지금도 있고 최신 로그에서 FAIL 줄이 없다(단계 5 안의 추론 서버 stop/start 문장 포함).
+- **단계 PASS 대조 완료, 단계가 그 장애를 직접 다룸: 21칸.** A2 F1~F5(5q·5w·5p 환자 턴), A4 F1·F4(5), A5 F1·F4(5p), C4 F1·F4, D4 F1·F4, E1 F1·F4(5p의 서버 /readyz 503→200과 행 지문 보존), A10 F7·C7 F7·C8 F7·D6 F7·G7 F7(역할별 401/403 단언: 5f, 4g·4b·5, 5, 7, 5r), G1 F4(5p의 postgres stop/start).
+- **단계는 PASS이나 칸의 장애 방식과 완전히는 맞지 않음: 7칸.** A5·C4·D1·D4·E1의 F8(분리)은 stop과 같은 증상으로 본 것이고 네트워크 분리 자체는 일으키지 않는다(5칸). D1 F1·F4는 5p가 서비스 /readyz와 행 지문만 보고 `job-ops-feedback` 잡을 DB 중지 중에 돌리지 않는다(2칸). C4의 수집 잡도 같은 한계가 있다(칸 수에는 위에서 서버 쪽으로 셈).
+- **E에서 N으로 내림: 3칸(G2 F1·F4, G3 F1).** 단계 9는 레지스트리를 멈추지 않고(`e2e.sh`에 registry stop 없음), 백업 도중 postgres를 멈추지도 않는다(백업은 postgres를 남기고 나머지만 멈춘 뒤 실행). 이 칸들의 간선 설명이 이미 'N으로 보수적으로 둠'이라 적고 있어 표와 어긋났던 것을 바로잡았다.
+- 표의 단계명 정정: C7 F7은 5f가 아니라 4g·4b·5, C8 F7은 5f가 아니라 5.
+- 3차 변경과의 관계: 5f의 위험 문구 기본 켜짐 단언(`DELIVERY_FAILED`와 직원 알림 목록)은 최신 로그에서 REAL이다. 그러나 5p의 환자 턴은 여전히 위험 신호 없는 발화이므로 A5 F1의 '위험 신호가 있는 턴의 확정 실패'는 보지 못한다(열린 항목 2번 그대로).
+
+**U 칸 107칸의 대조(전부 완료).** 인용된 시험 파일·함수는 모두 저장소에 있다(없는 것 0). 새 clone 재현 로그에서는 PostgreSQL이 필요한 시험이 TEST_DATABASE_URL 없음으로 건너뛰어졌으므로, 이 대조에서 **일회용 PostgreSQL 컨테이너 한 대(이름에 head-faultmx, 이미 지움)를 직접 띄워** 새 clone의 survey-service·release-gate·ops-feedback·question-authoring 시험을 다시 돌렸다(deploy의 dev 컨테이너나 남의 컨테이너는 건드리지 않음). 결과는 개수 대신 상태로 적는다.
+- **PostgreSQL을 켠 새 clone 재실행에서 실패 0, 인용 시험이 건너뛰어지지 않고 통과: C4·D1·D4·E1의 F2·F3(8칸, `docker pause` 시험 포함), D4 F5(`test_sql_error_not_retried_as_connection_loss`), E1 F5(`test_non_connection_errors_are_not_retried`), A5 F2·F3·F5·F7(4칸, `test_frozen_db_ends_within_server_turn_deadline` 포함).** survey-service는 전체 시험에서 실패 0(건너뜀은 학습 데이터 경로가 없는 `test_reference_data.py`뿐), release-gate·ops-feedback·question-authoring는 PostgreSQL을 켜면 건너뜀 없이(또는 PostgreSQL 전용 변형의 짝만 건너뜀) 실패 0이었다. 첫 시도에서 ops-feedback `test_ingest_api_on_postgres` 1건이 실패했으나 시험이 DB 계정 이름 `postgres`를 비밀로 보고 `postgresql` 글자에서 찾은 시험 쪽 가정(계정 이름을 바꾸면 통과)이며 코드 결함이 아니다.
+- **deploy 셸 시험을 직접 실행해 통과: C6 F1·F2·F3·F5(4칸), G1 F1, G5 F1(2칸).** `test-check-health.sh`(가짜 상태 파일, Docker 불필요)가 실패 0이었다.
+- **3차 변경 뒤 재확인: A9 F1, A10 F4(2칸).** `test_staff_alerts.py`와 `test_audit_fixes.py`를 읽고 실행했다. A10 F4의 Last-Event-ID 이어받기 시험은 `test_staff_alerts.py:475`(이전 표기 472는 줄 번호 어긋남)이고, 전달 실패 알림이 같은 턴 재시도에서도 DELIVERY_FAILED로 남고 구독자가 생기면 DELIVERED로 바뀌며 알림은 하나라는 3차 시험(`test_audit_fixes.py`의 `test_delivery_failure_is_not_turned_into_success_by_the_idempotent_retry`)이 A9 F1을 덮는다. 둘 다 통과. 따라서 \'근거 낡음\'은 해소되었다.
+- **나머지 85칸(A1 7, A2 F7, A4 5, A6 6, A7 7, B1 7, B2 2, C1·C2·C3 21, C5, C7 6, D3 6, D5 7, F1 7, F2 2 중 위 항목에 들지 않은 것): 인용 시험 파일이 새 clone에서 실행되어 통과했고 건너뛴 시험 목록에 없다.** 칸마다 단언을 한 줄씩 읽지는 않았다(파일·영역 단위 대조). kiosk-frontend의 건너뜀 1건은 빌드 산출물 시험(A1 아님)이다.
+- 합계: 8+2+4(A5)+4(C6)+2(G1·G5)+2(A9·A10)+85 = 107.
+
+**재집계(268칸).** E2E 단계 PASS 대조: E 28칸 중 21칸은 단계가 장애를 직접 다룸, 7칸은 단계 PASS이나 장애 방식이 완전히는 맞지 않음(F8 5, D1 잡 2). E에서 N으로 내림 3칸. U 107칸 전부 시험 통과 대조 완료(칸별로 인용 시험을 지목해 실행한 것은 앞의 항목들이고, 나머지 85칸은 파일·영역 단위). 근거 낡음 0칸(2칸을 재확인해 해소). 대조하지 못한 칸 0. 남은 한계는 위 7칸의 장애 방식 불일치이며, 이를 닫으려면 전체 E2E에 잡 실행 중 DB 중지와 네트워크 분리 변형을 더해야 한다(이번 범위에서 전체 E2E는 돌리지 않았다). 나머지 D·P·? 칸 중 시험 N인 칸(133)은 시험 근거가 없다는 것 자체가 확인 결과이다.
+
+**그 밖의 3차 변경과 칸.** release-gate PRUNING→PRUNED, ops-feedback 보존 설정, CSRF Origin 변경은 이 행렬의 간선(네트워크·볼륨·DB 장애 방식)에 해당하는 칸이 없어 칸 상태를 바꾸지 않았다. C5(gate-data 볼륨)와 D1·D4(보존)의 기대 동작 문서가 바뀌었을 수 있으나 해당 영역 문서를 이 대조에서 다시 읽지 않았다(미확인).
+
 ## 2. 간선을 찾은 방법 (재현 가능, 닫힌 목록의 한계)
 
 간선 = 호출자 -> 대상 중 런타임에 일어나는 것(HTTP, DB 연결, 볼륨 공유, 스케줄러 실행, 외부 서비스 호출). 아래 순서로 찾았고, **여기서 놓친 간선은 이 문서에도 없다.** 다시 돌려서 새로 나오는 줄이 있으면 이 문서에 보탠다. 경로는 모두 `/home/user/sdabin/healthKiosk` 기준. 2026-10-28 갱신에서 간선 1개(G8)를 보탰다.
@@ -297,8 +319,8 @@
 | F2 | 모델 게시 | model-registry -> models-data 볼륨 | DU | -- | -- | DN | -- | DU | -- | -- |
 | F3 | 데이터 | synthetic-data(컴포즈 밖) -> question-authoring(I1)·ops-feedback(I7)·(I2는 HTTP 면 없음) | PN | PN | PN | PN | PN | PN | PN | ?N |
 | G1 | 인프라 | PostgreSQL -> pg-data 볼륨(디스크) | PU | -- | -- | DE* | -- | ?N | -- | -- |
-| G2 | 인프라 | deploy up/rollback -> 로컬 레지스트리(compose.registry.yaml, 이미지 pull) | DE* | -- | -- | DE* | -- | ?N | -- | ?N |
-| G3 | 인프라 | backup job -> postgres(pg_dump) / BACKUP_DIR 디스크 | DE* | ?N | ?N | ?N | DN | ?N | -- | ?N |
+| G2 | 인프라 | deploy up/rollback -> 로컬 레지스트리(compose.registry.yaml, 이미지 pull) | DN | -- | -- | DN | -- | ?N | -- | ?N |
+| G3 | 인프라 | backup job -> postgres(pg_dump) / BACKUP_DIR 디스크 | DN | ?N | ?N | ?N | DN | ?N | -- | ?N |
 | G4 | 인프라 | Docker 데몬/호스트 -> 컨테이너 재시작(restart: unless-stopped) | DN | -- | -- | ?N | -- | -- | -- | -- |
 | G5 | 인프라 | 외부 감시 -> gateway /healthz (서버 밖) | DU | -- | -- | -- | -- | -- | -- | -- |
 | G6 | 환자 | 키오스크 브라우저 -> 브라우저 음성 인식(Web Speech API, 외부 서비스) | PN | PN | PN | -- | PN | PN | -- | PN |
@@ -348,7 +370,7 @@
 
 **A10. 직원 브라우저 SSE -> gateway -> survey-service(알림 스트림)** (직원)
 - 근거(간선): Caddyfile:30-41; survey_service/service.py:338(heartbeat)
-- 기대 동작·시험 근거: SSE는 gateway가 버퍼링을 끄고 read_timeout 1h(Caddyfile:38-40). 브라우저 EventSource 자동 재연결과 Last-Event-ID 이어받기(kiosk design.md:49). 서비스·게이트웨이 재시작 중 알림 유실 여부, 하트비트 끊김 감지 기준은 문서 없음. F7: 인증 없는 직원 경로 401/403은 E2E 5f/5r이 gateway 쪽에서 단언. [갱신] survey SIGTERM 때 /readyz는 503 shutting_down, SSE는 0.5초 안에 끝낸다고 boundary.md:114가 적었고 처리 중 턴을 끝까지 처리한다는 단위 시험이 있다(test_readyz_db_outage.py:173; SSE 종료 자체의 단언은 읽지 못함). SSE 재연결은 Last-Event-ID로 이어 받는 단위 시험이 있다(test_staff_alerts.py:472).
+- 기대 동작·시험 근거: SSE는 gateway가 버퍼링을 끄고 read_timeout 1h(Caddyfile:38-40). 브라우저 EventSource 자동 재연결과 Last-Event-ID 이어받기(kiosk design.md:49). 서비스·게이트웨이 재시작 중 알림 유실 여부, 하트비트 끊김 감지 기준은 문서 없음. F7: 인증 없는 직원 경로 401/403은 E2E 5f/5r이 gateway 쪽에서 단언. [갱신] survey SIGTERM 때 /readyz는 503 shutting_down, SSE는 0.5초 안에 끝낸다고 boundary.md:114가 적었고 처리 중 턴을 끝까지 처리한다는 단위 시험이 있다(test_readyz_db_outage.py:173; SSE 종료 자체의 단언은 읽지 못함). SSE 재연결은 Last-Event-ID로 이어 받는 단위 시험이 있다(test_staff_alerts.py:475).
 - 해당 없음: F3/F6: 스트림이라 느림·본문 검증 개념이 약함
 
 **B1. model-serving -> release-gate(I4 번들 읽기, PUT 적재 때)** (환자(적재))

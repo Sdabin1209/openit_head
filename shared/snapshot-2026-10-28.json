@@ -1,0 +1,82 @@
+{
+ "recorded_at": "2026-10-28T17:45:16+09:00",
+ "what": "전체 E2E 통과 시점의 13개 리포 커밋. head 의 commit 은 이 파일을 커밋하기 직전의 값이다(자기 자신의 해시는 적을 수 없다)",
+ "repos": {
+  "head": {
+   "commit": "ad26cd686871233896414d25414cc02ce89e33bd",
+   "origin_main": "ad26cd686871233896414d25414cc02ce89e33bd",
+   "tags_at_commit": []
+  },
+  "boundary-contracts": {
+   "commit": "be4667596181958c18adf0736ea5da86150b9696",
+   "origin_main": "be4667596181958c18adf0736ea5da86150b9696",
+   "tags_at_commit": [
+    "v2.1.1"
+   ]
+  },
+  "turn-engine": {
+   "commit": "e768e21ea14ed036f56a822821dcbd0269bf7c86",
+   "origin_main": "e768e21ea14ed036f56a822821dcbd0269bf7c86",
+   "tags_at_commit": [
+    "v0.4.2"
+   ]
+  },
+  "model-runtime": {
+   "commit": "7fc1b7621a0c21585b038ffe477aca7b8c33764a",
+   "origin_main": "7fc1b7621a0c21585b038ffe477aca7b8c33764a",
+   "tags_at_commit": [
+    "v0.7.6"
+   ]
+  },
+  "model-lab": {
+   "commit": "1f9a8cfe800d9d7dc4d450d8c77105b96dd85a7e",
+   "origin_main": "1f9a8cfe800d9d7dc4d450d8c77105b96dd85a7e",
+   "tags_at_commit": []
+  },
+  "synthetic-data": {
+   "commit": "8d030de6aa71e586207cb292113feb7ad778d70b",
+   "origin_main": "8d030de6aa71e586207cb292113feb7ad778d70b",
+   "tags_at_commit": []
+  },
+  "survey-service": {
+   "commit": "748ef523e430b0d7cf125de39ac250ce860d4c52",
+   "origin_main": "748ef523e430b0d7cf125de39ac250ce860d4c52",
+   "tags_at_commit": []
+  },
+  "release-gate": {
+   "commit": "fa9ed1b5fe9261bacae1215fc5cb6fc4020066a9",
+   "origin_main": "fa9ed1b5fe9261bacae1215fc5cb6fc4020066a9",
+   "tags_at_commit": []
+  },
+  "ops-feedback": {
+   "commit": "c8a62d8ddd605c3d51ddc468d07f7359a87c1b81",
+   "origin_main": "c8a62d8ddd605c3d51ddc468d07f7359a87c1b81",
+   "tags_at_commit": []
+  },
+  "question-authoring": {
+   "commit": "ee90fda5d7078cfdc25a4a1687873acfef64a353",
+   "origin_main": "ee90fda5d7078cfdc25a4a1687873acfef64a353",
+   "tags_at_commit": []
+  },
+  "kiosk-frontend": {
+   "commit": "da8afbfa9fbf13feccf0bec08f1148dad35b899f",
+   "origin_main": "da8afbfa9fbf13feccf0bec08f1148dad35b899f",
+   "tags_at_commit": []
+  },
+  "admin-console": {
+   "commit": "ab4767c1a71b720b07b16e601bfe3beb49a70439",
+   "origin_main": "ab4767c1a71b720b07b16e601bfe3beb49a70439",
+   "tags_at_commit": []
+  },
+  "deploy": {
+   "commit": "3c5956c3d023b44c9b7131ae1e327f410ed38373",
+   "origin_main": "3c5956c3d023b44c9b7131ae1e327f410ed38373",
+   "tags_at_commit": []
+  }
+ },
+ "sources": {
+  "version_table": "deploy/scripts/lib.sh (이 파일에 값을 복사하지 않는다)",
+  "e2e_results": "deploy/docs/E2E_RESULTS.md (이 PC 와 gpu-dev 의 전체 실행 기록)",
+  "area_list": "head/shared/areas.json"
+ }
+}

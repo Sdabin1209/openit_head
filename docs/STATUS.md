@@ -7,11 +7,12 @@
 (2026-10-27 갱신. 근거는 각 항목에 적었다. 이전 문구는 2026-10-26의 v1 기준이라 아래로 대체했다.)
 
 - 구조는 학습 데이터셋 v2(D74)다. 세션 시작은 B만 부르고, 발화는 LoRA-A extract -> 사후 검증(`validate_extraction`) -> 저장 -> 표 조회로 B 입력 조립 -> LoRA-B respond 순이다. 서비스에 정규화기·Plan 코드는 없다. 도식은 `PROJECT_STRUCTURE.md` 2절, `architecture.md` 4절.
-- **v0.7.0 열차**(D80의 완전 일치 정렬): boundary-contracts `v2.0.2`, turn-engine `v0.4.0`(23973fc, v1 폐기 모듈 제거), model-runtime `v0.7.0`(8279847, 비밀 파일화·`prompt-3` 제거·golden 제거·dev 핀 제거). survey-service 6241d00과 deploy 85e2d27이 이 태그로 맞췄다(`git log`). 문진 스키마 정수 버전은 1이다(D79, 태그 `survey-schema-v1.0.0`).
+- **v0.7.0 열차**(D80의 완전 일치 정렬): boundary-contracts `v2.0.2`, turn-engine `v0.4.0`(23973fc, v1 폐기 모듈 제거), model-runtime `v0.7.0`(8279847, 비밀 파일화·`prompt-3` 제거·golden 제거·dev 핀 제거). **(2026-10-28 정정: 이후 model-runtime은 v0.7.3까지 올랐다. 현재 기준 버전은 `deploy/scripts/lib.sh`가 정본이다.)** survey-service 6241d00과 deploy 85e2d27이 이 태그로 맞췄다(`git log`). 문진 스키마 정수 버전은 1이다(D79, 태그 `survey-schema-v1.0.0`).
 - 결정 D82(제약 디코딩이 `pattern`·`minItems`를 지킴), D83(`allOf`/`if-then`을 `anyOf` 변형으로 펼침), D84(비밀은 `<이름>_FILE` 파일로 받음, compose secrets)를 기록했다.
 - gpu-dev 측정(2026-10-27, **model-runtime v0.6.5 + 계약 v2.0.1 기준**이며 v0.7.0으로는 재측정하지 않았다): U01 Qwen3-1.7B 적재 약 10.1GB, `/readyz` 200. U04 extract 48회 모두 형식 통과, OUTPUT_INVALID 0건. U07 키오스크 발화 14턴은 모두 실패했다(학습 안 된 1.7B가 없는 slot key를 지어내 `UNKNOWN_SLOT`에서 걸림, 의도대로의 동작). 세부는 `OPEN_GAPS.md`.
 - 가짜 모델로 서비스끼리 도는 E2E는 이전 기록이 있다(이 PC 한 환경. 최신 결과: [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md)). v0.7.0 정렬 뒤의 재실행 결과는 이 갱신에서 확인하지 못했다.
 - 남은 구멍: GPU가 필요한 일 H1~H4(`OPEN_GAPS.md` 3-1절, `COMPLETION_PLAN.md`). GPU 없이 닫을 수 있는 일은 줄기 R, E, D, T, A에 있다.
+- (2026-10-27 서술, 2026-10-28 기준으로는 아래 '진행 기록 (2026-10-28 2차·3차 점검)'과 OPEN_GAPS가 우선한다. G01 상태는 갱신 필요 표시가 붙어 있다.)
 - 사용자 결정 대기: G01 직원 알림 입력원, G12 재질문 상한 값과 의미, G02 synthetic-data 역할, D-A 운영 정책(도메인·HTTPS, 직원 로그인, 토큰 발급·회전, 원본 보관 기간). 모아서 한 번에 묻는다.
 - 확인하지 못한 것(변함 없음): 실제 브라우저 화면, 한국어 STT, 웹 푸시 수신, 24GB GPU 실측, 일반 Linux 서버 설치.
 
@@ -123,4 +124,13 @@
 - 실제 데이터 검증(학습 서버의 최종 데이터 C1 64,459행, 서버와 해시 일치): 서빙 프롬프트 100% 일치, 정답 거부 0, B 입력 100% 일치, A state 97.64% 일치, 합성 데이터 게시기 실제 실행 성공. 이 비교로 서비스 값 검증 규칙의 과한 1건, 평가 누수 판정의 키 문제를 찾아 고쳤다.
 - 실제 결함 발견: 키오스크 기기 2대 이상일 때 게이트웨이 기기 인증 전부 401(Caddy 헤더 매처 오용), 기기별 토큰이 게이트웨이에서 공유 토큰으로 바뀌어 런타임에 안 쓰이던 문제.
 - openit 서버: 탐색·~/dabin 복사/수정은 상시 허가, GPU는 06:00까지 허가(사용 전 다른 프로세스 확인). 데이터셋 담당의 C2 증강이 GPU를 점유해 쓰지 못했다. GPU 세션 키트를 준비했다(model-runtime `docs/GPU_SESSION.md`).
-- 마감 보고용 알려진 한계는 `OPEN_GAPS.md` 3-0절(L01~L18).
+- 마감 보고용 알려진 한계는 `OPEN_GAPS.md` 3-0절(L01~L27).
+
+## 진행 기록 (2026-10-28 2차·3차 점검)
+
+- 2차 독립 점검(diff 점검 2건 포함 보고서 4건)을 처리했고 새 한계 L19~L22를 적었다(`AUDIT_SUMMARY.md` 2차 절).
+- 3차: 2차 수정의 diff만 보는 독립 점검 2건(`audit/round3-A.md`, `round3-B.md`)과, push된 `origin/main`을 새로 clone해 README 설치 명령 그대로 시험을 다시 돌린 재현을 했다(`AUDIT_SUMMARY.md` 3차 절). 위험 문구 감지의 부정·제3자 표지 결함, 알림 멱등이 전달 실패를 성공으로 바꾸는 결함, 보존 설정 우회 등 높음 지적을 영역이 고쳤다. 새 한계 L23~L27.
+- **열린 환자 안전 항목 L23**: 직원 호출 전달 실패 시 키오스크가 직원을 다시 부를 수 없다. 변경 요청 초안 `change-requests/CR-H001-staff-call-redelivery.md`(사용자 결정 전, boundary-contracts는 수정하지 않음).
+- 이 PC의 깨끗한 clone 재현은 한 환경이다. 시험 개수는 영역 README 5절, E2E는 [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md)를 본다. 이 기록에는 옮겨 적지 않는다.
+- FAULT_MATRIX 칸 수와 상태를 본문과 실제 칸에서 다시 센 결과는 그 문서 1절에 있다.
+- 사용자 결정 대기에 더해진 것: L23(재알림 계약), L19(실패 원본 보존 기한), L13(4-eyes, 의료인 1명인 현장).

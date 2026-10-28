@@ -1,6 +1,5 @@
 {
   "_설명": "워크스페이스 영역(리포) 목록과 속성의 유일한 정본. 영역을 더하거나 빼려면 이 파일만 고친다. 읽는 곳: deploy/scripts/areas.py(check_all.py 와 셸 스크립트는 이것을 거친다). kind: python|node|library|compose|docs. version_train: check-versions.sh 가 태그 표기를 대조하는 영역. 순서는 동기화·bump 순서다.",
-  "readme_sections": ["소개", "전체 속의 위치", "구조", "실행 방법", "현재 상태", "열린 항목", "더 자세한 문서"],
   "areas": [
     {"name": "head", "kind": "docs", "version_train": false},
     {"name": "boundary-contracts", "kind": "library", "version_train": false},

@@ -20,7 +20,7 @@
 
 ## 3. 소비하는 것
 
-- 소비하는 계약: `ParserSample`, `GeneratorSample`, `DatasetManifest`, `FailureCase`, `QuestionBank`, `GateDecision`.
+- 소비하는 계약: `ActionExtractionSample`, `ResponseSample`, `DatasetManifest`, `FailureCase`, `QuestionBank`, `GateDecision`.
 - 소비하는 SDK: 데이터셋 읽기 SDK(synthetic-data), 실패 사례 읽기 SDK(ops-feedback), 문항 읽기 SDK(question-authoring, D13), 판정 조회 SDK(release-gate). 라이브러리로 turn-engine, model-runtime, 문진 스키마.
 - 지원하는 계약 버전: 문진 스키마 정수 버전, 경계 계약 `MAJOR.MINOR`.
 

@@ -3,7 +3,7 @@
   "areas": [
     {"name": "head", "kind": "docs", "version_train": false},
     {"name": "boundary-contracts", "kind": "library", "version_train": false},
-    {"name": "turn-engine", "kind": "python", "version_train": true},
+    {"name": "turn-engine", "kind": "python", "version_train": false, "_note": "D109: v0.4.3에 동결된 라이브러리. 코드 의존이 없어져 버전 열차 밖이다(기록의 turn_engine_version 표지 값만 남는다)"},
     {"name": "model-runtime", "kind": "python", "version_train": true},
     {"name": "model-lab", "kind": "python", "version_train": true},
     {"name": "synthetic-data", "kind": "python", "version_train": true},

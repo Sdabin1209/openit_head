@@ -33,7 +33,7 @@
 | kiosk-frontend | 환자용 키오스크 화면과 직원 콘솔 화면 | [README](../../kiosk-frontend/README.md) | 계약 v2.1.0 |
 | admin-console | 출고 승인과 실패 사례 검토 화면 | [README](../../admin-console/README.md) | 계약 v2.1.0 |
 
-서비스 영역의 기준 버전 `main`은 계약 v2.1.0, turn-engine v0.4.1, model-runtime v0.7.5에 맞춰져 있다(기준 표는 `deploy/scripts/lib.sh`). `deploy/scripts/check-versions.sh`가 **10개 영역의 표기**가 표와 같은지 확인한다(두 프런트엔드는 오늘 뒤늦게 정렬하고 점검 대상에 넣었다. 시험 상태는 각 영역 README 5절).
+서비스 영역의 기준 버전 `main`은 하나의 기준 표에 맞춰져 있다(표와 값은 `deploy/scripts/lib.sh`에만 있다). `deploy/scripts/check-versions.sh`가 **10개 영역의 표기**가 표와 같은지 확인한다(두 프런트엔드는 오늘 뒤늦게 정렬하고 점검 대상에 넣었다. 시험 상태는 각 영역 README 5절).
 
 ## 4. 지금 확인된 것 (숫자는 주인 문서에서 본다)
 

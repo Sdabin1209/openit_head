@@ -739,7 +739,7 @@ flowchart LR
 | 경계 계약 | 스키마 `2.1`(MAJOR 2), 패키지 태그 `v2.1.0`(`git tag`: v2.0.0-rc1, v2.0.1, v2.0.2, v2.1.0 …). 영역 문서는 기준 표(`deploy/scripts/lib.sh`)의 값을 적는다 | MINOR는 추가만이나 v1에서 v2로는 병행 없이 MAJOR. 읽는 쪽은 모르는 필드 허용 | D25, D74, D75, D79 |
 | turn-engine | `v0.4.0`(`ENGINE_VERSION`). 유효한 입력 하나라도 출력이 달라지면 MINOR | 정규화·판정·기록·Plan 제거(G07), `validate_extraction`만 제공 | `turn-engine/docs/boundary.md` |
 | model-runtime | `v0.7.0`. `prompt-4`(학습 글자와 같은 직렬화), `protect-2`, `relax-3`(anyOf 펼침). `prompt-3` 제거(G10) | 서버·라이브러리를 같은 리포가 가짐. 릴리스 매니페스트의 MAJOR.MINOR가 같아야 적재 | D77, D80, D82, D83, `model-runtime/docs/boundary.md` |
-| 열차 정렬 | 같은 열차를 모든 영역이 쓴다(현재 기준은 `deploy/scripts/lib.sh`: 계약 v2.1.0, turn-engine v0.4.1, model-runtime v0.7.5). 비교는 완전 일치(D80) | 게이트의 `CONTRACT_COMPAT`도 문자열 일치 | D80 |
+| 열차 정렬 | 같은 열차를 모든 영역이 쓴다(현재 기준 값은 `deploy/scripts/lib.sh`에만 있다). 비교는 완전 일치(D80) | 게이트의 `CONTRACT_COMPAT`도 문자열 일치 | D80 |
 | 라이브러리 설치 | Git 태그. 이미지 빌드 때 태그를 고정하고 의존 버전은 잠금 파일로 고정 | `pip install git+ssh://…@태그` | D18, 루트 `CLAUDE.md` |
 | 비밀 | `<이름>_FILE`로 읽음. 환경 변수는 개발·시험용. `boundary_contracts.read_secret` | 값은 로그·`/readyz`·오류에 내지 않음 | D84 |
 | 해시 | JCS(RFC 8785) 정규화 + SHA-256(`boundary_contracts.canonical`). 모델 입력 직렬화는 해시와 달리 JCS가 아니라 학습 글자(`json.dumps(ensure_ascii=False)`)다 | 클라이언트가 응답을 읽을 때 해시를 다시 계산 | D20, D34, D49, D77 |

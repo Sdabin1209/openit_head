@@ -89,7 +89,7 @@
 | L21 | GPU 세션 키트(`model-runtime scripts/gpu_session`)는 가짜 백엔드·가짜 nvidia-smi로만 시험했다. 호출자가 먼저 끊으면 서버가 최대 3.5초 엔진을 잡는다(추정, 미측정) | GPU 사용 가능 시간대 필요 |
 | L22 | ops-feedback 검토 입력의 이메일 탐지는 `@` 뒤 254자까지만 본다. 오래 걸리는 정규식 점검은 입력군 일부(20,000·80,000자)로만 했다 | 알려진 한계 |
 | L23 | **직원 호출 전달 실패(DELIVERY_FAILED) 때 키오스크가 직원을 다시 부를 수 없다.** 알림을 다시 보내는 API와 서버에 '알림이 안 닿았다'를 남기는 계약이 없다. 지금은 "직접 알리셨나요?"를 묻고 세션을 끝내지 않는 데서 멈춘다(kiosk-frontend `docs/design.md`) | **환자 안전.** boundary-contracts 변경 요청(재알림 API, 실패 기록)을 헤드가 처리해야 한다. 임상 현장 흐름 확인 필요 |
-| L24 | PostgreSQL에서 question-authoring의 업로드와 purge가 동시에 도는 스레드 경쟁 시험이 없다(SQL 구조 확인과 SQLite 경쟁 시험만) | 후속 시험 |
+| L24 | [닫힘 표시 2026-10-28, 에이전트 보고 근거, 새 clone 재현 전] PostgreSQL 업로드·purge 경쟁 시험을 추가했다(question-authoring 9b912e9, ADR 0011 보강). 시험이 실제 결함(R5: 방치 초안 확정과 purge가 겹치면 원본 없는 출처를 가리키는 불변 버전이 만들어짐)을 찾아 세 저장소의 commit_version에서 같은 락 안에 원본 존재를 확인하도록 고쳤다. 한계: R5는 결정적 끼워 넣기로만 재현(자연 발생 창은 일반 동시 시험에서 안 걸림), 반복 횟수 기본 12는 시험 시간에서 나온 값(근거 측정 없음), 60회는 110초 안에 끝나지 않아 원인 미확인 | 후속 시험 |
 | L25 | survey-service의 DB 장애 시험(`test_readyz_db_outage.py` 등)이 `io.openit.dev-postgres=1` 라벨의 모든 컨테이너를 `docker pause`한다. 같은 서버의 다른 세션과 겹치면 서로 영향을 준다. 독립 재현 중 원인 불명의 시험 멈춤이 1회 있었으나 재현하지 못했다 | survey-service 후속 **[닫힘 표시 2026-10-28: survey-service 6ba56a6, `survey-service/docs/adr/ADR-0019.md`. 원인은 라벨 탐색 범위와 포트 부분 문자열 비교. (에이전트 보고 근거, 새 clone 재현 전)]** |
 | L26 | 영역 README의 시험 개수 8곳이 오래된 값이다(실제가 더 많음). 워크스페이스 규칙(영역 시험 상태는 그 영역 README 5절)에 어긋난다 | 각 영역이 갱신 |
 | L27 | deploy `scripts/test-inference-location.sh`가 게이트웨이 HTTPS 필수 이후 평문 포트로 호출해 통과하지 못한다(원인은 에이전트 추정, 미확정). 이 시험은 `e2e.sh`가 쓰지 않아 전체 E2E에는 안 들어간다. `check-standalone.sh`도 이번에 실행하지 못했다 | deploy 후속: TLS 구성(HTTPS 포트, 시험용 CA 신뢰)으로 적응 |

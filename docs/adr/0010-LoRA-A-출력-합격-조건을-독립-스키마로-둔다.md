@@ -15,7 +15,7 @@
 
 1. **독립 스키마로 올린다.** (헤드 소유, `boundary-contracts`)
    - 이미 있는 `ActionExtractionInput`, `ActionExtraction`.
-   - **`QuestionFlow`** 스키마(문항 순서와 건너뛰기 규칙). 문진 스키마의 `question_flow.json`에서 survey-service가 만들어 넘기는 값의 형식이다.
+   - **`QuestionFlow`** 스키마(문항 순서와 건너뛰기 규칙). **이미 있다**: 문진 스키마 패키지(`survey-service/schema/schemas/QuestionFlow.json`, `COMPONENTS.yaml`의 `extraction_validator.contracts.table`)가 정의한다. 새로 만들지 않는다. 다만 이 스키마를 model-runtime(LoRA-A 컴포넌트)도 읽게 되므로 영역 사이 스키마가 되고, 규칙 6에 따라 소유를 헤드로 옮길지(`boundary-contracts`로 승격) 정한다. 이 결정은 전수 점검 결과와 함께 한다. (초안에 '새 스키마'라고 쓴 것은 `COMPONENTS.yaml`을 읽기 전에 쓴 틀린 서술이었다.)
    - **`ActionExtraction` 합격 조건**: 스키마로 표현되는 부분은 스키마에, 표현되지 않는 부분(`targets`⊂`values` 키, `next_item`이 순서표로 계산한 값과 같음)은 **규칙 명세(데이터)**로 적는다. 명세는 스키마와 같은 버전으로 움직인다.
    - **기준 검사기**: 명세를 읽어 판정하는 참조 구현을 계약 패키지의 `conformance`에 둔다. 영역들의 보장을 시험하는 정본이다.
 2. **LoRA-A 컴포넌트(model-runtime)가 보장한다.** 출력이 위 스키마와 합격 조건을 만족함을 자기 안에서 보장한다(생성 → 스키마·의미 검증 → 재시도는 컴포넌트 안). 호출자에게는 합격한 출력만 나간다.

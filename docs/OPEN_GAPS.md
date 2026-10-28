@@ -67,7 +67,7 @@
 | ID | 내용 | 이유 / 담당 |
 |---|---|---|
 | L01 | secrets/ 백업은 구현·시험됨(`backup-secrets.sh`, 복원까지 해시 확인, deploy stream-b 56f2b29). **복호 개인키 분실 = 백업 복구 불가**(서버 밖에서 사람이 2곳 이상 보관해야 함) | 키 보관은 사람 일. runbook 4-6절 |
-| L02 | 컨테이너가 읽는 비밀 파일이 644(700 폴더 안이라 다른 사용자는 접근 못 함). Compose 파일 secrets의 uid/mode가 이 Docker/Compose 버전에서 적용되지 않음. **640+`group_add: [gid]` 방식은 검증됨**(uid 10001 컨테이너가 읽음) | 이번 라운드에는 미적용: 실질 노출 감소가 작고(700 폴더), 약 13곳·공용 파일 변경과 호스트별 gid 차이로 전체 기동 실패 위험. E2E 안정 뒤 별도 변경. 절차는 deploy ADR 0022 |
+| L02 | 컨테이너가 읽는 비밀 파일이 644(700 폴더 안이라 다른 사용자는 접근 못 함). Compose 파일 secrets의 uid/mode가 이 Docker/Compose 버전에서 적용되지 않음. **640+`group_add: [gid]` 방식은 검증됨**(uid 10001 컨테이너가 읽음) | 이번 라운드에는 미적용: 실질 노출 감소가 작고(700 폴더), 약 13곳·공용 파일 변경과 호스트별 gid 차이로 전체 기동 실패 위험. E2E 안정 뒤 별도 변경. 절차는 deploy ADR 0022 **[상태 열림(보류) 2026-10-28: deploy 6f0b71f~156c23e 보고. 적용하려면 바꿀 곳이 많고(서비스 약 10개, job-* 4개, compose.inference.yaml, gen-secrets.sh, lib.sh, check-secret-perms.sh와 시험, up.sh 호출) gid가 호스트마다 달라 이식성 위험이 있어, deploy ADR 0022에는 후속 판단만 적었다. (에이전트 보고 근거, 새 clone 재현 전)]** |
 | L03 | gateway 로그인 시도 속도 제한 없음 | Caddy 플러그인이 필요해 커스텀 이미지 빌드라는 새 위험. 대안(네트워크 제한, 강한 암호, 실패 로그 감시)을 runbook에 | **[D103: 수용된 한계로 닫음, runbook에 요건]**
 | L04 | 취약점 스캔·SBOM 없음 | 외부 도구 설치·전송 금지 제약. '확인 못 함' |
 | L05 | 서비스 간 내부 TLS 없음 | 컴포즈 내부 네트워크 한정. ADR에 범위와 위험 | **[D103: 수용된 한계로 닫음, ADR에 범위·위험]**
@@ -94,6 +94,8 @@
 | L26 | 영역 README의 시험 개수 8곳이 오래된 값이다(실제가 더 많음). 워크스페이스 규칙(영역 시험 상태는 그 영역 README 5절)에 어긋난다 | 각 영역이 갱신 |
 | L27 | deploy `scripts/test-inference-location.sh`가 게이트웨이 HTTPS 필수 이후 평문 포트로 호출해 통과하지 못한다(원인은 에이전트 추정, 미확정). 이 시험은 `e2e.sh`가 쓰지 않아 전체 E2E에는 안 들어간다. `check-standalone.sh`도 이번에 실행하지 못했다 | deploy 후속: TLS 구성(HTTPS 포트, 시험용 CA 신뢰)으로 적응 |
 | L28 | **위험 정지와 되묻기 한도 정지를 구분할 수 없다.** 둘 다 `PAUSED_RISK`이고 `GET /v1/sessions/{id}/state`와 `turn_failure_signal`의 모양이 같다. 구분은 환자에게 가는 고정 문장(`RISK_NOTICE`/`CALL_STAFF`)뿐이라 직원 콘솔·운영 지표가 사유를 가를 수 없다. 근거: survey-service ADR-0020 보고(새 clone 재현 전) | 정지 사유 필드를 계약에 더하는 변경 요청 초안 [`CR-H002`](change-requests/CR-H002-pause-reason.md). 사용자 결정 전 |
+| L29 | **운영 `deploy/config/model-serving.env`의 기본 백엔드가 fake인데, model-runtime v0.7.3부터 fake는 `MODEL_RUNTIME_ALLOW_FAKE=1` 없이 시작을 거부한다.** 기본 설정 그대로는 단독 배포에서 model-serving이 뜨지 않는다. `check-standalone.sh`는 시험용 overlay로 그 값만 줘서 통과한다. 실제 모델 배포에서는 백엔드를 바꿔야 한다 | runbook에 명시 필요(deploy 후속). (에이전트 보고 근거, 새 clone 재현 전) |
+| L30 | **E2E 구조 변경(deploy 6f0b71f)이 전체 경로로는 실행되지 않았다.** 새 `e2e.sh`의 SKIP·fail-fast·changed-only 코드는 자체 시험(Docker 불필요)으로만 확인했고, 전체 경로 실행은 최종 관문이 처음이다. `solo`가 모두 False라 `--changed-only`가 아직 줄이는 것이 없다 | 최종 관문에서 확인. (에이전트 보고 근거, 새 clone 재현 전) |
 
 ## 3-1. GPU 구멍 (H, 2026-10-27 신설)
 

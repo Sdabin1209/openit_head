@@ -53,3 +53,12 @@
 ## 6. 점검의 한계 (보고서마다 있는 "점검하지 못한 것"의 공통분)
 
 이웃 코드는 규칙상 못 읽었고(교차 확인 필요), 이미지 빌드·Docker 스모크·PostgreSQL·실제 브라우저·GPU는 돌리지 않았다. ADR·runbook 본문은 일부만 읽었다. 에이전트 보고는 증거가 아니다: 단계 2 이전에 P1 전부를 헤드가 코드에서 직접 재현·확인한다.
+
+## 7. 헤드가 한 계약 수정과 영역이 받을 후속 요청 (2026-10-28 밤)
+
+헤드가 고친 것(`boundary-contracts`): I3 평가 보고서 서술, I4·I5·I7 읽는/쓰는 쪽 표와 `release-approver`(`c31ff0a`), I7 검토의 `X-Openit-User` 규칙과 `StaffAlert.kind` 정본 값(다음 커밋).
+
+영역에 전할 후속 요청(지금 일하는 에이전트에 끼우지 않고 병합 뒤 다음 지시로):
+- survey-service: 세션 보기(`StaffSessionView.alerts[].kind`)가 `KIND_MAP`을 역변환해 `RISK`를 낸다. 계약은 목록과 같은 이름(`RISK_STOP` 등)을 쓴다 → 역변환 제거 (KF-13의 서버 쪽 원인).
+- ops-feedback: I7 검토가 `X-Openit-User`를 필수로 요구하는 것은 이제 계약과 맞다(OF 보고의 계약 밖 헤더 항목 해소).
+

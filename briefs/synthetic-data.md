@@ -16,7 +16,7 @@
 - 소유 저장소: 데이터셋 저장소(불변 버전).
 - 제공하는 SDK 인터페이스: 데이터셋 게시 SDK(쓰기), 데이터셋 읽기 SDK(지정 버전 조회). 소비자는 model-lab.
 - 이 SDK의 메모리 구현(가짜 구현)을 함께 배포한다.
-- 생산하는 계약: `ParserSample`, `GeneratorSample`, `DatasetManifest`.
+- 생산하는 계약: `ActionExtractionSample`, `ResponseSample`, `DatasetManifest`. 영역 사이 전달은 I2 DatasetStore HTTP(계약 v2.1.0 `HTTP.md ## I2`, D100)로 하고 이 영역이 서버를 제공한다(v1의 `ParserSample`, `GeneratorSample`은 삭제됐다).
 
 ## 3. 소비하는 것
 

@@ -4,6 +4,12 @@
 
 ## 현재 단계
 
+**(2026-10-30 04:1x 갱신, 작업 환경 gpu-dev)** 열차: boundary-contracts `v2.7.0`(48a928b), model-runtime `v0.10.0`, 문진 스키마 `survey-schema-v1.3.0`. 모두 GitHub에 태그. 계약 검증 `verify.py` 2.4.2~2.7.0 각 태그 통과(246건, 2026-10-30 04:1x).
+- 끝난 것(10-30): 리뷰 반영 U24·U26·U32·U33·U34·U35(빈칸 원인 코드), 직원 푸시 계약 위반 U41, 계약 클라이언트 U21·U29·U45, 버전 점검 U39, 영역 빌드 진입점 U42(영역 9곳 + deploy `build-images.sh` 전환), 시험 환경 선언 U43(영역 전부), 노출 선언 라벨·ext 시험·문항 세트 API U47(대부분). 전체 E2E 02:11 통과(148, 004dda5 기준).
+- 진행 중: deploy wo-29(U43 소비 마무리·잡 이미지 실행·U48 설계안), survey-service wo-47(문항 세트 API 소비·노출 라벨). 둘이 들어오면 전체 E2E 1회 → push.
+- 남은 대장: U20(GPU 측정), U25·StaticImageInterface 등 3.0.0 후보(`proposals/계약-3.0.0-후보.md`), U36·U37(외부 답), U40(흔들림 관찰), U44 일부(model-runtime 손코드 확인), U47 deploy 몫(Caddyfile을 노출 선언으로, PublishResult, SyntheticJobError), U48.
+- 운영 메모: 팀원 SendMessage 보고가 헤드에게 도착하지 않는다 → `progress/tools/branch-watch.sh`로 커밋을 완료 신호로 쓴다.
+
 **(2026-10-29 12:20 갱신)** 단위 4(4a 표준 인프라 교체 + 4b 키오스크 mTLS) 모든 영역이 main에 들어갔다(push 전, boundary-contracts만 push: v2.2.2·v2.3.0). 계약 열차: boundary-contracts `v2.3.0`(6개 영역 핀 v2.3.0), model-runtime `v0.9.0`(main 0.10.0 미태그), 문진 스키마 `survey-schema-v1.1.0`, turn-engine `v0.4.3`(동결). 검증: 영역마다 별도 clone 재현(4b는 수정 전 실패 확인), `check-all` FAIL 0(이 PC). 진행 중: gpu-dev 전체 E2E(12:18 시작, `~/openit/deploy/build/gpu-u4.result`) — 통과하면 13개 리포 push. 결정: D113(키오스크 mTLS 구현), D114·ADR 0013(추론 경로 TLS). 작업 환경은 그날 저녁 gpu-dev(데스크톱 WSL2)로 옮긴다: 준비 목록 `../progress/MOVE_TO_GPUDEV.md`(리포 밖).
 
 **(2026-10-29 06:33 갱신)** 열차: boundary-contracts `v2.2.1`, model-runtime `v0.9.0`, 문진 스키마 `survey-schema-v1.1.0`, turn-engine `v0.4.3`(D109로 동결, 버전 열차 밖). 모두 GitHub에 태그·main push 완료. gpu-dev E2E(`--changed-only`, 사실상 대부분 단계) 146 PASS / 0 FAIL(06:30). GitHub 태그로 새 clone `setup-env.sh` 확인(survey-service).

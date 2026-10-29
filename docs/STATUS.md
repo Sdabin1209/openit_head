@@ -4,6 +4,8 @@
 
 ## 현재 단계
 
+**(2026-10-29 12:20 갱신)** 단위 4(4a 표준 인프라 교체 + 4b 키오스크 mTLS) 모든 영역이 main에 들어갔다(push 전, boundary-contracts만 push: v2.2.2·v2.3.0). 계약 열차: boundary-contracts `v2.3.0`(6개 영역 핀 v2.3.0), model-runtime `v0.9.0`(main 0.10.0 미태그), 문진 스키마 `survey-schema-v1.1.0`, turn-engine `v0.4.3`(동결). 검증: 영역마다 별도 clone 재현(4b는 수정 전 실패 확인), `check-all` FAIL 0(이 PC). 진행 중: gpu-dev 전체 E2E(12:18 시작, `~/openit/deploy/build/gpu-u4.result`) — 통과하면 13개 리포 push. 결정: D113(키오스크 mTLS 구현), D114·ADR 0013(추론 경로 TLS). 작업 환경은 그날 저녁 gpu-dev(데스크톱 WSL2)로 옮긴다: 준비 목록 `../progress/MOVE_TO_GPUDEV.md`(리포 밖).
+
 **(2026-10-29 06:33 갱신)** 열차: boundary-contracts `v2.2.1`, model-runtime `v0.9.0`, 문진 스키마 `survey-schema-v1.1.0`, turn-engine `v0.4.3`(D109로 동결, 버전 열차 밖). 모두 GitHub에 태그·main push 완료. gpu-dev E2E(`--changed-only`, 사실상 대부분 단계) 146 PASS / 0 FAIL(06:30). GitHub 태그로 새 clone `setup-env.sh` 확인(survey-service).
 - 끝난 단위: 1(계약 v2.2.0 열차, 401/403·서버 발급 세션·시간 예산·ImageLabels), 2(ADR 0010: LoRA-A 출력 규칙은 model-runtime 서버가 `check_action_extraction`으로 보증, survey-service는 `ExtractRequest{input, flow}` 전송·중복 재검증 제거, turn-engine 코드 의존 제거 D109), 3(10개 영역이 손코드 검증을 계약 경계 스키마 49개로 교체, D107·D108·D110).
 - 다음: 단위 4(단계 C, 표준 인프라 교체: WSGI/waitress, Caddy 정적, yoyo 마이그레이션, systemd 타이머, restic, Prometheus, 기기 인증서 mTLS ADR 0012). 사용자 결정 대기 5건(릴리스 무결성 해시 vs 서명, 감시·스케줄러 교체 범위, model-lab 학습 도구, KF-11 직원 호출 실패 화면, QA-15 4인 검토 기본값).

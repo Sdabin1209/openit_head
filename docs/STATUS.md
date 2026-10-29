@@ -4,6 +4,10 @@
 
 ## 현재 단계
 
+**(2026-10-30 08:0x 갱신, gpu-dev)** 열차: boundary-contracts `v3.0.1`(3.0.0 + 라벨 뜻 설명), 문진 스키마 `survey-schema-v2.0.0`, model-runtime `v0.11.1`. 영역 10곳 + deploy 기준표가 이 열차로 main(헤드가 깨끗한 clone에서 시험·빌드 진입점·U50 거부 재현). 계약 verify.py 통과.
+- 이 묶음에서 끝난 것: 계약 3.0.0(D116: turn_engine 퇴역, I9 ExtractRequest만·flow/fields 필수, SetupEnvReport 환경 필수, ReleaseReader 문항 세트, 비식별 선택지 축소 U25, StaticImageInterface 제거), 문진 스키마 2.0.0(skipped 폐지), U42·U43·U47·U48·U49·U50, turn-engine을 영역 목록에서 뺌.
+- 남은 것: 전체 E2E 1회(이 열차) → push 확인. 그 뒤 GPU 항목(U20 등), 외부 답(U36·U37), 관찰(U40).
+
 **(2026-10-30 04:1x 갱신, 작업 환경 gpu-dev)** 열차: boundary-contracts `v2.7.0`(48a928b), model-runtime `v0.10.0`, 문진 스키마 `survey-schema-v1.3.0`. 모두 GitHub에 태그. 계약 검증 `verify.py` 2.4.2~2.7.0 각 태그 통과(246건, 2026-10-30 04:1x).
 - 끝난 것(10-30): 리뷰 반영 U24·U26·U32·U33·U34·U35(빈칸 원인 코드), 직원 푸시 계약 위반 U41, 계약 클라이언트 U21·U29·U45, 버전 점검 U39, 영역 빌드 진입점 U42(영역 9곳 + deploy `build-images.sh` 전환), 시험 환경 선언 U43(영역 전부), 노출 선언 라벨·ext 시험·문항 세트 API U47(대부분). 전체 E2E 02:11 통과(148, 004dda5 기준).
 - 진행 중: deploy wo-29(U43 소비 마무리·잡 이미지 실행·U48 설계안), survey-service wo-47(문항 세트 API 소비·노출 라벨). 둘이 들어오면 전체 E2E 1회 → push.

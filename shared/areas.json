@@ -1,18 +1,71 @@
 {
   "_설명": "워크스페이스 영역(리포) 목록과 속성의 유일한 정본. 영역을 더하거나 빼려면 이 파일만 고친다. 읽는 곳: deploy/scripts/areas.py(check_all.py 와 셸 스크립트는 이것을 거친다). kind: python|node|library|compose|docs. version_train: check-versions.sh 가 태그 표기를 대조하는 영역. 순서는 동기화·bump 순서다.",
   "areas": [
-    {"name": "head", "kind": "docs", "version_train": false},
-    {"name": "boundary-contracts", "kind": "library", "version_train": false},
-    {"name": "turn-engine", "kind": "python", "version_train": false, "_note": "D109: v0.4.3에 동결된 라이브러리. 코드 의존이 없어져 버전 열차 밖이다(기록의 turn_engine_version 표지 값만 남는다)"},
-    {"name": "model-runtime", "kind": "python", "version_train": true},
-    {"name": "model-lab", "kind": "python", "version_train": true},
-    {"name": "synthetic-data", "kind": "python", "version_train": true},
-    {"name": "survey-service", "kind": "python", "version_train": true},
-    {"name": "release-gate", "kind": "python", "version_train": true},
-    {"name": "ops-feedback", "kind": "python", "version_train": true},
-    {"name": "question-authoring", "kind": "python", "version_train": true},
-    {"name": "kiosk-frontend", "kind": "node", "version_train": true},
-    {"name": "admin-console", "kind": "node", "version_train": true},
-    {"name": "deploy", "kind": "compose", "version_train": false}
+    {
+      "name": "head",
+      "kind": "docs",
+      "version_train": false
+    },
+    {
+      "name": "boundary-contracts",
+      "kind": "library",
+      "version_train": false
+    },
+    {
+      "name": "model-runtime",
+      "kind": "python",
+      "version_train": true
+    },
+    {
+      "name": "model-lab",
+      "kind": "python",
+      "version_train": true
+    },
+    {
+      "name": "synthetic-data",
+      "kind": "python",
+      "version_train": true
+    },
+    {
+      "name": "survey-service",
+      "kind": "python",
+      "version_train": true
+    },
+    {
+      "name": "release-gate",
+      "kind": "python",
+      "version_train": true
+    },
+    {
+      "name": "ops-feedback",
+      "kind": "python",
+      "version_train": true
+    },
+    {
+      "name": "question-authoring",
+      "kind": "python",
+      "version_train": true
+    },
+    {
+      "name": "kiosk-frontend",
+      "kind": "node",
+      "version_train": true
+    },
+    {
+      "name": "admin-console",
+      "kind": "node",
+      "version_train": true
+    },
+    {
+      "name": "deploy",
+      "kind": "compose",
+      "version_train": false
+    }
+  ],
+  "_retired": [
+    {
+      "name": "turn-engine",
+      "why": "D109·D116: 계약 3.0.0에서 turn_engine_version 표지까지 없어져 어느 영역도 의존하지 않는다. 리포는 기록으로 남기고 작업 공간 영역 목록에서 뺀다(2026-10-30)."
+    }
   ]
 }

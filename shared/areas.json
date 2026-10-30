@@ -60,6 +60,11 @@
       "name": "deploy",
       "kind": "compose",
       "version_train": false
+    },
+    {
+      "name": "link",
+      "kind": "library",
+      "version_train": true
     }
   ],
   "_retired": [

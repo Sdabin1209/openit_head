@@ -11,7 +11,7 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 NON_AREAS = {"head", "boundary-contracts", "link"}   # 영역이 아닌 헤드 소유물(문서·계약·통신 기반 라이브러리)
-HTTP_PY = re.compile(r"^\s*(from|import)\s+(boundary_contracts\.clients|urllib\.request|http\.client|http\.server|requests|waitress|wsgiref)\b", re.M)
+HTTP_PY = re.compile(r"^\s*(from|import)\s+(openit_link|boundary_contracts\.clients|urllib\.request|http\.client|http\.server|requests|waitress|wsgiref)\b", re.M)
 HTTP_TS = re.compile(r"\bfetch\s*\(|from\s+['\"](node:)?http['\"]")
 ENTRY = re.compile(r"(^|/)(__main__|main|app|server|config|settings|migrate|cli|index)\.(py|ts)$|(^|/)migrations?/")
 

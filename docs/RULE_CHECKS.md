@@ -8,7 +8,7 @@
 | 2 | 시험 판정에 실제 시간 없음, 컴포넌트는 시계를 주입받음 (U422, ADR: 영역별 시계 주입) | 각 영역 `tests/test_no_real_time.py` · `test_timing_table.py` · `timing.test.ts` · survey `test_structure.py::test_components_never_read_the_time_module_or_the_real_clock_config`, 표 `tests/TIMING.md` | 있음(영역마다 이름 다름) |
 | 3 | 생산자는 내보내기 전에 계약으로 검증, 받는 쪽은 재검증 안 함 (R7, ADR 0010, CONVENTIONS 3절) | `head/scripts/producer-check.py`(계약 86개의 생산자 표 `head/shared/producers.json` ↔ 생산자 동작 코드의 참조 대조) + 경로별 openit_link Route `response_schema`/`request_schema`, 영역 생산자 검증 시험 | 있음(참조 대조: 문자열 참조가 있으면 통과하므로 '검증 호출'까지는 경로별 시험이 본다) |
 | 4 | 시간 사슬: 화면 대기 > gateway > 서버 요청 마감 > 이웃·모델 호출 (CONVENTIONS 시간표, D119, D120) | deploy `scripts/test_time_chain.py`(ProxyChain: 모든 reverse_proxy, model-serving 상한), 영역 노출 선언 시험(`test_exposure*`, `test_exposure_budget.py`), deploy `check-exposure` | 있음 |
-| 5 | 고정 버전 일치 (기준표 `deploy/scripts/lib.sh`: DEPLOY_BC_TAG, LINK, DEPLOY_MR_TAG, DEPLOY_SS_TAG) | deploy `scripts/check-versions.sh`, link 고정 점검, consistency_check(공개 이름) | 있음 |
+| 5 | 고정 버전 일치 (기준표 `deploy/scripts/lib.sh`: DEPLOY_BC_TAG, LINK, DEPLOY_MR_TAG, DEPLOY_SS_TAG; model-runtime의 Dockerfile ARG 포함) | deploy `scripts/check-versions.sh`, link 고정 점검(`check-link-pins.sh`, E2E 시작 전), consistency_check(공개 이름). 고정을 올린 뒤에는 각 영역 작업 폴더에서 `scripts/setup-env.sh`를 다시 돌린다 — check-all은 작업 폴더 venv로 시험하므로 옛 패키지가 남으면 거짓 실패(2026-10-31 15:17 사례) | 있음 |
 | 6 | 상시 서비스 재시작 정책 (U17) | deploy `scripts/test_compose_restart_policy.py` | 있음 |
 | 7 | 서비스 목록 단일 정본(계약 PublishRequest.service ↔ lib.sh) (U46) | deploy `scripts/test_services_enum.py` | 있음 |
 | 8 | 영역 전체 시험이 모두 동시에 돌아도 통과 | deploy `scripts/check-all.sh --strict`(E2E 시작 점검) | 있음 |

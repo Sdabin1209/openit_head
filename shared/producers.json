@@ -1,0 +1,476 @@
+{
+ "ActionExtraction": {
+  "producers": [
+   "model-runtime"
+  ]
+ },
+ "ActionExtractionInput": {
+  "producers": [
+   "survey-service"
+  ]
+ },
+ "ActionExtractionRules": {
+  "producers": [
+   "boundary-contracts"
+  ]
+ },
+ "ActionExtractionSample": {
+  "producers": [
+   "synthetic-data"
+  ]
+ },
+ "ActivateRequest": {
+  "producers": [
+   "admin-console"
+  ]
+ },
+ "ActivePointer": {
+  "producers": [
+   "release-gate"
+  ]
+ },
+ "ApprovalRequest": {
+  "producers": [
+   "admin-console"
+  ]
+ },
+ "AuthoringRequests": {
+  "producers": [
+   "outside"
+  ]
+ },
+ "AuthoringResponses": {
+  "producers": [
+   "question-authoring"
+  ]
+ },
+ "BoundaryError": {
+  "producers": [
+   "model-lab",
+   "model-runtime",
+   "ops-feedback",
+   "question-authoring",
+   "release-gate",
+   "survey-service",
+   "synthetic-data"
+  ]
+ },
+ "BuildImageRequest": {
+  "producers": [
+   "deploy"
+  ]
+ },
+ "BuildImageResult": {
+  "producers": [
+   "release-gate",
+   "ops-feedback",
+   "survey-service",
+   "question-authoring",
+   "model-runtime",
+   "model-lab",
+   "synthetic-data",
+   "kiosk-frontend",
+   "admin-console"
+  ]
+ },
+ "CaseReviewRequest": {
+  "producers": [
+   "admin-console"
+  ]
+ },
+ "ChangeClassification": {
+  "producers": [
+   "question-authoring"
+  ]
+ },
+ "DatasetManifest": {
+  "producers": [
+   "synthetic-data"
+  ]
+ },
+ "DeviceConfig": {
+  "producers": [
+   "deploy"
+  ]
+ },
+ "EvaluationReport": {
+  "producers": [
+   "model-lab"
+  ]
+ },
+ "Exposure": {
+  "producers": [
+   "release-gate",
+   "ops-feedback",
+   "survey-service",
+   "question-authoring",
+   "model-runtime",
+   "model-lab",
+   "synthetic-data",
+   "kiosk-frontend",
+   "admin-console"
+  ]
+ },
+ "ExtractRequest": {
+  "producers": [
+   "survey-service"
+  ]
+ },
+ "FailureCase": {
+  "producers": [
+   "ops-feedback"
+  ]
+ },
+ "GateApproval": {
+  "producers": [
+   "release-gate"
+  ]
+ },
+ "GateDecision": {
+  "producers": [
+   "release-gate"
+  ]
+ },
+ "GateExt": {
+  "producers": [
+   "release-gate"
+  ]
+ },
+ "GateJobConfig": {
+  "producers": [
+   "deploy"
+  ]
+ },
+ "GateJobResult": {
+  "producers": [
+   "release-gate"
+  ]
+ },
+ "GatePolicy": {
+  "producers": [
+   "deploy"
+  ]
+ },
+ "GateReadyz": {
+  "producers": [
+   "release-gate"
+  ]
+ },
+ "GateSubmission": {
+  "producers": [
+   "release-gate"
+  ]
+ },
+ "GateSubmissionRequest": {
+  "producers": [
+   "release-gate"
+  ]
+ },
+ "ImageLabels": {
+  "producers": [
+   "release-gate",
+   "ops-feedback",
+   "survey-service",
+   "question-authoring",
+   "model-runtime",
+   "model-lab",
+   "synthetic-data",
+   "kiosk-frontend",
+   "admin-console"
+  ]
+ },
+ "IngestResult": {
+  "producers": [
+   "ops-feedback"
+  ]
+ },
+ "JobsDeclaration": {
+  "producers": [
+   "release-gate",
+   "ops-feedback",
+   "survey-service",
+   "question-authoring",
+   "synthetic-data"
+  ]
+ },
+ "KioskStartFragment": {
+  "producers": [
+   "outside"
+  ]
+ },
+ "ListEnvelope": {
+  "producers": [
+   "release-gate"
+  ]
+ },
+ "ModelPackageLayout": {
+  "producers": [
+   "model-lab"
+  ]
+ },
+ "ModelPackageManifest": {
+  "producers": [
+   "model-lab"
+  ]
+ },
+ "OpsFeedbackDeidentifiedTrace": {
+  "producers": [
+   "ops-feedback"
+  ]
+ },
+ "OpsFeedbackFailureCaseExt": {
+  "producers": [
+   "ops-feedback"
+  ]
+ },
+ "OpsFeedbackJobConfig": {
+  "producers": [
+   "deploy"
+  ]
+ },
+ "OpsFeedbackJobResult": {
+  "producers": [
+   "ops-feedback"
+  ]
+ },
+ "OpsFeedbackReadyz": {
+  "producers": [
+   "ops-feedback"
+  ]
+ },
+ "OpsFeedbackServerEnv": {
+  "producers": [
+   "deploy"
+  ]
+ },
+ "PublishRequest": {
+  "producers": [
+   "outside"
+  ]
+ },
+ "PublishResult": {
+  "producers": [
+   "deploy"
+  ]
+ },
+ "PushConfig": {
+  "producers": [
+   "survey-service"
+  ]
+ },
+ "QuestionAuthoringDeployInterface": {
+  "producers": [
+   "question-authoring",
+   "deploy"
+  ]
+ },
+ "QuestionAuthoringExt": {
+  "producers": [
+   "question-authoring"
+  ]
+ },
+ "QuestionFieldSpec": {
+  "producers": [
+   "survey-service"
+  ]
+ },
+ "QuestionFlowTable": {
+  "producers": [
+   "survey-service"
+  ]
+ },
+ "ReleaseLoadStatus": {
+  "producers": [
+   "model-runtime"
+  ]
+ },
+ "ReleaseManifest": {
+  "producers": [
+   "release-gate"
+  ]
+ },
+ "ResponseRequest": {
+  "producers": [
+   "survey-service"
+  ]
+ },
+ "ResponseSample": {
+  "producers": [
+   "synthetic-data"
+  ]
+ },
+ "ResponseText": {
+  "producers": [
+   "model-runtime"
+  ]
+ },
+ "ReviewRecord": {
+  "producers": [
+   "question-authoring"
+  ]
+ },
+ "ReviewReport": {
+  "producers": [
+   "release-gate"
+  ]
+ },
+ "RollbackReceipt": {
+  "producers": [
+   "release-gate"
+  ]
+ },
+ "RollbackRequest": {
+  "producers": [
+   "ops-feedback"
+  ]
+ },
+ "RuntimeFlowFile": {
+  "producers": [
+   "deploy"
+  ]
+ },
+ "RuntimeInfo": {
+  "producers": [
+   "model-runtime"
+  ]
+ },
+ "RuntimeProfile": {
+  "producers": [
+   "model-runtime"
+  ]
+ },
+ "ServingConfig": {
+  "producers": [
+   "model-lab"
+  ]
+ },
+ "SessionState": {
+  "producers": [
+   "survey-service"
+  ]
+ },
+ "SetupEnvReport": {
+  "producers": [
+   "release-gate",
+   "ops-feedback",
+   "survey-service",
+   "question-authoring",
+   "model-runtime",
+   "model-lab",
+   "synthetic-data",
+   "kiosk-frontend",
+   "admin-console"
+  ]
+ },
+ "SignalsResponse": {
+  "producers": [
+   "question-authoring"
+  ]
+ },
+ "StaffAlert": {
+  "producers": [
+   "survey-service"
+  ]
+ },
+ "StaffAlertPage": {
+  "producers": [
+   "survey-service"
+  ]
+ },
+ "StaffCallReport": {
+  "producers": [
+   "kiosk-frontend"
+  ]
+ },
+ "StaffCallRetryRequest": {
+  "producers": [
+   "kiosk-frontend"
+  ]
+ },
+ "StaffCallRetryResult": {
+  "producers": [
+   "survey-service"
+  ]
+ },
+ "StaffPushPayload": {
+  "producers": [
+   "survey-service"
+  ]
+ },
+ "SubmissionView": {
+  "producers": [
+   "release-gate"
+  ]
+ },
+ "SurveyPurgeOutput": {
+  "producers": [
+   "survey-service"
+  ]
+ },
+ "SurveyQuestionBankRead": {
+  "producers": [
+   "release-gate"
+  ]
+ },
+ "SurveyReadyz": {
+  "producers": [
+   "survey-service"
+  ]
+ },
+ "SurveyRiskRulesFile": {
+  "producers": [
+   "deploy",
+   "outside"
+  ]
+ },
+ "SurveyServiceEnv": {
+  "producers": [
+   "deploy"
+  ]
+ },
+ "SyntheticDefs": {
+  "producers": [
+   "defs"
+  ]
+ },
+ "SyntheticImportReport": {
+  "producers": [
+   "synthetic-data"
+  ]
+ },
+ "SyntheticJobConfigImport": {
+  "producers": [
+   "deploy"
+  ]
+ },
+ "SyntheticJobConfigRun": {
+  "producers": [
+   "deploy"
+  ]
+ },
+ "SyntheticJobError": {
+  "producers": [
+   "synthetic-data"
+  ]
+ },
+ "SyntheticJobResult": {
+  "producers": [
+   "synthetic-data"
+  ]
+ },
+ "SyntheticRunReport": {
+  "producers": [
+   "synthetic-data"
+  ]
+ },
+ "TraceEnvelope": {
+  "producers": [
+   "survey-service"
+  ]
+ },
+ "_common": {
+  "producers": [
+   "defs"
+  ]
+ }
+}

@@ -12,13 +12,14 @@ import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-SKIP = {"outside", "defs"}   # 리포 밖 생산자, 정의 묶음: 생산자 코드가 이 워크스페이스에 없다
+SKIP = {"outside", "defs", "none"}   # 리포 밖 생산자, 정의 묶음, 지금 만드는 코드가 없음(생기면 그 영역으로 바꾼다)
 TEST_OR_DOC = re.compile(r"(^|/)(tests?|test-e2e|docs?|scripts/test[_-][^/]*)(/|$)|(^|/)test_[^/]*$|\.test\.ts$|\.md$|(^|/)(types|schemas)/|\.gen\.|(^|/)conformance/")
 
 
 def code_files(repo):
     out = subprocess.run(["git", "-C", str(ROOT / repo), "ls-files"], capture_output=True, text=True, check=True).stdout.split("\n")
-    return [f for f in out if f.endswith((".py", ".ts", ".mjs", ".sh", ".json", ".yaml", ".yml")) and not TEST_OR_DOC.search(f) and "node_modules/" not in f]
+    return [f for f in out if (f.endswith((".py", ".ts", ".tsx", ".js", ".mjs", ".cjs", ".sh", ".json", ".yaml", ".yml")) or f.endswith("Dockerfile"))
+            and not TEST_OR_DOC.search(f) and "node_modules/" not in f]
 
 
 def main():
@@ -35,7 +36,7 @@ def main():
                 continue
             if repo not in cache:
                 cache[repo] = {f: (ROOT / repo / f).read_text(encoding="utf-8", errors="replace") for f in code_files(repo)}
-            pat = re.compile(rf"\b{re.escape(name)}\b")
+            pat = re.compile(rf"(?<![A-Za-z0-9_]){re.escape(name)}(?![A-Za-z0-9_])")   # \b는 유니코드라 이름 뒤에 한글 조사가 붙으면 못 잡는다(ASCII 경계로)
             hits = [f for f, t in cache[repo].items() if pat.search(t)]
             via = [v for v in ent.get("via", {}).get(repo, []) if (ROOT / repo / v).exists()]
             if not hits and not via:

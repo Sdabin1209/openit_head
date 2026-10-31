@@ -6,7 +6,7 @@
 
 **(2026-10-31 15:1x 갱신, gpu-dev)** 최종 고정(D121): boundary-contracts `v3.1.2`(스키마는 v3.1.1 그대로), link `v0.4.3`, model-runtime `v0.11.8`, 문진 스키마 `survey-schema-v3.0.0`. 영역 10곳 모두 이 고정으로 main에 합쳐 push(각각 새 clone 재현 실패 0, 구조 검사 통과).
 - 오늘 끝난 것: 영역 구조 개편(D117, U400), 시험에서 실제 시간 판정 제거·시계 주입(U422, 영역별 TIMING.md), 생산자 계약 검증(R7) 빠짐 14건 수정과 `head/scripts/producer-check.py` 대조 통과, 시간 사슬(D119·D120: gateway·서버 요청 마감, 노출 선언) 정렬, 규칙↔점검 대응표(`RULE_CHECKS.md`).
-- 지금: 전체 E2E 1회 실행 중(`~/openit-logs/e2e-final8.log`, 15:12 시작). 결과는 `deploy/docs/E2E_RESULTS.md`.
+- E2E 전체 1회(16:04, `~/openit-logs/e2e-final10.log`): 181개 중 180 통과, 1 실패(U63: 5pn survey `/readyz` 2.9초 — 호스트 주기 지연으로 보이나 미확인). 결과는 `deploy/docs/E2E_RESULTS.md`. 그 전 두 실행은 작업 폴더 venv 미갱신·model-runtime 고정 어긋남으로 시작 점검에서 멈춤(둘 다 고침, v0.11.9).
 - 남은 것(헤드 밖): 사용자 결정 U31·U36, 외부 조율 U37·G02·G03·G13·U09, GPU 항목(U01~U04·U07·U08·U10·U13·U20·H1~H4), 두 번째 머신·일반 Linux 서버(U06·U12).
 
 ### 이전 갱신

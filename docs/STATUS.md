@@ -4,6 +4,13 @@
 
 ## 현재 단계
 
+**(2026-10-31 15:1x 갱신, gpu-dev)** 최종 고정(D121): boundary-contracts `v3.1.2`(스키마는 v3.1.1 그대로), link `v0.4.3`, model-runtime `v0.11.8`, 문진 스키마 `survey-schema-v3.0.0`. 영역 10곳 모두 이 고정으로 main에 합쳐 push(각각 새 clone 재현 실패 0, 구조 검사 통과).
+- 오늘 끝난 것: 영역 구조 개편(D117, U400), 시험에서 실제 시간 판정 제거·시계 주입(U422, 영역별 TIMING.md), 생산자 계약 검증(R7) 빠짐 14건 수정과 `head/scripts/producer-check.py` 대조 통과, 시간 사슬(D119·D120: gateway·서버 요청 마감, 노출 선언) 정렬, 규칙↔점검 대응표(`RULE_CHECKS.md`).
+- 지금: 전체 E2E 1회 실행 중(`~/openit-logs/e2e-final8.log`, 15:12 시작). 결과는 `deploy/docs/E2E_RESULTS.md`.
+- 남은 것(헤드 밖): 사용자 결정 U31·U36, 외부 조율 U37·G02·G03·G13·U09, GPU 항목(U01~U04·U07·U08·U10·U13·U20·H1~H4), 두 번째 머신·일반 Linux 서버(U06·U12).
+
+### 이전 갱신
+
 **(2026-10-30 08:0x 갱신, gpu-dev)** 열차: boundary-contracts `v3.0.1`(3.0.0 + 라벨 뜻 설명), 문진 스키마 `survey-schema-v2.0.0`, model-runtime `v0.11.1`. 영역 10곳 + deploy 기준표가 이 열차로 main(헤드가 깨끗한 clone에서 시험·빌드 진입점·U50 거부 재현). 계약 verify.py 통과.
 - 이 묶음에서 끝난 것: 계약 3.0.0(D116: turn_engine 퇴역, I9 ExtractRequest만·flow/fields 필수, SetupEnvReport 환경 필수, ReleaseReader 문항 세트, 비식별 선택지 축소 U25, StaticImageInterface 제거), 문진 스키마 2.0.0(skipped 폐지), U42·U43·U47·U48·U49·U50, turn-engine을 영역 목록에서 뺌.
 - 남은 것: 전체 E2E 1회(이 열차) → push 확인. 그 뒤 GPU 항목(U20 등), 외부 답(U36·U37), 관찰(U40).

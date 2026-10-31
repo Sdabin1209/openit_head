@@ -137,8 +137,9 @@
   ]
  },
  "GateJobConfig": {
+  "note": "deploy 보고(2026-10-31): release-gate 잡은 환경 변수로 설정, 정책 파일은 O11 확정 전이라 두지 않는다",
   "producers": [
-   "deploy"
+   "none"
   ]
  },
  "GateJobResult": {
@@ -147,8 +148,9 @@
   ]
  },
  "GatePolicy": {
+  "note": "deploy 보고(2026-10-31): release-gate 잡은 환경 변수로 설정, 정책 파일은 O11 확정 전이라 두지 않는다",
   "producers": [
-   "deploy"
+   "none"
   ]
  },
  "GateReadyz": {
@@ -267,7 +269,14 @@
  "QuestionAuthoringExt": {
   "producers": [
    "question-authoring"
-  ]
+  ],
+  "via": {
+   "question-authoring": [
+    "schemas/ChangeRecord.json",
+    "schemas/ConfirmFinalizeResult.json",
+    "schemas/ReviewFollowupResult.json"
+   ]
+  }
  },
  "QuestionFieldSpec": {
   "producers": [

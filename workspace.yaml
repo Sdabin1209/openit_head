@@ -5,7 +5,7 @@ host: git@github.com:Sdabin1209
 repos:
   - {path: head,               remote: openit_head,               tag: null}
   - {path: boundary-contracts, remote: openit_boundary-contracts, tag: null}
-  - {path: turn-engine,        remote: openit_turn-engine,        tag: null}
+  - {path: link,               remote: openit_link,               tag: null}   # 영역 통신 기반(D118). turn-engine은 퇴역(D109)이라 목록에서 뺀다
   - {path: model-runtime,      remote: openit_model-runtime,      tag: null}
   - {path: survey-service,     remote: openit_survey-service,     tag: null}
   - {path: question-authoring, remote: openit_question-authoring, tag: null}

@@ -4,7 +4,7 @@
 
 ## 현재 단계
 
-**(2026-11-01 18:3x 갱신, gpu-dev) 샌드박스 E2E 전환과 D72 결함 수정 완료, 합치기 전.** 새 clone에서 전체 E2E **185 통과 / 0 실패**(deploy wo-445 22d88ed, BLOCKED 2는 브라우저 화면). 브랜치: deploy `wo-445`(wo-440~444 통합, 40 커밋), question-authoring `wo-signals-author-read`(2커밋), head `wo-d72-remote-inference`. 모든 리포 main은 2026-10-31 동결 그대로. 사용자 결정: 합치기·push·동결 해제(U-b). 남은 열린 것: U67(노출 계약 기계 토큰 종류, 계약 다음 판), U69(model-lab→model-registry 게시 입구, GPU 경로), H5(iranglab 실증, toolkit 설치 뒤).
+**(2026-11-01 18:3x 갱신, gpu-dev) 샌드박스 E2E 전환과 D72 결함 수정 완료, 합치기 전.** 새 clone에서 전체 E2E **185 통과 / 0 실패**(deploy wo-445 22d88ed, BLOCKED 2는 브라우저 화면). 그 뒤 데모 기동 확인에서 demo.sh 결함 3건(이미지 목록 dataset-store 누락, 추론 호출 도우미의 제품 안 경로, 지운 도우미 복원)을 고쳐 wo-445 d8940f4; 바뀐 도우미가 닿는 단계 1~5·5L만 국소 재실행 통과(147/0). 데모 `demo.sh up` 실제 기동·게이트웨이 경유 확인. 브랜치: deploy `wo-445`(wo-440~444 통합, 40 커밋), question-authoring `wo-signals-author-read`(2커밋), head `wo-d72-remote-inference`. 모든 리포 main은 2026-10-31 동결 그대로. 사용자 결정: 합치기·push·동결 해제(U-b). 남은 열린 것: U67(노출 계약 기계 토큰 종류, 계약 다음 판), U69(model-lab→model-registry 게시 입구, GPU 경로), H5(iranglab 실증, toolkit 설치 뒤).
 
 **(2026-11-01 15:2x, gpu-dev) 2026-10-31 'GPU 없는 범위 완성' 철회(U66).** iranglab(RTX 4090)에 추론 서버를 두려다 D72(추론 서버 위치 독립)가 운영 구성에서 성립하지 않음을 확인했다(L27 정정). 원인은 E2E가 제품 구성에 시험용 문을 내고 그 문으로 시험한 것(U65). 사용자 지시: 시험을 샌드박스 방식으로 오늘 안에 전부 고친다(D122·D123). 진행: deploy 브랜치 wo-440(D72 경로)·wo-441(샌드박스 틀)·wo-442~444(단계 이관), head 브랜치 wo-d72-remote-inference(이 문서들). 모든 리포 main은 2026-10-31 동결 그대로. 계획: `docs/plans/D72-remote-inference-recovery.md`.
 

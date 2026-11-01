@@ -14,7 +14,7 @@
 | 8 | 영역 전체 시험이 모두 동시에 돌아도 통과 | deploy `scripts/check-all.sh --strict`(E2E 시작 점검) | 있음 |
 | 9 | 영역 사이 끝까지 맞물림 | deploy `scripts/e2e.sh` | 있음 |
 
-| 10 | 추론 서버 위치 독립: 다른 호스트의 추론 서버가 운영 입구(게이트웨이 기계 토큰 경로)로 release-gate를 읽어 기동한다 (D72, D122) | deploy `scripts/test-inference-location.sh`(샌드박스: 제품 무변경 + `compose.inference.yaml` 별도 프로젝트, 사람 계정 404·무토큰 401 음성 확인 포함), 전체 E2E 단계로 편입 | **없음 → 작업 중**(wo-440, 2026-11-01) |
-| 11 | 시험용 문 0건: 운영 compose·overlay에 gateway 외 서비스의 `ports`·시험 플래그가 없고, E2E 드라이버는 게이트웨이·`docker exec/run`·다른 호스트 역할 컨테이너로만 닿는다 (U65, D123) | deploy `scripts/test_compose_no_test_doors.py`(check-all), e2e_steps 정적 검사(내부 포트 키 사용 0) | **없음 → 작업 중**(wo-441~444, 2026-11-01) |
+| 10 | 추론 서버 위치 독립: 다른 호스트의 추론 서버가 운영 입구(게이트웨이 기계 토큰 경로)로 release-gate를 읽어 기동한다 (D72, D122) | deploy `scripts/test-inference-location.sh`(샌드박스: 제품 무변경 + `compose.inference.yaml` 별도 프로젝트, 사람 계정 404·무토큰 401 음성 확인 포함), 전체 E2E 단계로 편입 | 있음(2026-11-01 18:31, wo-445: `test-inference-location.sh` 17/17, E2E 단계 5L 통과) |
+| 11 | 시험용 문 0건: 운영 compose·overlay에 gateway 외 서비스의 `ports`·시험 플래그가 없고, E2E 드라이버는 게이트웨이·`docker exec/run`·다른 호스트 역할 컨테이너로만 닿는다 (U65, D123) | deploy `scripts/test_compose_no_test_doors.py`(check-all), e2e_steps 정적 검사(내부 포트 키 사용 0) | 있음(2026-11-01 18:31, wo-445: `test_compose_no_test_doors.py` check-all 연결, e2e_steps URL()이 내부 키를 거부, 전체 E2E 185/0) |
 
 헤드 점검(`structure-check.py`, `producer-check.py`)은 영역이 head를 읽을 수 없으므로(루트 CLAUDE.md 읽기 허용 목록) deploy check-all에 넣지 않고, 헤드가 "완료"를 말하기 전에 직접 돌려 통과를 확인한다.

@@ -4,6 +4,8 @@
 
 ## 현재 단계
 
+**(2026-11-01 18:3x 갱신, gpu-dev) 샌드박스 E2E 전환과 D72 결함 수정 완료, 합치기 전.** 새 clone에서 전체 E2E **185 통과 / 0 실패**(deploy wo-445 22d88ed, BLOCKED 2는 브라우저 화면). 브랜치: deploy `wo-445`(wo-440~444 통합, 40 커밋), question-authoring `wo-signals-author-read`(2커밋), head `wo-d72-remote-inference`. 모든 리포 main은 2026-10-31 동결 그대로. 사용자 결정: 합치기·push·동결 해제(U-b). 남은 열린 것: U67(노출 계약 기계 토큰 종류, 계약 다음 판), U69(model-lab→model-registry 게시 입구, GPU 경로), H5(iranglab 실증, toolkit 설치 뒤).
+
 **(2026-11-01 15:2x, gpu-dev) 2026-10-31 'GPU 없는 범위 완성' 철회(U66).** iranglab(RTX 4090)에 추론 서버를 두려다 D72(추론 서버 위치 독립)가 운영 구성에서 성립하지 않음을 확인했다(L27 정정). 원인은 E2E가 제품 구성에 시험용 문을 내고 그 문으로 시험한 것(U65). 사용자 지시: 시험을 샌드박스 방식으로 오늘 안에 전부 고친다(D122·D123). 진행: deploy 브랜치 wo-440(D72 경로)·wo-441(샌드박스 틀)·wo-442~444(단계 이관), head 브랜치 wo-d72-remote-inference(이 문서들). 모든 리포 main은 2026-10-31 동결 그대로. 계획: `docs/plans/D72-remote-inference-recovery.md`.
 
 **(2026-10-31 15:1x 갱신, gpu-dev)** 최종 고정(D121): boundary-contracts `v3.1.2`(스키마는 v3.1.1 그대로), link `v0.4.3`, model-runtime `v0.11.8`, 문진 스키마 `survey-schema-v3.0.0`. 영역 10곳 모두 이 고정으로 main에 합쳐 push(각각 새 clone 재현 실패 0, 구조 검사 통과).

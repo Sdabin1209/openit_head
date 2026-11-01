@@ -156,7 +156,7 @@ GPU 서버가 열릴 때 할 일이다. 줄기와 계획은 [`COMPLETION_PLAN.md
 | H1 | 24GB급 GPU에서 Qwen3-8B 적재·실측 | U02, U13 | 열림 |
 | H2 | 학습된 LoRA-A/B를 얹어 한 턴이 통과하는지, 어댑터 교체 시험 | U07, U08, U10 | 열림 |
 | H3 | 학습 파이프라인 실제 실행 | G06 | 열림 |
-| H4 | 문법 컴파일 비용, 동시 요청 부하 | U01, U04 | 열림 |
+| H4 | 문법 컴파일 비용, 동시 요청 부하 | U01, U04 | 열림 **첫 실측(2026-11-02 00:2x, gpu-dev RTX 4070 SUPER 12GB, Qwen3-1.7B + 중립 LoRA, `demo.sh up --llm`)**: 첫 환자 턴의 extract 가 3.0초 상한을 넘겼다(survey `elapsed=3.01s TimeoutError`). vLLM 로그: 추론 중 Triton JIT 컴파일(`_lora_shrink_kernel`) '지연 급증, warmup 확장을 고려'. 즉 첫 호출 비용이 상한을 먹는다. 둘째 턴은 추출은 됐으나 의미 검증 `UNKNOWN_SLOT`(중립 LoRA가 없는 칸 이름을 냄, 학습 전이라 예상 범위). 해법 후보: model-runtime 이 적재 직후 extract·respond 를 한 번 예열(값 변경 아님) |
 
 | H5 | iranglab(RTX 4090, WSL2)에서 추론 서버를 실제 다른 호스트로 띄워 게이트웨이 경로(D122)로 번들 적재까지 확인. 전제: nvidia-container-toolkit·compose 설치(관리자), gpu-dev→iranglab ssh 터널(-R을 게이트웨이 8443으로) | 2026-11-01 신설. D72의 실제 다른 호스트 증거 |
 

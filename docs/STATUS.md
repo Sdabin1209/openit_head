@@ -4,6 +4,8 @@
 
 ## 현재 단계
 
+**(2026-11-01 15:2x, gpu-dev) 2026-10-31 'GPU 없는 범위 완성' 철회(U66).** iranglab(RTX 4090)에 추론 서버를 두려다 D72(추론 서버 위치 독립)가 운영 구성에서 성립하지 않음을 확인했다(L27 정정). 원인은 E2E가 제품 구성에 시험용 문을 내고 그 문으로 시험한 것(U65). 사용자 지시: 시험을 샌드박스 방식으로 오늘 안에 전부 고친다(D122·D123). 진행: deploy 브랜치 wo-440(D72 경로)·wo-441(샌드박스 틀)·wo-442~444(단계 이관), head 브랜치 wo-d72-remote-inference(이 문서들). 모든 리포 main은 2026-10-31 동결 그대로. 계획: `docs/plans/D72-remote-inference-recovery.md`.
+
 **(2026-10-31 15:1x 갱신, gpu-dev)** 최종 고정(D121): boundary-contracts `v3.1.2`(스키마는 v3.1.1 그대로), link `v0.4.3`, model-runtime `v0.11.8`, 문진 스키마 `survey-schema-v3.0.0`. 영역 10곳 모두 이 고정으로 main에 합쳐 push(각각 새 clone 재현 실패 0, 구조 검사 통과).
 - 오늘 끝난 것: 영역 구조 개편(D117, U400), 시험에서 실제 시간 판정 제거·시계 주입(U422, 영역별 TIMING.md), 생산자 계약 검증(R7) 빠짐 14건 수정과 `head/scripts/producer-check.py` 대조 통과, 시간 사슬(D119·D120: gateway·서버 요청 마감, 노출 선언) 정렬, 규칙↔점검 대응표(`RULE_CHECKS.md`).
 - **E2E 전체(18:09, deploy 5c531ea, `~/openit-logs/e2e-final15.log`): 181 통과 / 0 실패**, BLOCKED 2(브라우저 화면, E2E 밖), TEST-SUB 3(가짜 모델 등, GPU 몫). 정본 `deploy/docs/E2E_RESULTS.md`. 앞선 실패와 수정: 16:04 5pn(U63 검증기 매 요청 생성 → survey d2531f6), 17:22 5g(U64 게시 스크립트 무출력 실패 → deploy 5c531ea).

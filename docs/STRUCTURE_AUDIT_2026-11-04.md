@@ -14,7 +14,7 @@
 | S5 | 데이터베이스: postgres, postgres-reload, config/postgres, pg-*.sh | 12-Factor IV(백킹 서비스는 설정으로 붙는 자원) | 플랫폼 영역이 서버를 소유. 영역마다 따로 주는 데이터베이스·계정(이미 분리됨)만 영역 사이 계약 |
 | S6 | 감시: prometheus, alertmanager, blackbox, json-exporter, node-exporter, gateway-root, config/prometheus | 같음 | 플랫폼 영역 |
 | S7 | 백업: backup-target, backup*.sh, openit-backup*.timer | 같음 | 플랫폼 영역 |
-| S8 | 잡 스케줄러: systemd 타이머 6개, run-job.sh, sd_jobs.py | 같음 | 플랫폼 영역(스케줄러). 영역 잡과는 JobsDeclaration·*JobResult 로만 |
+| S8 | (정정 04:20) 잡을 언제 어떤 명령으로 띄우는가는 컨테이너 기동과 같은 배포 설정이라 deploy 에 남는다(CONVENTIONS 13절 예외). 고칠 것은 S10(잡 명령을 선언에서 만든다)뿐 | — | deploy 유지 |
 | S9 | 게이트웨이가 영역 API 경로·메서드·역할을 Caddyfile 에 직접 적음(경로 규칙 48곳) | 구조 규칙 1·4: 남의 구조를 모른다. 계약 Exposure 스키마가 이미 있음 | 게이트웨이 경로 표를 영역 이미지의 `io.openit.exposure` 선언(Exposure)에서 만든다. 손으로 쓴 영역 경로 금지 |
 | S10 | deploy compose 가 영역 잡 명령(`python -m …`)을 직접 적음(5곳 + migrate 1곳) | 구조 규칙 1·4. 계약 JobsDeclaration 이 이미 있음 | 잡 정의를 이미지의 `io.openit.jobs` 선언에서 만든다 |
 | S11 | 영역 사이 계약(RUNTIME 3.4.4 이전)이 deploy 내부 구조를 정함 | 구조 규칙 5·6 | 3.4.4(60dc386)에서 정정함. 플랫폼 영역이 생기면 R 조항의 "배포"를 "플랫폼"으로 |
@@ -24,6 +24,11 @@
 | S15 | 게이트웨이 `header Cache-Control no-store`(? 없음 3곳)가 앱이 정한 값을 덮어씀 | RUNTIME R2.1 | `?` 접두(앱이 정하지 않았을 때만) |
 | S16 | 호출 × 실패 표의 칸 확정이 끝나지 않음(이전 초안 빈칸·모순 약 250줄) | 계약 = 모든 입력에 출력 | 칸 확정 → 열린 칸은 계약 행으로 |
 | S17 | 독립 검토 없이 계약을 고정해 옴 | — | 고정 전 독립 검토 2건 |
+| S18 | 영역 게이트웨이가 없다: 서비스 컨테이너마다 들어오는 TLS 종단만 있고, 나가는 호출(서비스·잡 → 이웃)은 컴포넌트가 직접 보낸다 | 사용자 구조 원칙(CONVENTIONS 13절) | 영역마다 게이트웨이 하나(들어오고 나가는 것 모두). 사이드카(S4)를 영역 게이트웨이로 바꾼다 |
+| S19 | 감시가 영역 안을 직접 수집(/metrics·/readyz) | 같음 | 영역 게이트웨이를 거친다(R10.11, R5.1) |
+| S20 | 공개 입구·인증이 deploy 안 | 같음 | platform 영역(S1·S2) |
+| S21 | 저작 화면이 없다: question-authoring 저작 API 를 부르는 화면이 어디에도 없다 | 기능 누락 | 저작 화면을 만든다(소유 영역은 question-authoring, 입구는 platform 공개 입구) |
+| S22 | 영역 목록 정본(head/shared/areas.json)에 platform 이 없다 | — | platform 리포를 만들 때 같은 커밋 묶음에서 추가(먼저 넣으면 리포 없는 영역을 도는 점검이 깨진다) |
 
 ## C. 계약 대비 코드 결함 (계약 고정 뒤 영역별로 고칠 것, 04:00 보고에서)
 

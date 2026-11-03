@@ -43,9 +43,9 @@ NAMES = {
 }
 
 
-def files(root: Path):
+def files(root: Path, skip=SKIP_DIRS):
     for p in root.rglob("*"):
-        if p.is_file() and not (set(p.relative_to(root).parts) & SKIP_DIRS) and not any(x.startswith(".") for x in p.relative_to(root).parts[:-1]) and "CHANGELOG" not in p.name:
+        if p.is_file() and not (set(p.relative_to(root).parts) & skip) and not any(x.startswith(".") for x in p.relative_to(root).parts[:-1]) and "CHANGELOG" not in p.name:
             yield p
 
 
@@ -92,10 +92,19 @@ def main() -> int:
     # 3) 평문·검증 끄기 금지(U99 원칙: 모든 영역 사이 통신 TLS, 배치 무관). 서비스 사이 주소가 http:// 이면 서버를 나누는 순간 평문이 된다.
     #    예외는 같은 기계 안(loopback)뿐이다. 경로(/healthz)로 봐주면 망을 건너는 감시 프로브까지 빠진다.
     plain = re.compile(r"http://(?!localhost[:/]|127\.)[a-z0-9][a-z0-9.-]*:[0-9]+")   # loopback(localhost·127.x)만 예외. 계약 3.4.1 클라이언트 규칙과 같다. 포트가 붙은 주소만 본다($schema 같은 식별자 URL 제외)
+    import yaml as _y   # 서비스 이름 목록: deploy compose 의 서비스들. 포트 없는 http://<서비스> 도 평문이다(23:05 E2E 단계 6 이 잡은 구멍)
+    _svcs = set()
+    for _c in deploy.glob("compose*.yaml"):
+        try:
+            _svcs |= set((_y.safe_load(_c.read_text(encoding="utf-8")) or {}).get("services", {}) or {})
+        except Exception:
+            pass
+    bare = re.compile(r"http://(" + "|".join(sorted(map(re.escape, _svcs), key=len, reverse=True)) + r")(?=[/\"'\s:,)}]|$)") if _svcs else None
     built = re.compile(r"http://(\{|\$\{?|%s|%\(|'\s*\+|\"\s*\+)")   # 조립한 평문 주소(f"http://{name}:8080", "http://$HOST", "http://%s" 등) — 글자 그대로가 아니라 정규식 plain 이 못 잡는다
     noverify = re.compile(r"verify\s*=\s*False|ssl\.CERT_NONE|check_hostname\s*=\s*False|NODE_TLS_REJECT_UNAUTHORIZED|rejectUnauthorized\s*:\s*false")
+    # deploy 의 test/ 는 E2E·시험이 실제로 쓰는 설정이다(예: test/ops-job/test-ops-job.yaml) — 평문 점검에서 빼지 않는다(23:05 E2E 단계 6 이 잡은 구멍)
     for name, root in [*((a, WS / a) for a in AREAS), ("DEPLOY", deploy)]:
-        for p in files(root):
+        for p in files(root, SKIP_DIRS - {"test", "test-e2e", "test-image"} if name == "DEPLOY" else SKIP_DIRS):
             if p.suffix not in {".py", ".ts", ".mjs", ".js", ".env", ".yaml", ".yml", ".json", ".sh"} and p.name != "Caddyfile":
                 continue
             text = p.read_text(encoding="utf-8", errors="replace")
@@ -104,6 +113,8 @@ def main() -> int:
                     continue   # plaintext-rejection-test: "평문이면 거부된다"를 확인하는 시험 줄임을 그 줄에 밝힌 것만 예외(파일 단위 예외는 두지 않는다)
                 if plain.search(line):
                     bad.append(f"평문 주소: {p.relative_to(root.parent if name != 'DEPLOY' else root)}:{i}: {plain.search(line).group(0)}")
+                if bare and bare.search(line) and not plain.search(line):
+                    bad.append(f"평문 서비스 주소(포트 없음): {p.relative_to(root.parent if name != 'DEPLOY' else root)}:{i}: {bare.search(line).group(0)}")
                 if built.search(line) and not re.search(r"http://(\{|\$\{?)(localhost|127\.)", line):
                     bad.append(f"조립한 평문 주소: {p.relative_to(root.parent if name != 'DEPLOY' else root)}:{i}: {line.strip()[:80]}")
                 if noverify.search(line):

@@ -5,7 +5,7 @@
    DEPLOY_BC_TAG·DEPLOY_LINK_TAG·DEPLOY_MR_TAG·DEPLOY_SS_TAG) 값과 같은가. 기준표가 유일한 정본(워크스페이스 CLAUDE.md).
 2) 영역 사이 이름: 계약에 있는 이름(필드·헤더·사유 코드·경로)을 생산자와 소비자 영역이 둘 다 쓰는가.
    한쪽에만 있으면 철자 어긋남이나 빠진 구현이다.
-3) 평문 주소·인증서 검증 끄기 금지(U99): 서비스 사이 http:// 주소와 verify=False 류가 코드·설정에 없어야 한다(자기 /healthz·/readyz 프로브 제외).
+3) 평문 주소·인증서 검증 끄기 금지(U99): 서비스 사이 http:// 주소와 verify=False 류가 코드·설정에 없어야 한다(같은 기계 안 loopback 주소만 예외, 계약 3.4.1 과 같은 규칙).
 시험·문서·변경 기록·생성물 폴더는 보지 않는다(옛 판을 인용할 수 있다).
 
 사용: python3 head/scripts/cross-area-check.py [--deploy <deploy 작업 트리>]   종료 코드 0 통과, 1 어긋남.
@@ -90,8 +90,8 @@ def main() -> int:
                 if not has(ar, name):
                     bad.append(f"이름 누락: {name} 이 {side} {ar} 코드에 없다")
     # 3) 평문·검증 끄기 금지(U99 원칙: 모든 영역 사이 통신 TLS, 배치 무관). 서비스 사이 주소가 http:// 이면 서버를 나누는 순간 평문이 된다.
-    #    /healthz·/readyz 컨테이너 내부 프로브는 예외(자기 자신, 네트워크를 나가지 않는다).
-    plain = re.compile(r"http://[a-z][a-z0-9-]*:[0-9]+(?![0-9])(?!/(healthz|readyz)\b)")   # (?![0-9]): 숫자 되돌아가기로 예외가 무력화되지 않게(808+0/healthz)
+    #    예외는 같은 기계 안(loopback)뿐이다. 경로(/healthz)로 봐주면 망을 건너는 감시 프로브까지 빠진다.
+    plain = re.compile(r"http://(?!localhost[:/]|127\.)[a-z0-9][a-z0-9.-]*:[0-9]+")   # loopback(localhost·127.x)만 예외. 계약 3.4.1 클라이언트 규칙과 같다. 포트가 붙은 주소만 본다($schema 같은 식별자 URL 제외)
     noverify = re.compile(r"verify\s*=\s*False|ssl\.CERT_NONE|check_hostname\s*=\s*False|NODE_TLS_REJECT_UNAUTHORIZED|rejectUnauthorized\s*:\s*false")
     for name, root in [*((a, WS / a) for a in AREAS), ("DEPLOY", deploy)]:
         for p in files(root):

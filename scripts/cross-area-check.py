@@ -91,7 +91,7 @@ def main() -> int:
                     bad.append(f"이름 누락: {name} 이 {side} {ar} 코드에 없다")
     # 3) 평문·검증 끄기 금지(U99 원칙: 모든 영역 사이 통신 TLS, 배치 무관). 서비스 사이 주소가 http:// 이면 서버를 나누는 순간 평문이 된다.
     #    /healthz·/readyz 컨테이너 내부 프로브는 예외(자기 자신, 네트워크를 나가지 않는다).
-    plain = re.compile(r"http://[a-z][a-z0-9-]+:[0-9]+(?!/(healthz|readyz))")
+    plain = re.compile(r"http://[a-z][a-z0-9-]+:[0-9]+(?![0-9])(?!/(healthz|readyz)\b)")   # (?![0-9]): 숫자 되돌아가기로 예외가 무력화되지 않게(808+0/healthz)
     noverify = re.compile(r"verify\s*=\s*False|ssl\.CERT_NONE|check_hostname\s*=\s*False|NODE_TLS_REJECT_UNAUTHORIZED|rejectUnauthorized\s*:\s*false")
     for name, root in [*((a, WS / a) for a in AREAS), ("DEPLOY", deploy)]:
         for p in files(root):

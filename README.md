@@ -63,3 +63,6 @@ Claude Code는 시작한 디렉터리에서 위로 올라가며 CLAUDE.md를 읽
 
 - 첫 커밋과 원격 설정은 사용자가 한다. 헤드는 영역 리포지토리의 내용을 수정하지 않는다.
 - 설계서 전체(`ARCHITECTURE_FULL.md`)는 리포지토리에 없다. 필요하면 `docs/`에 넣는다.
+
+## ADR
+헤드(계약·구조) 결정의 ADR 은 `docs/adr/` 에 있다. 영역 사이 결정의 기록은 `docs/DECISIONS.md`, 규칙↔점검 대응은 `docs/RULE_CHECKS.md`, 전수 대응표(생성물)는 `docs/RULE_COVERAGE.md`.

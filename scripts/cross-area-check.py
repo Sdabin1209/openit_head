@@ -5,7 +5,7 @@
    DEPLOY_BC_TAG·DEPLOY_LINK_TAG·DEPLOY_MR_TAG·DEPLOY_SS_TAG) 값과 같은가. 기준표가 유일한 정본(워크스페이스 CLAUDE.md).
 2) 영역 사이 이름: 계약에 있는 이름(필드·헤더·사유 코드·경로)을 생산자와 소비자 영역이 둘 다 쓰는가.
    한쪽에만 있으면 철자 어긋남이나 빠진 구현이다.
-3) 평문 주소·인증서 검증 끄기 금지(U99): 서비스 사이 http:// 주소와 verify=False 류가 코드·설정에 없어야 한다(같은 기계 안 loopback 주소만 예외, 계약 3.4.1 과 같은 규칙).
+3) 평문 주소·인증서 검증 끄기 금지(U99, 글자 그대로와 조립한 주소 모두. 거부 시험 줄은 그 줄에 plaintext-rejection-test 표시): 서비스 사이 http:// 주소와 verify=False 류가 코드·설정에 없어야 한다(같은 기계 안 loopback 주소만 예외, 계약 3.4.1 과 같은 규칙).
 시험·문서·변경 기록·생성물 폴더는 보지 않는다(옛 판을 인용할 수 있다).
 
 사용: python3 head/scripts/cross-area-check.py [--deploy <deploy 작업 트리>]   종료 코드 0 통과, 1 어긋남.
@@ -92,6 +92,7 @@ def main() -> int:
     # 3) 평문·검증 끄기 금지(U99 원칙: 모든 영역 사이 통신 TLS, 배치 무관). 서비스 사이 주소가 http:// 이면 서버를 나누는 순간 평문이 된다.
     #    예외는 같은 기계 안(loopback)뿐이다. 경로(/healthz)로 봐주면 망을 건너는 감시 프로브까지 빠진다.
     plain = re.compile(r"http://(?!localhost[:/]|127\.)[a-z0-9][a-z0-9.-]*:[0-9]+")   # loopback(localhost·127.x)만 예외. 계약 3.4.1 클라이언트 규칙과 같다. 포트가 붙은 주소만 본다($schema 같은 식별자 URL 제외)
+    built = re.compile(r"http://(\{|\$\{?|%s|%\(|'\s*\+|\"\s*\+)")   # 조립한 평문 주소(f"http://{name}:8080", "http://$HOST", "http://%s" 등) — 글자 그대로가 아니라 정규식 plain 이 못 잡는다
     noverify = re.compile(r"verify\s*=\s*False|ssl\.CERT_NONE|check_hostname\s*=\s*False|NODE_TLS_REJECT_UNAUTHORIZED|rejectUnauthorized\s*:\s*false")
     for name, root in [*((a, WS / a) for a in AREAS), ("DEPLOY", deploy)]:
         for p in files(root):
@@ -99,10 +100,12 @@ def main() -> int:
                 continue
             text = p.read_text(encoding="utf-8", errors="replace")
             for i, line in enumerate(text.splitlines(), 1):
-                if line.lstrip().startswith("#"):
-                    continue
+                if line.lstrip().startswith("#") or "plaintext-rejection-test" in line:
+                    continue   # plaintext-rejection-test: "평문이면 거부된다"를 확인하는 시험 줄임을 그 줄에 밝힌 것만 예외(파일 단위 예외는 두지 않는다)
                 if plain.search(line):
                     bad.append(f"평문 주소: {p.relative_to(root.parent if name != 'DEPLOY' else root)}:{i}: {plain.search(line).group(0)}")
+                if built.search(line) and not re.search(r"http://(\{|\$\{?)(localhost|127\.)", line):
+                    bad.append(f"조립한 평문 주소: {p.relative_to(root.parent if name != 'DEPLOY' else root)}:{i}: {line.strip()[:80]}")
                 if noverify.search(line):
                     bad.append(f"인증서 검증 끄기: {p.relative_to(root.parent if name != 'DEPLOY' else root)}:{i}")
     for b in bad:

@@ -253,3 +253,36 @@ GPU 서버가 열릴 때 할 일이다. 줄기와 계획은 [`COMPLETION_PLAN.md
 | L01·L15·U05·U06·U12 | 사람 몫(키 보관·서버 실행·실기기·두 번째 머신) | |
 | U01·U02·U04·U07·U10·U13·L21·H1~H5 | GPU | |
 | U77·U78·U79·U14 | 제외 | 사용자 결정(데이터셋·학습 형식) |
+
+## 6. 2026-11-03 수정 반영(헤드, 영역 커밋·새 clone 재현 근거, 전체 E2E 통과 전)
+
+| ID | 상태 | 근거 |
+|---|---|---|
+| U71 | 고침(E2E 확인 대기) | deploy b249c11: prometheus 가 model-serving·survey-service /metrics 수집, 경보 4개, promtool 시험 |
+| U82 | 고침(E2E 확인 대기) | deploy 3199f5d·edcaea3·0ff9c5e(Keycloak·oauth2-proxy·forward_auth, 가입 신청·admin 승인·초기 admin openit-admin 임시 비밀번호), admin-console 59bcf33·e5bb944, 계약 CONVENTIONS 6절, question-authoring 8a52874 |
+| U83·U92 | 고침(E2E 확인 대기) | 계약 3.4.0 RESULT_READY·topics, survey-service b39ef0b·7e95648, admin-console 790c34e, deploy dfe3fe2 |
+| L02 | 고침 | deploy af5deff(비밀 640+group_add, 읽기 시험) |
+| L08 | 고침 | ops-feedback 6728e5a(소유자/앱 계정, verify 만), deploy 64ecfbd |
+| L18 | 닫힘 | survey-service 8ab24b0(운영 문진표 칸 정의로 학습 정답 46,047값 위반 0) |
+| L19 | 닫힘 | deploy f782b38 등(failed_raw_days 30 명시) |
+| L20 | 고침 | deploy 6bc4cca(CSRF 허용 호스트=GATEWAY_HOSTS, 경로 우회 회귀 시험) |
+| L23 | 닫힘 | kiosk-frontend 50097c6(재호출 경로 확인+시험) |
+| L26 | 닫힘 | head area-presence-check OK(README 시험 숫자 없음) |
+| L28 | 닫힘 | survey-service 2816e2a, kiosk-frontend 7054d9a, admin-console 790c34e |
+| U64 | 닫힘 | deploy ecd9b79(push 실패 사유 보존 확인) |
+| G06 | 고침(실제 학습은 GPU) | model-lab 0f3cdad·8cb75b2·b903c9d·4b17d1f·6d4e031(서버 정본 실행, ~/dabin 안, GPU 점유·디스크 검사) |
+| U96 | 닫힘 | kiosk-frontend bcbdb52(60초 타이머), 헤드 새 clone 301/301 |
+| L30 | 열림 | 전체 E2E 미통과(2026-11-03 18:12 실패 — 아래 신규) |
+
+## 7. 2026-11-03 18:12 E2E 가 드러낸 결함(신규, deploy)
+
+| ID | 내용 | 상태 |
+|---|---|---|
+| E1 | 사람 로그인(OIDC) 뒤 단계에서 시험 도구가 게이트웨이에 연결 거부(단계 1·5a·5u, 복구 단계는 그 연쇄) | 열림 |
+| E2 | E2E 게이트웨이 인증 검사의 기대값이 OIDC 이전(화면도 401) | 열림 |
+| E3 | Keycloak 이 관리자·DB 비밀번호를 환경 변수로 받음(D84 위반) | 열림 |
+| E4 | question-authoring 정리 잡 환경이 서버와 다름(12-Factor XII 위반) | 열림 |
+| E5 | 이미지 게시 실패(error getting credentials), 원인 미확정 | 열림 |
+| E6 | E2E 가 선행 실패를 SKIP 이 아닌 FAIL 로 표시(chk_dep 누락) | 열림 |
+| E7 | Keycloak 만 읽기 전용 루트 예외(표준: optimized image) | 열림 |
+| E8 | 로그인 쿠키 12시간·갱신 5분이 근거 없는 시작값(D89) | 열림 |

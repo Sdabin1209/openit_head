@@ -278,11 +278,19 @@ GPU 서버가 열릴 때 할 일이다. 줄기와 계획은 [`COMPLETION_PLAN.md
 
 | ID | 내용 | 상태 |
 |---|---|---|
-| E1 | 사람 로그인(OIDC) 뒤 단계에서 시험 도구가 게이트웨이에 연결 거부(단계 1·5a·5u, 복구 단계는 그 연쇄) | 열림 |
-| E2 | E2E 게이트웨이 인증 검사의 기대값이 OIDC 이전(화면도 401) | 열림 |
-| E3 | Keycloak 이 관리자·DB 비밀번호를 환경 변수로 받음(D84 위반) | 열림 |
-| E4 | question-authoring 정리 잡 환경이 서버와 다름(12-Factor XII 위반) | 열림 |
-| E5 | 이미지 게시 실패(error getting credentials), 원인 미확정 | 열림 |
-| E6 | E2E 가 선행 실패를 SKIP 이 아닌 FAIL 로 표시(chk_dep 누락) | 열림 |
-| E7 | Keycloak 만 읽기 전용 루트 예외(표준: optimized image) | 열림 |
-| E8 | 로그인 쿠키 12시간·갱신 5분이 근거 없는 시작값(D89) | 열림 |
+| E1 | 사람 로그인(OIDC) 뒤 단계에서 시험 도구가 게이트웨이에 연결 거부(단계 1·5a·5u, 복구 단계는 그 연쇄) | 수정됨(deploy a0613ed, wo-450): e2e.sh 한 줄 대입 순서로 공개 주소에 기본 포트 8443 이 들어감. 분리·공개 주소 점검·E2E 밖 시험 추가. E2E 재확인 전 |
+| E2 | E2E 게이트웨이 인증 검사의 기대값이 OIDC 이전(화면도 401) | 수정됨(a0613ed): 기대표 한 곳(test/gateway-oidc/unauth-expectations.txt)을 E2E·test-gateway-auth 가 공유, 통과. E2E 재확인 전 |
+| E3 | Keycloak 이 관리자·DB 비밀번호를 환경 변수로 받음(D84 위반) | 수정됨(67073fb): 설정 파일·비밀 realm 파일, 비밀 env 정적 점검 추가, idp 스모크 통과 |
+| E4 | question-authoring 정리 잡 환경이 서버와 다름(12-Factor XII 위반) | 부분(67073fb): survey·QA purge, release-gate prune·collect 를 서버 환경과 같게+점검. 남음: ops-feedback 잡·migrate 환경 갈라짐, 합친 compose 에 check_config_contracts 실행 |
+| E5 | 이미지 게시 실패(error getting credentials), 원인 미확정 | 열림: 착수 안 함. 남음: push 단독 재현(임시 레지스트리 connection refused), 원인 확정, 사용자 설정 불간섭 표준 수정, doctor 항목 |
+| E6 | E2E 가 선행 실패를 SKIP 이 아닌 FAIL 로 표시(chk_dep 누락) | 수정됨(67073fb): chk_dep 로, 같은 모양 정적 시험 추가 |
+| E7 | Keycloak 만 읽기 전용 루트 예외(표준: optimized image) | 열림: 시도분이 기동 실패(로그 미확인), deploy stash a88760f("D10-7 …미완")에 보관. 남음: 원인 확인, 예외 줄 삭제, ADR |
+| E8 | 로그인 쿠키 12시간·갱신 5분이 근거 없는 시작값(D89) | 열림: 착수 안 함 |
+
+### 7-1. 18:3x 쉬는 지점(사용자 지시)의 상태
+- U99 영역 점검 완료(코드 수정 없음, 영역마다 TLS 시험 추가): survey 1afbf5f, release-gate b109db4, QA cb72fea, ops b8a5cd3·b9acfd7, model-lab bbd77f6, synthetic 936869d. model-runtime 은 헤드 점검 미착수.
+- head 점검 도구에 평문 주소·검증 끄기 금지 추가(af601eb). 현재 deploy 설정의 서비스 사이 http 주소와 감시 대상이 잡힘(U98·U99 미완의 증거).
+- deploy TLS 줄(step-ca·사이드카·https·DB TLS·공개 입구 인증서)과 배치 줄(Ansible·분리 시험)은 착수 전 멈춤(브랜치 wo-450-tls·wo-450-place, 변경 없음). 명세는 헤드 비커밋 progress/U99-spec.md.
+- 계약 3.5.0(클라이언트가 loopback 밖 http 거부) 미착수.
+- 전체 E2E 미실행.
+

@@ -19,7 +19,7 @@ from pathlib import Path
 
 WS = Path(__file__).resolve().parents[2]
 AREAS = ["survey-service", "release-gate", "question-authoring", "ops-feedback", "model-runtime", "model-lab",
-         "synthetic-data", "kiosk-frontend", "admin-console", "link"]
+         "synthetic-data", "kiosk-frontend", "admin-console", "link", "platform"]
 SKIP_DIRS = {"node_modules", ".venv", "build", "dist", "docs", "tests", "test", "test-e2e", "test-image", "__pycache__", ".git"}
 PIN_FILES = re.compile(r"(requirements[^/]*\.(txt|lock)|Dockerfile|pyproject\.toml|build[-_][^/]*\.sh|smoke[^/]*\.sh|setup-env\.sh)$")
 PIN_PATTERNS = {   # 기준표 키 -> 영역 파일에서 판을 뽑는 정규식들

@@ -8,6 +8,7 @@
 | 배치(Ansible) | bf1d876 (wo-450-place) | test_placement_areas·names·ops rc=0, test-split-placement·pki-playbook·sslrootcert rc=0, test-split-gateway.sh rc=0(실제 platform 게이트웨이 이미지) | — | 헤드 미재현 | 코드 끝, 아래 할 일 남음 |
 | model-runtime | a43ba5c = v0.11.18 (계약 v3.4.7) | pytest 385 pass rc=0, 변이 12건(영역 보고) | smoke.sh rc=0 | 07:44 재현 rc=0 | 3.4.8 고정판 0.11.19 대기 |
 | model-lab | ca1d86e (wo-324, 계약 v3.4.8·MR v0.11.19; a349143 뒤 고정 파일만, 헤드 diff 확인) | a349143 에서 setup·pytest 393·smoke rc=0 재현 | SMOKE_OK | 07:51 재현(a349143) | 3.4.9 고정 뒤 재현 |
+| release-gate | cb5d1d4 (wo-344-code, v3.4.8·v0.4.14·MR v0.11.19) | pytest(PG) 1043 pass rc=0(영역 보고) | 깨끗한 clone smoke rc=0(영역 보고) | 헤드 미재현 | 실제 restic 왕복·R10.5 변이 남음 |
 
 ## 최종 검증 단계에서 할 일(코드 단계에서 할 수 없는 것, 빼지 않는다)
 - model-lab: 기존 모델 패키지를 lineage.question_sets 를 채운 새 버전으로 다시 게시(학습 서버 어댑터 읽기, 쓰기는 ~/dabin 안만, deploy 스택의 model-registry 필요). 절차는 model-lab docs.

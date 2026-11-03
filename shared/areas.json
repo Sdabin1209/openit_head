@@ -57,6 +57,11 @@
       "version_train": true
     },
     {
+      "name": "platform",
+      "kind": "python",
+      "version_train": true
+    },
+    {
       "name": "deploy",
       "kind": "compose",
       "version_train": false

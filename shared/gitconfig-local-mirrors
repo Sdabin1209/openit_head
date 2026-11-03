@@ -1,0 +1,18 @@
+# 원격 동결(2026-10-31 이후 원격 main·태그 게시 금지) 동안 의존 리포를 로컬에서 받는 표준 경로(구조 점검 S14).
+# 쓰는 법: GIT_CONFIG_GLOBAL=<이 파일> pip install ... / 빌드 스크립트. git 표준 url.<base>.insteadOf(git-config(1)).
+[url "/home/user/sdabin/healthKiosk/boundary-contracts"]
+	insteadOf = ssh://git@github.com/Sdabin1209/openit_boundary-contracts.git
+	insteadOf = git@github.com:Sdabin1209/openit_boundary-contracts.git
+	insteadOf = https://github.com/Sdabin1209/openit_boundary-contracts.git
+[url "/home/user/sdabin/healthKiosk/link"]
+	insteadOf = ssh://git@github.com/Sdabin1209/openit_link.git
+	insteadOf = git@github.com:Sdabin1209/openit_link.git
+	insteadOf = https://github.com/Sdabin1209/openit_link.git
+[url "/home/user/sdabin/healthKiosk/model-runtime"]
+	insteadOf = ssh://git@github.com/Sdabin1209/openit_model-runtime.git
+	insteadOf = git@github.com:Sdabin1209/openit_model-runtime.git
+	insteadOf = https://github.com/Sdabin1209/openit_model-runtime.git
+[url "/home/user/sdabin/healthKiosk/survey-service"]
+	insteadOf = ssh://git@github.com/Sdabin1209/openit_survey-service.git
+	insteadOf = git@github.com:Sdabin1209/openit_survey-service.git
+	insteadOf = https://github.com/Sdabin1209/openit_survey-service.git

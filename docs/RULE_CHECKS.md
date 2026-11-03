@@ -29,3 +29,4 @@
 | 20 | 데모=제품: 데모 덮어쓰기는 모델 대역·포트·시험 계정 외 제품 설정을 못 바꾼다 (U75) | deploy `scripts/test-demo-parity.sh` | 있음 |
 | 21 | 규칙 전수 대응표가 입력(DECISIONS·CLAUDE·RULE_CHECKS·self-checks)과 같다 (U76) | `head/scripts/rules-coverage.py --check` | 있음 |
 | 22 | 게이트웨이 사이트 목록은 host:port(와일드카드·포트만 금지) (L20) | deploy `schemas/GatewayEnv` via `scripts/check_config_contracts.py` | 있음 |
+| 23 | 모든 영역의 의존 고정이 deploy 기준표와 같고, 영역 사이 이름(문진표 선택·결과 푸시·역할 헤더·승인 대기 사유)을 생산자·소비자가 둘 다 쓴다 (정적 일관성, 2026-11-03) | `head/scripts/cross-area-check.py --deploy <deploy 작업 트리>` | 있음 |

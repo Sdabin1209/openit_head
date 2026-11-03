@@ -102,6 +102,11 @@
 | U89 | **실제 질문 문장이 든 운영 문진표가 없었다.** 리포의 문항 세트는 "시험 문항 Q1.D01입니다" 양식뿐. 사용자 지시(2026-11-03): 기존 데이터셋(`reference/openit-server/data/question_bank.json`의 official 문장)에서 만든다 | 닫힘(2026-11-03 13:00, 새 clone 검증) | question-authoring 3ae115f forms/health-screening-v1.txt·health-screening-short-order.txt(데이터셋 official 문장), deploy b710c03 E2E가 실제 양식 사용;  question-authoring `forms/health-screening-v1.txt`(ID health-screening)·`forms/health-screening-short-order.txt`(순서 B). 거절 설명·되묻기 문장·정책 한도·세션 설정은 임시 값(임상 검토 필요, 사람 몫) |
 | U90 | **계약 `ResponseRequest` START의 첫 문항이 `Q1.D01`로 고정**돼 첫 문항이 다른 문진표는 시작 응답을 만들 수 없었다(survey-service 담당 발견) | 닫힘(2026-11-03 13:00, 새 clone 검증) | 계약 bab17ee(v3.3.0);  계약 3.3.0에서 임의 문항 ID로 |
 | U91 | **문진 스키마 정수 버전의 뜻이 두 가지로 섞여 있었다.** CONVENTIONS 12절(3.2.0)이 "필수 추가면 정수를 올린다"고 적었는데 그 정수는 모델 패키지·ServingConfig·릴리스 매니페스트가 같은 값으로 드는 모델 입출력 계약 번호라, 그대로 따르면 모델이 그대로인데 LoRA 패키지를 전부 다시 게시해야 했다 | 닫힘(2026-11-03) | 계약 3.3.0 CONVENTIONS 12절 개정: 정수는 모델 입출력이 깨질 때만, 문진 스키마 패키지는 semver MAJOR. 4.0.0은 정수 1 유지 |
+| U92 | **결과 도착 알림이 의사 화면을 연 동안(SSE)만 온다.** 계약 PUBLIC_API B절이 "웹 푸시로는 보내지 않는다"고 정해 화면을 닫은 의사는 결과 도착을 모른다. 사용자 결정(2026-11-03) "도착 알림" 미충족 → U83 미완성 | 열림 | 계약(푸시 종류 result_ready·clinician 구독), survey-service 발송, admin-console 구독, deploy 구독 경로 |
+| U93 | survey-service·question-authoring 표준 설치(setup-env)가 새 clone에서 실패: openit-link v0.4.4가 계약 v3.2.0을 고정해 v3.3.0과 충돌 | 닫힘(2026-11-03) | survey-service 8172768, question-authoring fabf46c. 헤드 새 clone(/tmp/verify2) 재현 통과 |
+| U94 | question-authoring이 문진 스키마 정수 2를 가정(헤드의 잘못된 지시) | 닫힘(2026-11-03) | question-authoring d7ce64c, 새 clone 666 통과 |
+| U95 | deploy self-check 5건 실패(시간 상한 사슬 분류, 설정 관문 정규식, sd_jobs 2, check-all 작업 트리 워크스페이스) | 닫힘(2026-11-03, 담당 보고 근거) | deploy 2281f43·1792b1c·8de0b4e·2c16ef6. 헤드 재현은 정적 시험 일부만 |
+| U96 | kiosk-frontend `npm test` 전체 실행이 담당 환경에서 끝나지 않음(두 벌이 50분 멈춤) | 열림(원인 미확인) | 헤드 새 clone에서는 298/298 통과. 멈춘 원인 미확인 |
 | U14 | (보류, 요구 아님) 제약 디코딩이 `values[].key`를 현재 문항의 유효 칸 집합으로 제한하지 못한다. 모델 입력 형식은 학습 데이터로 고정(D74)이라 입력에 칸 목록을 넣을 수 없다. 하려면 프롬프트가 아니라 서빙 API의 별도 매개변수로 문법에만 쓰는 방식인데, 학습된 LoRA-A는 키를 학습했고 서비스가 사후 검증으로 막으므로 학습 안 된 모델로 데모를 통과시키려는 목적 외에는 필요 없다 | 보류 | 필요해지면 그때 | 
 | U15 | model-runtime `pyproject`의 dev extra가 turn-engine v0.3.0(boundary v2.0.0 고정)을 가리킨다. `model-runtime[dev]`로 설치하면 boundary v2.0.1과 충돌. 서비스 이미지·lock 해결에는 영향 없음(model-lab에서 확인). 다음 model-runtime 릴리스(D80 연쇄 때문에 단독 릴리스 안 함)에서 v0.3.1로 고친다 | 닫힘 | 근거: model-runtime 8279847(v0.7.0)이 dev extra의 turn-engine 하드 핀을 없앴다. turn-engine이 필요한 시험은 `importorskip`으로 없으면 건너뛴다(CHANGELOG 0.7.0) |
 | U16 | E2E의 가짜 모델은 A 출력을 `values` 빈 NEXT로만 내서, 환자 말에서 값을 뽑아 저장하는 경로(검증 → 저장 → 응답 재료 조립)가 E2E에서 한 번도 실행되지 않는다. 영역 단위 시험(survey-service 415)에는 있을 수 있으나 이 세션에서 E2E 수준으로는 확인하지 못했다. 가짜 A가 문항별로 값을 내도록 확장해 저장·정정·건너뛰기를 E2E에서 확인해야 한다 | 닫힘 | model-runtime 가짜 백엔드(`MODEL_RUNTIME_FAKE_FLOW_FILE` 확장) + deploy E2E 단계. 다음 model-runtime 릴리스에 묶는다 | **정정(2026-10-27)**: 영역 단위로는 survey-service `tests/test_orchestrator.py::test_full_conversation`이 값 저장·다음 문항·B 입력 조립을 지난다(확인). 빠진 것은 영역 사이(E2E)다. model-runtime v0.7.1에서 가짜 A가 값을 내도록 확장했고, deploy E2E 단계 추가가 남았다. **진행(2026-10-27 16:18)**: model-runtime v0.7.1 가짜 A가 `slots`/`skips`로 값을 내고, deploy E2E 단계 5g(직접 6건 + 서비스 경유 값 있는 3턴)와 5s(릴리스 교체 전후 컨테이너 불변)를 REAL로 추가, 전체 모드 통과(deploy 4720f02, 통과 수는 최신 결과: [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md)). **남은 것**: 저장된 값 자체를 읽는 공개 경로는 없다. **정정(2026-10-27 22:45)**: 직원 세션 조회(`GET /v1/staff/sessions/{id}`)가 turns[].action과 values[]를 읽기 전용으로 주므로 그것으로 값과 status를 직접 단언했다. 정정(CORRECT)은 model-runtime v0.7.2 가짜 A(`corrections`)와 deploy E2E 단계 5c에서 전체 모드 REAL로 확인했다. 못 보는 것: 이력의 이전 값, 정정 뒤 다음 문항, 모델이 실제 정정 표현을 알아듣는지. | **닫힘(2026-10-31 헤드 확인)**: 저장·건너뛰기는 E2E 5g, 정정은 5c가 전체 모드 REAL로 본다 — 2026-10-31 01:03 gpu-dev 전체 실행(`~/openit-logs/e2e-final7.log`)에서 통과. 정정 뒤 이전 값 이력은 survey-service `tests/test_orchestrator.py`(정정 턴, 이력 단언). 모델이 실제 정정 표현을 알아듣는지는 GPU(실제 모델) 몫. |
@@ -198,3 +203,50 @@ GPU 서버가 열릴 때 할 일이다. 줄기와 계획은 [`COMPLETION_PLAN.md
 | G14 | ops-feedback REASK_STREAK 정의 | ops-feedback 7c9309d, ADR 0012 (에이전트 보고 근거, 새 clone 재현 전) |
 | L16 | devDependency 취약점 상향 | kiosk-frontend 49fe49c, admin-console a0918e8 (에이전트 보고 근거, 새 clone 재현 전) |
 | L25 | 시험의 다른 컨테이너 pause | survey-service 6ba56a6, ADR-0019 (에이전트 보고 근거, 새 clone 재현 전) |
+
+## 5. 2026-11-03 대조 (헤드, 열림·부분 항목을 코드·커밋으로 판정)
+
+판정: 닫힘=근거 커밋이 브랜치에 있음(로컬, 미push, 전체 E2E 전) / 남음=수정 필요 / 사람 몫 / GPU / 제외(데이터셋·학습 형식, 사용자 결정).
+
+| ID | 판정 | 근거 |
+|---|---|---|
+| U67 | 닫힘 | 계약 3.2.0 Exposure `machine-token`, deploy wo-450 노출 대조 |
+| U69 | 닫힘 | deploy wo-450 게이트웨이 `@registrymachine`·`gateway-registry-publish-token` |
+| U73 | 닫힘 | 계약 3.2.0 서비스 env 스키마 8개, 기동 검증: survey-service settings.py, release-gate main.py, question-authoring __main__.py, ops-feedback config.py, model-runtime env_check.py, model-lab, synthetic-data; deploy check_config_contracts |
+| U74 | 닫힘 | 계약 3.1.3 `fill_next_item`(ADR 0014), model-runtime 0.11.10 |
+| U75 | 닫힘 | deploy wo-450 데모 분기 제거, test-demo-parity.sh |
+| U76 | 닫힘 | head d2bbfdc rules-coverage.py·RULE_COVERAGE.md |
+| U80 | 닫힘 | 계약 CONVENTIONS 11절, survey-service tests/test_state_key_order_u80.py |
+| U81 | 닫힘 | question-authoring 231faa2, release-gate a5dfe5a·c9f90d9(세트별) |
+| U11 | 닫힘 | model-lab eval_report semantic_violation_rate(계약 check_action_extraction) |
+| U20 | 닫힘 | D125 시간 상한 사슬: 클라이언트 21/26초 > 서버 20/25초(계약 CONVENTIONS) |
+| U31 | 닫힘(결정) | 사용자 결정 2026-11-03: 이 시스템이 정본, 매일·14일. deploy backup.env.example BACKUP_RETENTION_DAYS=14 |
+| U36 | 닫힘 | 사용자 결정 2026-11-03: 3회 뒤 빈칸+사유. 계약 3.2.0, survey-service blank_details.py |
+| G04 | 닫힘(결정) | 사용자 결정 2026-11-03: 문구 유지 |
+| L07 | 닫힘 | ops-feedback de79865: 롤백 근거는 사람이 CONFIRMED로 검토한 사례만(CR-012) |
+| L11 | 닫힘(결정) | 사용자 결정: 위험 감지 끔. 계약 3.2.0 기본 off, survey-service settings.py 기본 False |
+| L12 | 닫힘(결정) | 사용자 결정: 180일 유지+검토용 발화 원문. ops-feedback 4d63c22 |
+| L13 | 닫힘(결정) | 사용자 결정: 2인 승인 기본 꺼짐. question-authoring 8503c0d |
+| L14 | 닫힘 | survey-service ed3a3b5(알림 재시도 큐, ADR-0058), 새 clone 통과 |
+| L29 | 닫힘 | deploy wo-450 config/model-serving.env `MODEL_RUNTIME_BACKEND=vllm` |
+| U71 | 남음 | 지표는 있음(model-runtime /metrics, survey-service metrics_export). deploy prometheus가 서비스 /metrics를 수집하지 않음(textfile만), 경보 없음 |
+| U83 | 남음 | 의사 화면·확인·접근 기록은 있음(계약 507c17a, survey-service 97d0cd7, admin-console 7f07c7a, deploy). U92 웹 푸시 없음, E2E 미확인 |
+| U92 | 남음 | 위 행 |
+| U82 | 남음 | 계정 관리(표준 IdP) |
+| L19 | 남음 | 사용자 결정 30일, ops-feedback 기본값은 아직 90일 |
+| L02 | 남음 | compose 비밀 파일 640+group_add 미적용 |
+| L20 | 남음 | 게이트웨이 CSRF 허용 Origin이 GATEWAY_HOSTS와 연동 안 됨, 경로 우회 회귀 시험 없음 |
+| L08 | 남음 | ops-feedback DB 계정 분리·verify/migrate 분리 |
+| L23 | 남음(판정 미완) | 직원 재호출 경로가 키오스크에서 끝까지 이어지는지 이번 대조로 확정하지 못함 |
+| L28 | 남음(판정 미완) | 계약 pause_reason(H절)은 있음, 직원 콘솔·지표가 사유를 가르는지 확정하지 못함 |
+| L26 | 남음(판정 미완) | head area-presence-check로 README 시험 숫자 점검을 아직 돌리지 않음 |
+| U64 | 남음(판정 미완) | publish 스크립트의 push 실패 출력 보존을 이번 대조로 확정하지 못함 |
+| L18 | 남음 | 칸 정의가 있는 실제 문진표로 서비스 값 검증을 학습 정답에 돌린 적 없음(운영 문진표 U89는 생김) |
+| G06 | 남음 | model-lab 학습기가 학습 서버 코드와 다름(서버 코드를 감싸는 실행 필요) |
+| U96 | 남음 | kiosk 전체 시험 멈춤 원인 |
+| L30 | 남음 | 전체 E2E 1회로 확인 |
+| G11 | 운영 제약 | survey-service·ops-feedback 같은 문진 스키마(둘 다 survey-schema-v4.0.0) |
+| G02·G03·G13·U37·U09 | 사람 몫(데이터셋 담당) | |
+| L01·L15·U05·U06·U12 | 사람 몫(키 보관·서버 실행·실기기·두 번째 머신) | |
+| U01·U02·U04·U07·U10·U13·L21·H1~H5 | GPU | |
+| U77·U78·U79·U14 | 제외 | 사용자 결정(데이터셋·학습 형식) |

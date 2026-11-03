@@ -119,6 +119,20 @@ def main() -> int:
                     bad.append(f"조립한 평문 주소: {p.relative_to(root.parent if name != 'DEPLOY' else root)}:{i}: {line.strip()[:80]}")
                 if noverify.search(line):
                     bad.append(f"인증서 검증 끄기: {p.relative_to(root.parent if name != 'DEPLOY' else root)}:{i}")
+    # 4) 문진 스키마에 정본이 있는 영역 사이 스키마(boundary-contracts EXTERNAL_SCHEMAS.json, 3.4.4 검토 B-20)가
+    #    기준표 판(DEPLOY_SS_TAG)의 문진 스키마에 실제로 있는가. 없으면 계약이 가리키는 정본이 없다.
+    import json as _j, subprocess as _sp
+    reg_p = WS / "boundary-contracts" / "EXTERNAL_SCHEMAS.json"
+    if reg_p.exists():
+        reg = _j.loads(reg_p.read_text(encoding="utf-8"))
+        tag = want.get("DEPLOY_SS_TAG")
+        for e in reg["schemas"]:
+            r = _sp.run(["git", "-C", str(WS / "survey-service"), "cat-file", "-e", f"{tag}:schema/schemas/{e['name']}.json"],
+                        capture_output=True)
+            if r.returncode != 0:
+                bad.append(f"외부 스키마 없음: {e['name']} 이 문진 스키마 {tag} 에 없다(EXTERNAL_SCHEMAS.json)")
+    else:
+        bad.append("EXTERNAL_SCHEMAS.json 이 없다(boundary-contracts)")
     for b in bad:
         print(b)
     print(f"{'OK' if not bad else 'FAIL'}: 기준표 {want}, 어긋남 {len(bad)}건")

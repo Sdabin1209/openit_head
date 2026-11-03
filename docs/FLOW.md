@@ -4,13 +4,14 @@
 
 | 단계 | 행위자 | 정하는 값 | 계약 필드(정본) | 저장 | 읽음 | 수용 시험(E2E 단계) |
 |---|---|---|---|---|---|---|
+| 0 사람 인증(1·2·5·6·7 의 선행) | 사람(저자·승인자·직원·의사·검토자·관리자) | 로그인 세션, 역할(가입 승인) | `HumanAuthEndpoints`·`HumanUserInfo`(platform), CONVENTIONS 6절 `X-Openit-User`·`X-Openit-Roles`, RUNTIME R3.23·R3.24 | platform 계정 관리 | 모든 사람 경로의 서비스(게이트웨이를 거친 헤더) | 로그인·가입 승인 대기 403·역할별 접근 |
 | 1 저작 | 저자 | 문진표 ID·제목·문항(순서 `order`·선행 조건 `prerequisite`·칸·문장) | 문진 스키마 `QuestionBank`(4.0.0) ← question-authoring 텍스트 양식 | question-authoring DB(버전) | release-gate(I1) | 양식 둘 등록·확정 |
 | 2 승인 | 승인자 | 함께 운영할 문진표 목록 + 모델 패키지 | `GateSubmissionRequest.subject.question_sets[]` → `GateDecision`·`ReviewReport`·`GateSubmission.subject.question_sets[]` → `ReleaseManifest.question_sets[]`(QuestionSetRef) | release-gate DB | survey-service(I4), admin-console | 세트 둘 제출·승인·활성, 구조 다른 세트 거절(U81) |
 | 3 배치 | 운영자 | 기기마다 기본 문진표 | `DeviceConfig.question_set_id`(deploy 기기 설정), `KioskStartFragment.question_set_id`(시작 URL 조각, 조각이 먼저) | deploy 설정 | kiosk-frontend | 기기 A 배치, 기기 B 배치 없음 |
 | 4 접수·시작 | 접수/환자 | (배치 없고 둘 이상이면) 선택 | I10 `GET /v1/question-sets` → `SESSION_START.question_set_id`(하나면 생략 가능) | survey-service 세션(세트 ID·제목) | survey-service | A 자동 시작·첫 문항 Q1.D01, B 목록 둘→선택→첫 문항 Q3, 모르는 ID 400 |
 | 5 문진 | 환자·모델 | 다음 문항·끝 | 문진표 `order`·`prerequisite` → `QuestionFlowTable`(I9 extract `flow`, 연산자 6종) → 서버가 `next_item` 채움(ADR 0014) | 세션 상태 | model-runtime | 두 세션 끝까지, 건너뛰기 동작 |
-| 6 결과 | 서비스 | 어느 문진표의 결과인지 | `SessionResult.question_set_id/title/question_bank_version`(PUBLIC_API B절), `result_ready` SSE | survey-service DB | admin-console(clinician) | 결과에 세트 ID·제목이 각각 맞음, clinician 조회·ack |
-| 7 검토·학습 | 검토자·모델 실험 | 실패 사례의 문진표 | `FailureCase.question_set`(ArtifactRef, 세션의 세트), `DatasetManifest.question_sets`, `ModelPackageManifest.question_sets` | ops-feedback, dataset-store, model-registry | model-lab, release-gate(U81 대조) | (영역 시험) |
+| 6 결과 | 서비스 | 어느 문진표의 결과인지 | `SessionResult.question_set_id/title/question_bank_version`(PUBLIC_API B절), `result_ready` SSE(`ResultReadyEvent`, clinician 만), 웹 푸시 `StaffPushPayload` RESULT_READY, 확인 표시 ack, 정지 사유 `pause_reason` | survey-service DB | admin-console(clinician) | 결과에 세트 ID·제목이 각각 맞음, clinician 조회·ack |
+| 7 검토·학습 | 검토자·모델 실험 | 실패 사례의 문진표 | `FailureCase.question_set`(ArtifactRef, 세션의 세트), `DatasetManifest.question_sets`, `ModelPackageManifest.lineage.question_sets` | ops-feedback, dataset-store, model-registry | model-lab, release-gate(U81 대조) | (영역 시험) |
 
 ## 경계 밖(의식적으로 둔 것)
 - 문항·칸 **구조**가 다른 문진표를 모델이 다루는 것: 학습 형식 변경(U77) 필요. 게이트가 구조 다른 세트를 거절한다(U81).

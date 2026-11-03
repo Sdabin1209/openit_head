@@ -2,4 +2,4 @@
 
 | 영역 | 커밋 | 시험 | 스모크 | 헤드 재현(워크스페이스 배치 새 clone) | 상태 |
 |---|---|---|---|---|---|
-| admin-console | ad646e4 (wo-344-code) | npm test 206 pass·0 fail rc=0, tsc rc=0 | SMOKE OK rc=0 (smoke-ad646e4) | 07:11 재현 rc=0 | 끝 |
+| admin-console | 431d9a3 (wo-344-code; ad646e4 뒤는 README 문서만, 헤드가 diff 로 확인) | npm test 206 pass·0 fail rc=0, tsc rc=0 | SMOKE OK rc=0 (smoke-ad646e4) | 07:11 재현 rc=0 | 끝 |

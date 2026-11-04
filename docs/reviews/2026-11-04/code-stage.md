@@ -6,7 +6,7 @@
 | kiosk-frontend | 46ffc75 (wo-344, v3.4.12) | 헤드 새 clone: ci·test·typecheck·test:image·test:dom·test:e2e rc=0 | smoke rc=0 | 16:18 재현 rc=0 | 끝 |
 | synthetic-data | b8b3238 (wo-320c, v3.4.12·v0.4.18) | 헤드 새 clone: setup·pytest rc=0 | smoke_service.sh rc=0 | 16:18 재현 rc=0 | 끝 |
 | 배치(Ansible) | bf1d876 (wo-450-place) | test_placement_areas·names·ops rc=0, test-split-placement·pki-playbook·sslrootcert rc=0, test-split-gateway.sh rc=0(실제 platform 게이트웨이 이미지) | — | 헤드 미재현 | 코드 끝, 아래 할 일 남음 |
-| model-runtime | 13b3569 = v0.11.20 (v3.4.9·v0.4.15) | 헤드 새 clone: setup rc=0, pytest 385 pass 2 skip rc=0 — 같은 clone 에서 skip 난 두 파일만 다시 돌리니 50 pass 0 skip(setup-env 태그 받기 재시도 실패 skip 이 부하 때 남, 원인 미규명) | smoke.sh rc=0 | 11:46 재현 rc=0 | 끝 |
+| model-runtime | b6d99ae = v0.11.21 (v3.4.12·v0.4.18) | 헤드 새 clone: setup rc=0, pytest 385 pass 2 skip rc=0 — skip: xgrammar 없음(GPU 쪽 선택 의존), MODEL_RUNTIME_REFERENCE_DATA_DIR 없음 | smoke.sh rc=0 | 16:30 재현 rc=0 | 끝 |
 | model-lab | 48f30fd (wo-324, v3.4.9·v0.4.15·MR v0.11.20) | 헤드 새 clone: setup rc=0, pytest 393 pass 0 skip rc=0 | smoke_registry.sh rc=0 | 11:46 재현 rc=0 | 끝(기존 패키지 재게시는 최종 검증) |
 | release-gate | 05ec36d (wo-344-code, v3.4.9·v0.4.15·MR v0.11.20) | 헤드 새 clone: setup rc=0, pytest(PG) 1053 pass 48 skip rc=0 — skip 은 전부 저장소 조합(메모리·SQLite·PG 전용) 매개변수, 환경 없음 skip 0 | smoke.sh SMOKE OK rc=0 | 11:47 재현 rc=0 | 끝 |
 | ops-feedback | 3e7cfa0 (wo-c2-code, v3.4.9·v0.4.15; 시험 root 파일 수정) | 헤드 새 clone: setup rc=0, dev-postgres.sh 898 pass 0 skip rc=0, 실행 뒤 새 root 소유 파일 0 | smoke.sh SMOKE OK rc=0 | 12:38 재현 rc=0 | 끝 |

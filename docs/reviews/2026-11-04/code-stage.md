@@ -7,7 +7,7 @@
 | synthetic-data | b8b3238 (wo-320c, v3.4.12·v0.4.18) | 헤드 새 clone: setup·pytest rc=0 | smoke_service.sh rc=0 | 16:18 재현 rc=0 | 끝 |
 | 배치(Ansible) | bf1d876 (wo-450-place) | test_placement_areas·names·ops rc=0, test-split-placement·pki-playbook·sslrootcert rc=0, test-split-gateway.sh rc=0(실제 platform 게이트웨이 이미지) | — | 헤드 미재현 | 코드 끝, 아래 할 일 남음 |
 | model-runtime | b6d99ae = v0.11.21 (v3.4.12·v0.4.18) | 헤드 새 clone: setup rc=0, pytest 385 pass 2 skip rc=0 — skip: xgrammar 없음(GPU 쪽 선택 의존), MODEL_RUNTIME_REFERENCE_DATA_DIR 없음 | smoke.sh rc=0 | 16:30 재현 rc=0 | 끝 |
-| model-lab | 48f30fd (wo-324, v3.4.9·v0.4.15·MR v0.11.20) | 헤드 새 clone: setup rc=0, pytest 393 pass 0 skip rc=0 | smoke_registry.sh rc=0 | 11:46 재현 rc=0 | 끝(기존 패키지 재게시는 최종 검증) |
+| model-lab | 2be42cb (wo-324, v3.4.12·v0.4.18·MR v0.11.21) | 헤드 새 clone: setup·pytest rc=0 | smoke_registry.sh rc=0 | 17:0x 재현 | 끝(기존 패키지 재게시는 최종 검증) |
 | release-gate | 9005a46 (wo-344-code, v3.4.12·v0.4.18·MR v0.11.21; release-gate-db 이미지) | 헤드 새 clone: setup rc=0, PG 포함 1064 pass 50 skip rc=0 — 추가 skip 2 는 재현 공간 옆 리포에 v0.11.21 태그가 없던 탓(태그 받은 뒤 그 파일 21 pass 0 skip) | 앱 smoke rc=0, smoke-db.sh(variant db) rc=0 | 16:45 재현 rc=0 | 끝 |
 | ops-feedback | 387a4dc (wo-c2-code, v3.4.12·v0.4.18; ops-feedback-db 이미지) | 헤드 새 clone: setup rc=0, dev-postgres.sh 전체 시험 rc=0 | smoke.sh rc=0 | 16:52 재현 rc=0 | 끝 |
 | platform | 5a3b9f7 (master, v3.4.9; 651df91 뒤 스모크 준비 확인 결함 수정 5eb788f, egg-info 추적 제거 5a3b9f7 — 헤드 diff 확인: .gitignore 와 산출물 삭제뿐) | 헤드 새 clone(651df91): setup rc=0, pytest 36 pass rc=0, test-gateway-auth rc=0, test-idp-smoke(실제 Keycloak) rc=0 | 5eb788f: scripts/smoke.sh 2회 연속 rc=0(변형 5개 PASS 15) | 13:12 재현 rc=0 | 끝 |

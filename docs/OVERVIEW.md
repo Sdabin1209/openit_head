@@ -96,7 +96,6 @@
 | [`FAULT_POLICY.md`](FAULT_POLICY.md), [`FAULT_MATRIX.md`](FAULT_MATRIX.md) | 장애 대응 기준과 칸별 확인 표 | 장애 대응을 다룰 때 |
 | [`AUDIT_CHECKLIST.md`](AUDIT_CHECKLIST.md), [`AUDIT_SUMMARY.md`](AUDIT_SUMMARY.md), `audit/` | 전수 점검 기준·종합·영역별 원문 | 점검 결과가 필요할 때 |
 | [`STATUS.md`](STATUS.md) | 진행 기록 | 헤드 |
-| [`COMPLETION_PLAN.md`](COMPLETION_PLAN.md) | 완성까지의 작업줄기와 GPU 구멍 | 헤드, 계획 확인 |
 | [`STRUCTURE.md`](STRUCTURE.md) | 에이전트용 구조 요약이자 영역 작업의 기준 | 에이전트 |
 | [`PROJECT_STRUCTURE.md`](PROJECT_STRUCTURE.md) | 사람용 구조 설명(턴 도식, 소유와 의존 방향) | 사람 |
 | [`architecture.md`](architecture.md) | 흐름·시퀀스·상태·배포 도식(790줄) | 상세가 필요할 때 |

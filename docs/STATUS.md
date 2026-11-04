@@ -8,7 +8,7 @@
 
 **(2026-11-01 18:3x 갱신, gpu-dev) 샌드박스 E2E 전환과 D72 결함 수정 완료, 합치기 전.** 새 clone에서 전체 E2E **185 통과 / 0 실패**(deploy wo-445 22d88ed, BLOCKED 2는 브라우저 화면). 그 뒤 데모 기동 확인에서 demo.sh 결함 3건(이미지 목록 dataset-store 누락, 추론 호출 도우미의 제품 안 경로, 지운 도우미 복원)을 고쳐 wo-445 d8940f4; 바뀐 도우미가 닿는 단계 1~5·5L만 국소 재실행 통과(147/0). 데모 `demo.sh up` 실제 기동·게이트웨이 경유 확인. 브랜치: deploy `wo-445`(wo-440~444 통합, 40 커밋), question-authoring `wo-signals-author-read`(2커밋), head `wo-d72-remote-inference`. 모든 리포 main은 2026-10-31 동결 그대로. 사용자 결정: 합치기·push·동결 해제(U-b). 남은 열린 것: U67(노출 계약 기계 토큰 종류, 계약 다음 판), U69(model-lab→model-registry 게시 입구, GPU 경로), H5(iranglab 실증, toolkit 설치 뒤).
 
-**(2026-11-01 15:2x, gpu-dev) 2026-10-31 'GPU 없는 범위 완성' 철회(U66).** iranglab(RTX 4090)에 추론 서버를 두려다 D72(추론 서버 위치 독립)가 운영 구성에서 성립하지 않음을 확인했다(L27 정정). 원인은 E2E가 제품 구성에 시험용 문을 내고 그 문으로 시험한 것(U65). 사용자 지시: 시험을 샌드박스 방식으로 오늘 안에 전부 고친다(D122·D123). 진행: deploy 브랜치 wo-440(D72 경로)·wo-441(샌드박스 틀)·wo-442~444(단계 이관), head 브랜치 wo-d72-remote-inference(이 문서들). 모든 리포 main은 2026-10-31 동결 그대로. 계획: `docs/plans/D72-remote-inference-recovery.md`.
+**(2026-11-01 15:2x, gpu-dev) 2026-10-31 'GPU 없는 범위 완성' 철회(U66).** iranglab(RTX 4090)에 추론 서버를 두려다 D72(추론 서버 위치 독립)가 운영 구성에서 성립하지 않음을 확인했다(L27 정정). 원인은 E2E가 제품 구성에 시험용 문을 내고 그 문으로 시험한 것(U65). 사용자 지시: 시험을 샌드박스 방식으로 오늘 안에 전부 고친다(D122·D123). 진행: deploy 브랜치 wo-440(D72 경로)·wo-441(샌드박스 틀)·wo-442~444(단계 이관), head 브랜치 wo-d72-remote-inference(이 문서들). 모든 리포 main은 2026-10-31 동결 그대로.
 
 **(2026-10-31 15:1x 갱신, gpu-dev)** 최종 고정(D121): boundary-contracts `v3.1.2`(스키마는 v3.1.1 그대로), link `v0.4.3`, model-runtime `v0.11.8`, 문진 스키마 `survey-schema-v3.0.0`. 영역 10곳 모두 이 고정으로 main에 합쳐 push(각각 새 clone 재현 실패 0, 구조 검사 통과).
 - 오늘 끝난 것: 영역 구조 개편(D117, U400), 시험에서 실제 시간 판정 제거·시계 주입(U422, 영역별 TIMING.md), 생산자 계약 검증(R7) 빠짐 14건 수정과 `head/scripts/producer-check.py` 대조 통과, 시간 사슬(D119·D120: gateway·서버 요청 마감, 노출 선언) 정렬, 규칙↔점검 대응표(`RULE_CHECKS.md`).
@@ -44,7 +44,7 @@
 - 결정 D82(제약 디코딩이 `pattern`·`minItems`를 지킴), D83(`allOf`/`if-then`을 `anyOf` 변형으로 펼침), D84(비밀은 `<이름>_FILE` 파일로 받음, compose secrets)를 기록했다.
 - gpu-dev 측정(2026-10-27, **model-runtime v0.6.5 + 계약 v2.0.1 기준**이며 v0.7.0으로는 재측정하지 않았다): U01 Qwen3-1.7B 적재 약 10.1GB, `/readyz` 200. U04 extract 48회 모두 형식 통과, OUTPUT_INVALID 0건. U07 키오스크 발화 14턴은 모두 실패했다(학습 안 된 1.7B가 없는 slot key를 지어내 `UNKNOWN_SLOT`에서 걸림, 의도대로의 동작). 세부는 `OPEN_GAPS.md`.
 - 가짜 모델로 서비스끼리 도는 E2E는 이전 기록이 있다(이 PC 한 환경. 최신 결과: [`deploy/docs/E2E_RESULTS.md`](../../deploy/docs/E2E_RESULTS.md)). v0.7.0 정렬 뒤의 재실행 결과는 이 갱신에서 확인하지 못했다.
-- 남은 구멍: GPU가 필요한 일 H1~H4(`OPEN_GAPS.md` 3-1절, `COMPLETION_PLAN.md`). GPU 없이 닫을 수 있는 일은 줄기 R, E, D, T, A에 있다.
+- 남은 구멍: GPU가 필요한 일 H1~H4(`OPEN_GAPS.md` 3-1절). GPU 없이 닫을 수 있는 일은 줄기 R, E, D, T, A에 있다.
 - (2026-10-27 서술, 2026-10-28 기준으로는 아래 '진행 기록 (2026-10-28 2차·3차 점검)'과 OPEN_GAPS가 우선한다. G01 상태는 갱신 필요 표시가 붙어 있다.)
 - 사용자 결정 대기: G01 직원 알림 입력원, G12 재질문 상한 값과 의미, G02 synthetic-data 역할, D-A 운영 정책(도메인·HTTPS, 직원 로그인, 토큰 발급·회전, 원본 보관 기간). 모아서 한 번에 묻는다.
 - 확인하지 못한 것(변함 없음): 실제 브라우저 화면, 한국어 STT, 웹 푸시 수신, 24GB GPU 실측, 일반 Linux 서버 설치.
@@ -97,7 +97,7 @@
 1. 사용자 결정 모으기: G01, G12, G02, D-A. 질문은 한 번에 하나씩, 질문 전 알림.
 2. D-C: 학습 담당과 `metrics-v2-proposal.md`의 [학습 담당 확인] 항목을 확인한 뒤 `boundary-contracts/METRICS.md`를 고친다. model-lab에 평가 구현 변경 요청(U11 지표, `OUTPUT_INVALID` 지표)을 낸다.
 3. 문서 정리의 남은 부분: `architecture.md` 5절의 LangGraph 노드 이름은 survey-service 설계서로 확인하지 못해 단계 수준으로만 그렸다. survey-service 쪽 확인 뒤 노드 이름을 채운다.
-4. 줄기 R(태그 정렬 점검), C(model-lab `tests/golden/` 확인), E(헤드리스 브라우저, 깨끗한 두 번째 환경), T(학습 실행 래퍼, G06), A(어댑터 올리는 한 명령과 런북). `COMPLETION_PLAN.md` 참고.
+4. 줄기 R(태그 정렬 점검), C(model-lab `tests/golden/` 확인), E(헤드리스 브라우저, 깨끗한 두 번째 환경), T(학습 실행 래퍼, G06), A(어댑터 올리는 한 명령과 런북).
 5. GPU 서버가 열리면 H1~H4. v0.7.0으로 gpu-dev 재측정(U01·U04·U07 갱신)도 여기에 든다.
 6. 사용자가 시키기 전에는 실제 문진 서비스 구축을 시작하지 않는다(메모리 기록: LangGraph 검토 보류).
 

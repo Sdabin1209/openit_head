@@ -22,3 +22,16 @@
 - platform: tests/test_area_gateway.py 가 이웃 작업 트리에 기대던 결함(헤드 재현 07:50 rc=1) 고침 확인.
 - 모든 DB 영역(survey·release-gate·question-authoring·ops-feedback): restore 잡 + 실제 rest-server backup→restore 왕복 시험(08:00 추가 지시, 계약 DATA_OWNERSHIP 백업 행). 백업 저장소 append-only 안 씀(platform).
 - 시험 흔들림 공통 원인(12:00 확인): 이 PC 의 Docker Desktop 호스트 포트 전달이 부하 때 늦거나 빈 응답(admin 스모크 1회, survey 일회용 PG 2건, QA 브라우저). 제품 결함 아님. 시험은 호스트 포트를 거치지 않는 쪽(같은 docker 네트워크)으로 고친다 — QA 지시함.
+
+## 최종 영역 재현(20:51, 헤드, 새 clone, rc 판정)
+
+| 영역 | 커밋 | 설치 | 시험 | 스모크 |
+|---|---|---|---|---|
+| survey-service | 32559a7 | 0 | 0 | 0 |
+| ops-feedback | 6a93440 | 0 | 0 | 0 |
+| release-gate | 09d84d3 | 0 | 0 | — |
+| model-lab | 33a866e | 0 | 0 | 0 |
+| model-runtime | v0.11.23 (030e629) | 0 | 0 | 0 |
+| synthetic-data | f43c6bb | 0 | 0 | 0 |
+
+question-authoring 1827512(DB HEALTHCHECK) 재현은 진행 중이다.

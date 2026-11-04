@@ -291,6 +291,153 @@ def check_compose_keys(services: dict[str, dict]) -> list[str]:
     return bad
 
 
+AREA_REPOS = ["survey-service", "question-authoring", "ops-feedback", "release-gate", "model-lab", "synthetic-data", "model-runtime",
+              "kiosk-frontend", "admin-console", "platform"]
+ENV_READ_RES = [
+    re.compile(r'(?:os\.environ|environ|\benv)\s*\[\s*["\']([A-Z][A-Z0-9_]+)["\']'),
+    re.compile(r'(?:os\.environ|environ|\benv)\.get\(\s*["\']([A-Z][A-Z0-9_]+)["\']'),
+    re.compile(r'os\.getenv\(\s*["\']([A-Z][A-Z0-9_]+)["\']'),
+    re.compile(r'read_secret\(\s*["\']([A-Z][A-Z0-9_]+)["\']'),
+    re.compile(r'process\.env(?:\.([A-Z][A-Z0-9_]+)|\[\s*["\']([A-Z][A-Z0-9_]+)["\']\s*\])'),
+    re.compile(r'os\.(?:Getenv|LookupEnv)\(\s*"([A-Z][A-Z0-9_]+)"'),
+    re.compile(r'\$\{([A-Z][A-Z0-9_]{2,})(?::?[-?=+])'),
+]
+# 실행 환경의 표준 변수(POSIX·언어 런타임·TLS): 계약 밖 경계 값이 아니다
+STD_ENV = {"PATH", "HOME", "USER", "HOSTNAME", "TZ", "LANG", "LC_ALL", "TMPDIR", "PWD", "SHELL", "TERM", "SSL_CERT_FILE", "SSL_CERT_DIR",
+           "PYTHONPATH", "PYTHONUNBUFFERED", "PYTHONDONTWRITEBYTECODE", "NODE_ENV", "HTTPS_PROXY", "HTTP_PROXY", "NO_PROXY", "XDG_CACHE_HOME", "CI",
+           "SOURCE_DATE_EPOCH",                                             # reproducible-builds.org 표준
+           "PGDATA", "POSTGRES_USER", "POSTGRES_DB", "POSTGRES_PASSWORD_FILE", "POSTGRES_INITDB_ARGS"}   # postgres 공식 이미지(DB 이미지의 기반)가 정한 이름
+WSGI_KEYS = re.compile(r"^(REQUEST_METHOD|PATH_INFO|SCRIPT_NAME|QUERY_STRING|CONTENT_TYPE|CONTENT_LENGTH|SERVER_NAME|SERVER_PORT|SERVER_PROTOCOL|REMOTE_ADDR|REQUEST_URI|RAW_URI|HTTP_[A-Z0-9_]*)$")   # PEP 3333 요청 환경(프로세스 환경이 아니다)
+
+
+def env_schema_names(repo: str) -> set[str]:
+    names = set()
+    for p in SCHEMAS.glob("*Env.schema.json"):
+        s = json.loads(p.read_text(encoding="utf-8"))
+        cons = s.get("x-consumers") or []
+        if "*" in cons or repo in cons:
+            names |= schema_names(p.name[: -len(".schema.json")])[0]
+    return names
+
+
+def check_area_env_reads(ws: Path) -> list[str]:
+    """규칙 10(구조 규칙 4: 컴포넌트는 자기 입력 스키마만 안다): 영역 코드(커밋된 판, 시험·개발 스크립트 제외)가 읽는 환경 변수 이름은
+    그 영역이 받는 Env 스키마(x-consumers)·CommonEnv·잡 선언(env, secret_files)·이미지 안 Dockerfile ENV·실행 표준 변수 중 하나여야 한다(NAME_FILE 은 NAME 으로도 맞춘다)."""
+    bad = []
+    for repo in AREA_REPOS:
+        rp = ws / repo
+        if not (rp / ".git").exists():
+            continue
+        allowed = env_schema_names(repo) | STD_ENV
+        files = subprocess.run(["git", "-C", str(rp), "ls-tree", "-r", "--name-only", "HEAD"], capture_output=True, text=True).stdout.splitlines()
+        for f in files:
+            base = f.rsplit("/", 1)[-1]
+            if base.startswith("Dockerfile"):
+                t = subprocess.run(["git", "-C", str(rp), "show", f"HEAD:{f}"], capture_output=True, text=True).stdout
+                for m in re.finditer(r'^\s*(?:ENV|ARG)\s+([A-Z][A-Z0-9_]+)', t, re.M):
+                    allowed.add(m.group(1))
+            if base.endswith(".json") and "jobs" in base:
+                try:
+                    for j in json.loads(subprocess.run(["git", "-C", str(rp), "show", f"HEAD:{f}"], capture_output=True, text=True).stdout).get("jobs", []):
+                        allowed |= set(j.get("env") or []) | set(j.get("secret_files") or [])
+                except (ValueError, AttributeError):
+                    pass
+        for f in files:
+            if not f.endswith((".py", ".ts", ".tsx", ".js", ".mjs", ".go", ".sh")) or re.search(r"(^|/)(tests?|scripts|node_modules|e2e|dev|mock-server)/|\.test\.|_test\.|test_", f):
+                continue
+            t = subprocess.run(["git", "-C", str(rp), "show", f"HEAD:{f}"], capture_output=True, text=True).stdout
+            for i, line in enumerate(t.splitlines(), 1):
+                if line.lstrip().startswith(("#", "//")):
+                    continue
+                for rx in ENV_READ_RES:
+                    for m in rx.finditer(line):
+                        n = next(g for g in m.groups() if g)
+                        if WSGI_KEYS.match(n) or re.match(r"\s*=(?!=)", line[m.end():]) or re.search(r"\]\s*,\s*env\[", line):
+                            continue   # 요청 환경 키, 또는 읽기가 아니라 하위 프로세스 환경에 써 넣기
+                        if n in allowed or (n.endswith("_FILE") and n[:-5] in allowed) or n + "_FILE" in allowed:
+                            continue
+                        bad.append(f"{repo}/{f}:{i}: 환경 변수 '{n}' 를 읽는데 이 영역의 Env 스키마·CommonEnv·잡 선언·이미지 ENV 에 없다")
+    return bad
+
+
+URL_RE = re.compile(r'https?://([a-z][a-z0-9-]*)(?=[:/"\'\s`}]|$)')
+
+
+def check_call_targets(services: dict[str, dict], ws: Path, pub: set[str], declared: dict[str, list]) -> list[str]:
+    """규칙 11(RUNTIME R1.8, CONVENTIONS 13절: 영역 밖 호출은 노출 선언 egress 에 적은 상대에게만, 게이트웨이를 거쳐):
+    (a) compose 가 서비스 X 에게 주는 환경 값의 URL 이 다른 서비스 Y(게시 이미지 이름)를 가리키면 Y 는 X 의 egress 에 있어야 한다.
+    (b) 영역 코드(커밋된 판, 시험·개발 제외)에 적힌 URL 이 다른 서비스를 가리키면 그 영역 서비스 중 하나의 egress 에 있어야 한다."""
+    bad = []
+    for key, s in services.items():
+        n = key.split(":", 1)[1]
+        if n not in declared:
+            continue
+        env = s.get("environment") or {}
+        vals = env.values() if isinstance(env, dict) else [str(e).split("=", 1)[-1] for e in env]
+        for v in vals:
+            for m in URL_RE.finditer(str(v)):
+                y = m.group(1)
+                if y in pub and y != n and y not in declared[n]:
+                    bad.append(f"{key}: 환경 값이 '{y}' 를 부르게 하는데 {n} 의 노출 선언 egress {declared[n]} 에 없다")
+    repo_egress: dict[str, set] = {}
+    for repo in AREA_REPOS:
+        rp = ws / repo
+        if not (rp / ".git").exists():
+            continue
+        files = subprocess.run(["git", "-C", str(rp), "ls-tree", "-r", "--name-only", "HEAD"], capture_output=True, text=True).stdout.splitlines()
+        own, eg = set(), set()
+        for f in files:
+            if "exposure" in f.rsplit("/", 1)[-1] and f.endswith(".json") and "node_modules/" not in f and "/tests/" not in f:
+                try:
+                    d = json.loads(subprocess.run(["git", "-C", str(rp), "show", f"HEAD:{f}"], capture_output=True, text=True).stdout)
+                except ValueError:
+                    continue
+                if isinstance(d, dict) and d.get("service"):
+                    own.add(d["service"]); eg |= set(d.get("egress") or [])
+        for f in files:
+            if not f.endswith((".py", ".ts", ".tsx", ".js", ".mjs", ".go", ".sh")) or re.search(r"(^|/)(tests?|scripts|node_modules|e2e|dev|mock-server)/|\.test\.|_test\.|test_", f):
+                continue
+            t = subprocess.run(["git", "-C", str(rp), "show", f"HEAD:{f}"], capture_output=True, text=True).stdout
+            for i, line in enumerate(t.splitlines(), 1):
+                if line.lstrip().startswith(("#", "//", "*")):
+                    continue
+                for m in URL_RE.finditer(line):
+                    y = m.group(1)
+                    if y in pub and y not in own and y not in eg:
+                        bad.append(f"{repo}/{f}:{i}: 코드가 '{y}' 를 부르는 주소를 갖는데 이 영역의 노출 선언 egress {sorted(eg)} 에 없다")
+    return bad
+
+
+def check_networks(services: dict[str, dict], declared: dict[str, list]) -> list[str]:
+    """규칙 9(CONVENTIONS 13절, RUNTIME R1.8: 영역 사이 길은 노출 선언이 정한 호출 관계뿐): compose 망에 두 영역 이상의 서비스(네트워크 공간 <서비스>-net,
+    공개 입구 gateway, backup-store)가 붙어 있으면, 그 쌍마다 한쪽의 egress 에 다른 쪽이 있어야 한다(공개 입구는 노출 선언을 낸 서비스, backup-store 는 external:backup).
+    같은 영역 안의 망(DB 망, 감시 망 등 구성원이 한 영역)은 대상이 아니다. 받는 쪽은 망에서 게이트웨이(443)만 열려 있으므로 이 쌍 대조가 영역 사이 길의 전부다."""
+    mem: dict[str, set] = {}
+    for key, s in services.items():
+        n = key.split(":", 1)[1]
+        svc = n[:-4] if n.endswith("-net") else n
+        if svc not in declared and svc not in ("gateway", "backup-store"):
+            continue
+        nets = s.get("networks") or {}
+        for k in (nets if isinstance(nets, dict) else nets):
+            mem.setdefault(k, set()).add(svc)
+
+    def linked(a: str, b: str) -> bool:
+        if "gateway" in (a, b):
+            return (b if a == "gateway" else a) in declared   # 공개 입구는 노출 선언을 낸 서비스로 간다
+        if "backup-store" in (a, b):
+            return "external:backup" in declared.get(b if a == "backup-store" else a, [])
+        return b in declared.get(a, []) or a in declared.get(b, [])
+    bad = []
+    for net, ms in sorted(mem.items()):
+        ms = sorted(ms)
+        for i, a in enumerate(ms):
+            for b in ms[i + 1:]:
+                if not linked(a, b):
+                    bad.append(f"망 {net}: {a} 와 {b} 가 같은 망에 있는데 어느 쪽 노출 선언 egress 에도 서로가 없다(계약에 없는 길)")
+    return bad
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--deploy", default=str(WS / "deploy" / "build" / "wt-deploy-450-lg"))
@@ -323,6 +470,12 @@ def main() -> int:
                                  "compose.yaml:job-a": {"image": "${DEPLOY_REGISTRY}/openit/a@sha", "command": ["sh"]},
                                  "compose.yaml:b": {"image": "${DEPLOY_REGISTRY}/openit/b@sha", "weird_key": 1},
                                  "compose.yaml:pg": {"image": "postgres:16", "command": ["x"]}})
+        cb = check_call_targets({"compose.yaml:survey-service": {"environment": {"A_URL": "https://release-gate/v1", "B_URL": "https://ops-feedback:443/x"}}},
+                                Path("/nonexistent"), publishable(), {"survey-service": ["release-gate"]})
+        ok = ok and len(cb) == 1 and "'ops-feedback'" in cb[0]
+        nb = check_networks({"compose.yaml:a-net": {"networks": ["x", "y"]}, "compose.yaml:b-net": {"networks": ["x"]}, "compose.yaml:c-net": {"networks": ["y"]}},
+                            {"a": ["b"], "b": [], "c": []})
+        ok = ok and len(nb) == 1 and "망 y" in nb[0]
         ok = ok and len(kb) == 2 and any("a-cert" in x and "'command'" in x for x in kb) and any("weird_key" in x for x in kb)
         print("self-test", "OK" if ok else f"FAIL {bad} {eb}")
         return 0 if ok else 1
@@ -332,7 +485,7 @@ def main() -> int:
         if p.exists():
             for n, s in ((yaml.safe_load(p.read_text(encoding="utf-8")) or {}).get("services") or {}).items():
                 services[f"{f}:{n}"] = s
-    bad = check(services, Path(a.deploy)) + check_egress_names(WS, publishable()) + check_gateway_exposure(services, (decl := exposure_services(WS))) + check_egress_proxy(services, decl) + check_no_area_internals(Path(a.deploy)) + check_compose_keys(services)
+    bad = check(services, Path(a.deploy)) + check_egress_names(WS, publishable()) + check_gateway_exposure(services, (decl := exposure_services(WS))) + check_egress_proxy(services, decl) + check_no_area_internals(Path(a.deploy)) + check_compose_keys(services) + check_area_env_reads(WS) + check_call_targets(services, WS, publishable(), decl) + check_networks(services, decl)
     for b in bad:
         print(b)
     print(f"서비스 {len(services)}개, 빈칸 {len(bad)}건")

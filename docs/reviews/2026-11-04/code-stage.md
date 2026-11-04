@@ -10,6 +10,7 @@
 | model-lab | 48f30fd (wo-324, v3.4.9·v0.4.15·MR v0.11.20) | 헤드 새 clone: setup rc=0, pytest 393 pass 0 skip rc=0 | smoke_registry.sh rc=0 | 11:46 재현 rc=0 | 끝(기존 패키지 재게시는 최종 검증) |
 | release-gate | 05ec36d (wo-344-code, v3.4.9·v0.4.15·MR v0.11.20) | 헤드 새 clone: setup rc=0, pytest(PG) 1053 pass 48 skip rc=0 — skip 은 전부 저장소 조합(메모리·SQLite·PG 전용) 매개변수, 환경 없음 skip 0 | smoke.sh SMOKE OK rc=0 | 11:47 재현 rc=0 | 끝 |
 | ops-feedback | 608b4c9 (wo-c2-code, v3.4.9·v0.4.15) | 헤드 새 clone: setup rc=0, dev-postgres.sh 898 pass 0 skip rc=0 | smoke.sh SMOKE OK rc=0 | 11:41 재현 rc=0 | 끝 |
+| platform | 95d69c0 (master, 계약 v3.4.9; wo-platform-ops 합침) | 헤드 새 clone: setup rc=0, pytest tests 32 pass 0 skip rc=0, ingress/tests/test-gateway-auth.sh rc=0, identity/tests/test-idp-smoke.sh(실제 Keycloak) rc=0 | (공개 입구 단독 스모크 스크립트 남음) | 12:01 재현 rc=0 | 공개 입구 스모크 스크립트 |
 
 ## 최종 검증 단계에서 할 일(코드 단계에서 할 수 없는 것, 빼지 않는다)
 - model-lab: 기존 모델 패키지를 lineage.question_sets 를 채운 새 버전으로 다시 게시(학습 서버 어댑터 읽기, 쓰기는 ~/dabin 안만, deploy 스택의 model-registry 필요). 절차는 model-lab docs.
@@ -18,3 +19,4 @@
 - platform: 나가는 쪽 전용 게이트웨이(학습 서버) 지원 — 지시함 07:45.
 - platform: tests/test_area_gateway.py 가 이웃 작업 트리에 기대던 결함(헤드 재현 07:50 rc=1) 고침 확인.
 - 모든 DB 영역(survey·release-gate·question-authoring·ops-feedback): restore 잡 + 실제 rest-server backup→restore 왕복 시험(08:00 추가 지시, 계약 DATA_OWNERSHIP 백업 행). 백업 저장소 append-only 안 씀(platform).
+- 시험 흔들림 공통 원인(12:00 확인): 이 PC 의 Docker Desktop 호스트 포트 전달이 부하 때 늦거나 빈 응답(admin 스모크 1회, survey 일회용 PG 2건, QA 브라우저). 제품 결함 아님. 시험은 호스트 포트를 거치지 않는 쪽(같은 docker 네트워크)으로 고친다 — QA 지시함.

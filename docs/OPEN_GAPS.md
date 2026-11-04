@@ -302,4 +302,4 @@ GPU 서버가 열릴 때 할 일이다. GPU 없이 닫을 수 없으므로 열�
 - G-REFSERVER-SCOPE (열림, 시험 범위): 계약 공용 참조 서버 PublicApiReferenceServer 는 결과 조회(B), 직원 세션 조회(C), 위험 신호 입력(D), X-Openit-User 행위자 기록(E), SSE·푸시 구독을 모사하지 않는다(HTTP.md 145행). 이 기능의 계약 준수는 survey-service 자체 시험·admin-console·kiosk-frontend 의 대역 시험과 E2E 로만 확인된다. 사용자 검사가 찾음(2026-11-04).
 
 ## 2026-11-05 추가
-- G-IDP-EGRESS-R18 (열림, 계약 입력 부족): identity-proxy 는 identity 를 영역 게이트웨이의 CONNECT 출구(RUNTIME R1.8)를 거치지 않고 `https://identity` 로 바로 부른다. 노출 선언(platform 367b8fb)의 egress ["identity"] 는 호출이 있다는 사실만 적은 것이다. oauth2-proxy 는 HTTPS_PROXY 로 출구를 쓸 수 있지만 계약 IdentityProxyEnv 에 출구 주소 입력이 없다. 닫으려면 계약에 그 입력을 더하고(헤드), platform 과 deploy 가 맞춘다. 지금 동작(같은 auth 망, TLS 사이드카 경유)은 E2E 의 사람 인증 단계가 확인한다. 출구 경유는 확인하지 않는다.
+- G-IDP-EGRESS-R18 (철회, 2026-11-05 02:45): "계약 입력 부족"은 틀린 판단이었다. 출구 입력은 CommonEnv.OPENIT_EGRESS_PROXY 로 이미 있다. 결함은 세 가지다. platform identity-proxy 가 그 입력을 쓰지 않았고, deploy compose 가 identity-proxy 와 model-serving 에 그 값을 주지 않았다. 헤드는 대조 없이 열린 항목으로 넘겼다. 수정 중이고, 헤드 경계 점검 규칙 6 이 같은 종류를 잡는다.

@@ -180,11 +180,11 @@ def check_egress_names(ws: Path, pub: set[str]) -> list[str]:
     return bad
 
 
-def exposure_services(ws: Path) -> set[str]:
+def exposure_services(ws: Path) -> dict[str, list]:
     """영역이 낸 노출 선언(Exposure)의 service 이름들: 각 영역 리포의 커밋된(HEAD) *exposure*.json.
     왜 HEAD 인가: 이미지는 커밋에서 빌드된다(deploy build-images 는 영역 사본의 HEAD). 작업 트리의 미커밋 파일은 아직 낸 것이 아니다."""
     import subprocess
-    out = set()
+    out: dict[str, list] = {}
     for repo in sorted(p for p in ws.iterdir() if (p / ".git").exists() and p.name not in ("deploy", "boundary-contracts", "head")):
         r = subprocess.run(["git", "-C", str(repo), "ls-tree", "-r", "--name-only", "HEAD"], capture_output=True, text=True)
         for path in r.stdout.splitlines():
@@ -196,7 +196,7 @@ def exposure_services(ws: Path) -> set[str]:
             except ValueError:
                 continue
             if isinstance(d, dict) and isinstance(d.get("service"), str):
-                out.add(d["service"])
+                out[d["service"]] = list(d.get("egress") or [])
     return out
 
 
@@ -208,6 +208,20 @@ def check_gateway_exposure(services: dict[str, dict], declared: set[str]) -> lis
         n = key.split(":", 1)[1]
         if n.endswith("-gw") and n[:-3] not in declared:
             bad.append(f"{n}: 서비스 '{n[:-3]}' 의 노출 선언(Exposure service='{n[:-3]}', 이미지 라벨 io.openit.exposure)을 어느 영역도 내지 않는다")
+    return bad
+
+
+def check_egress_proxy(services: dict[str, dict], declared: dict[str, list]) -> list[str]:
+    """규칙 6(CommonEnv.OPENIT_EGRESS_PROXY, RUNTIME R1.8, 2026-11-05 identity-proxy 가 출구를 거치지 않던 것): 노출 선언에 영역 밖 호출(egress)이 있는 서비스는
+    compose 에서 OPENIT_EGRESS_PROXY 를 받는다(자기 영역 게이트웨이 CONNECT 출구). 받지 않으면 그 호출은 게이트웨이를 거치지 않는다."""
+    bad = []
+    for key, s in services.items():
+        n = key.split(":", 1)[1]
+        if declared.get(n):
+            env = s.get("environment") or {}
+            names = set(env) if isinstance(env, dict) else {str(e).split("=", 1)[0] for e in env}
+            if "OPENIT_EGRESS_PROXY" not in names:
+                bad.append(f"{n}: 노출 선언에 egress {declared[n]} 가 있는데 compose 가 OPENIT_EGRESS_PROXY(자기 게이트웨이 출구)를 주지 않는다")
     return bad
 
 
@@ -229,6 +243,9 @@ def main() -> int:
         ok = ok and len(eb) == 2 and all("ops-feedback-ingest" in x for x in eb)
         gb = check_gateway_exposure({"compose.yaml:survey-service-gw": {}, "compose.yaml:identity-gw": {}}, {"survey-service"})
         ok = ok and len(gb) == 1 and gb[0].startswith("identity-gw:")
+        pb = check_egress_proxy({"compose.yaml:a": {"environment": {"OPENIT_EGRESS_PROXY": "http://127.0.0.1:3128"}}, "compose.yaml:b": {"environment": ["X=1"]}, "compose.yaml:c": {}},
+                                {"a": ["x"], "b": ["y"], "c": []})
+        ok = ok and len(pb) == 1 and pb[0].startswith("b:")
         print("self-test", "OK" if ok else f"FAIL {bad} {eb}")
         return 0 if ok else 1
     services: dict[str, dict] = {}
@@ -237,7 +254,7 @@ def main() -> int:
         if p.exists():
             for n, s in ((yaml.safe_load(p.read_text(encoding="utf-8")) or {}).get("services") or {}).items():
                 services[f"{f}:{n}"] = s
-    bad = check(services, Path(a.deploy)) + check_egress_names(WS, publishable()) + check_gateway_exposure(services, exposure_services(WS))
+    bad = check(services, Path(a.deploy)) + check_egress_names(WS, publishable()) + check_gateway_exposure(services, (decl := exposure_services(WS))) + check_egress_proxy(services, decl)
     for b in bad:
         print(b)
     print(f"서비스 {len(services)}개, 빈칸 {len(bad)}건")

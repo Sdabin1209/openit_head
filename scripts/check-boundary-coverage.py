@@ -167,6 +167,17 @@ def check(services: dict[str, dict], deploy_dir: Path | None = None) -> list[str
     return bad
 
 
+def check_egress_names(ws: Path, pub: set[str]) -> list[str]:
+    """규칙 4(CONVENTIONS 13절 서비스 이름): 영역 노출 선언의 egress 받는 쪽 이름은 게시 이미지 이름(PublishRequest.service)이다."""
+    bad = []
+    for f in sorted(ws.glob("*/deploy-exposure.json")):
+        d = json.loads(f.read_text(encoding="utf-8"))
+        for e in (d.get("egress") or []) if isinstance(d, dict) else []:
+            if not e.startswith("external:") and e not in pub:
+                bad.append(f"{f.parent.name}: egress '{e}' 가 게시 이미지 이름(PublishRequest.service)이 아니다")
+    return bad
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--deploy", default=str(WS / "deploy" / "build" / "wt-deploy-450-lg"))
@@ -178,7 +189,12 @@ def main() -> int:
                      "z": {"image": "${DEPLOY_REGISTRY}/openit/public-ingress@sha", "environment": {"GATEWAY_HOSTS": "a"}}})
         ok = (len([b for b in bad if b.startswith("x:")]) >= 1 and len([b for b in bad if b.startswith("y:")]) == 1
               and any(b.startswith("z:") and "INGRESS_DEVICE_CA_FILE" in b for b in bad))
-        print("self-test", "OK" if ok else f"FAIL {bad}")
+        import tempfile
+        with tempfile.TemporaryDirectory() as td:
+            (Path(td) / "x").mkdir(); (Path(td) / "x" / "deploy-exposure.json").write_text('{"egress": ["ops-feedback-ingest", "release-gate", "external:backup"]}')
+            eb = check_egress_names(Path(td), publishable())
+        ok = ok and len(eb) == 1 and "ops-feedback-ingest" in eb[0]
+        print("self-test", "OK" if ok else f"FAIL {bad} {eb}")
         return 0 if ok else 1
     services: dict[str, dict] = {}
     for f in COMPOSE:
@@ -186,7 +202,7 @@ def main() -> int:
         if p.exists():
             for n, s in ((yaml.safe_load(p.read_text(encoding="utf-8")) or {}).get("services") or {}).items():
                 services[f"{f}:{n}"] = s
-    bad = check(services, Path(a.deploy))
+    bad = check(services, Path(a.deploy)) + check_egress_names(WS, publishable())
     for b in bad:
         print(b)
     print(f"서비스 {len(services)}개, 빈칸 {len(bad)}건")

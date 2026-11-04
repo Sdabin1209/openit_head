@@ -10,7 +10,7 @@
 | model-lab | 2be42cb (wo-324, v3.4.12·v0.4.18·MR v0.11.21) | 헤드 새 clone: setup·pytest rc=0 | smoke_registry.sh rc=0 | 17:0x 재현 | 끝(기존 패키지 재게시는 최종 검증) |
 | release-gate | 9005a46 (wo-344-code, v3.4.12·v0.4.18·MR v0.11.21; release-gate-db 이미지) | 헤드 새 clone: setup rc=0, PG 포함 1064 pass 50 skip rc=0 — 추가 skip 2 는 재현 공간 옆 리포에 v0.11.21 태그가 없던 탓(태그 받은 뒤 그 파일 21 pass 0 skip) | 앱 smoke rc=0, smoke-db.sh(variant db) rc=0 | 16:45 재현 rc=0 | 끝 |
 | ops-feedback | 1ea37eb (wo-c2-code, v3.4.13·v0.4.19; 387a4dc 뒤 고정 두 줄·문서만, 헤드 diff 확인) | 387a4dc 헤드 재현 rc=0, 영역 보고 1ea37eb rc=0 | smoke rc=0 | diff 확인 | 최종 검증에서 전체 재실행 |
-| platform | 5a3b9f7 (master, v3.4.9; 651df91 뒤 스모크 준비 확인 결함 수정 5eb788f, egg-info 추적 제거 5a3b9f7 — 헤드 diff 확인: .gitignore 와 산출물 삭제뿐) | 헤드 새 clone(651df91): setup rc=0, pytest 36 pass rc=0, test-gateway-auth rc=0, test-idp-smoke(실제 Keycloak) rc=0 | 5eb788f: scripts/smoke.sh 2회 연속 rc=0(변형 5개 PASS 15) | 13:12 재현 rc=0 | 끝 |
+| platform | 203d524 (master, v3.4.14·v0.4.20) | 헤드 새 clone: setup rc=0, pytest tests 52 pass rc=0, test-gateway-auth·test-gateway-faults·test-device-mtls·test-idp-smoke(identity·identity-proxy·identity-db 이미지, 실제 Keycloak) rc=0 | scripts/smoke.sh rc=0 | 18:19 재현 rc=0 | 끝 |
 | survey-service | 724a5e8 (wo-344-code, v3.4.12·v0.4.18·MR v0.11.21; survey-db 이미지) | 헤드 새 clone(PG): setup rc=0, 전체 시험 rc=0, skip 5(4 실제 참조 자료 경로 없음, 1 HEAD 에 스키마 태그 없음) | smoke.sh rc=0 | 16:50 재현 rc=0 | 끝 |
 | question-authoring | 15ce668 (wo-321-code, v3.4.13·v0.4.19; 13ad63a 뒤 고정·문서만, 헤드 diff 확인) | 13ad63a 헤드 재현 rc=0, 영역 보고 15ce668 rc=0 | 스모크 2종 rc=0 | diff 확인 | 최종 검증에서 전체 재실행 |
 

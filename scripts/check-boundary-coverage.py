@@ -1,0 +1,166 @@
+#!/usr/bin/env python3
+"""경계 전수 점검(2026-11-04, 사용자 지시 "컴포넌트 목록에서 출발해 빈틈없음을 보장"). 종료 코드 0 = 빈칸 0건.
+
+왜: 계약 문서끼리 대조하면 계약에 없는 경계는 목록에 오를 수 없다. 그래서 실제로 돌아가는 구성(deploy compose)의
+서비스 하나하나에서 출발해, 그 서비스가 받는 입력(이미지·환경 변수·마운트)이 계약에 짝이 있는지 기계로 본다.
+
+규칙(정본: boundary-contracts CONVENTIONS 13절, 3.4.10~):
+1) 이미지: openit/<이름> 은 PublishRequest.service 에 있어야 한다. deploy 배포 도구(pause·util 이미지)만 예외(배포 때 설정, 13절 예외).
+   그 밖의 이미지(공식 postgres·keycloak·oauth2-proxy 를 직접 띄우기 등)는 빈칸이다 — 받는 영역 이미지로 내야 한다.
+2) 환경 변수: 이미지 이름 → 받는 쪽 Env 스키마(아래 표). 이름 또는 이름+_FILE 이 그 스키마나 CommonEnv 에 있어야 한다. SSL_CERT_FILE 은 IN-ROOT.
+3) 마운트 대상 경로: 받는 쪽 Env 스키마의 경로 기본값(또는 그 아래), 또는 이미지가 선언한 VOLUME(docker image inspect), 또는 deploy 도구.
+   이미지가 이 PC 에 없으면 VOLUME 을 확인하지 못한 것으로 세고 실패로 둔다(확인 못한 것을 통과로 세지 않는다).
+
+사용: python3 head/scripts/check-boundary-coverage.py --deploy <deploy 작업 트리>   (--self-test: 규칙을 어긴 입력이 실패하는지)
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+import yaml
+
+WS = Path(__file__).resolve().parents[2]
+SCHEMAS = WS / "boundary-contracts" / "boundary_contracts" / "schemas"
+COMPOSE = ["compose.yaml", "compose.monitoring.yaml", "compose.inference.yaml"]
+DEPLOY_TOOLS = {"pause", "util"}   # 배포 도구 이미지(locks 의 PAUSE_IMAGE·UTIL_IMAGE): 배포 때 설정 예외
+# 이미지 이름 → 받는 쪽 Env 스키마(PublishRequest.service 와 같은 이름). 영역 서비스 Env 는 각 영역 소유 이름.
+ENV_OF = {
+    "survey-service": "SurveyServiceEnv", "question-authoring": "QuestionAuthoringEnv", "ops-feedback": "OpsFeedbackServerEnv",
+    "release-gate": "GateEnv", "model-registry": "ModelRegistryEnv", "dataset-store": "DatasetStoreEnv",
+    "model-serving": "ModelServingEnv", "model-serving-gpu": "ModelServingEnv", "kiosk-frontend": "KioskFrontendEnv",
+    "admin-console": "AdminConsoleEnv", "area-gateway": "AreaGatewayEnv", "public-ingress": "PublicIngressEnv",
+    "monitoring": "MonitoringEnv", "backup-store": "BackupStoreEnv", "step-ca": "StepCaEnv", "identity": "IdentityEnv",
+    "identity-proxy": "IdentityProxyEnv", "identity-db": "AreaDatabaseEnv", "survey-db": "AreaDatabaseEnv",
+    "question-authoring-db": "AreaDatabaseEnv", "ops-feedback-db": "AreaDatabaseEnv", "release-gate-db": "AreaDatabaseEnv",
+}
+
+
+def schema_names(name: str) -> tuple[set[str], set[str]]:
+    """(환경 이름 집합, 경로 기본값 집합)."""
+    s = json.loads((SCHEMAS / f"{name}.schema.json").read_text(encoding="utf-8"))
+    names: set[str] = set()
+    paths: set[str] = set()
+
+    def walk(o):   # 스키마 어디에 있든(properties.env.properties 처럼 안쪽 포함) 대문자 환경 이름과 경로 기본값을 모은다
+        if isinstance(o, dict):
+            for k, v in (o.get("properties") or {}).items():
+                if re.match(r"^[A-Z][A-Z0-9_]*$", k):
+                    names.add(k)
+                    if isinstance(v, dict) and isinstance(v.get("default"), str) and v["default"].startswith("/"):
+                        paths.add(v["default"])
+            for v in o.values():
+                walk(v)
+        elif isinstance(o, list):
+            for v in o:
+                walk(v)
+    walk(s)
+    return names, paths
+
+
+def publishable() -> set[str]:
+    s = (SCHEMAS / "PublishRequest.schema.json").read_text(encoding="utf-8")
+    m = re.search(r'"service"\s*:\s*\{[^}]*"enum"\s*:\s*\[([^\]]*)\]', s, re.S)
+    return set(re.findall(r'"([a-z0-9-]+)"', m.group(1))) if m else set()
+
+
+def image_key(image: str) -> str | None:
+    if not image:
+        return None
+    m = re.search(r"openit/([a-z0-9-]+)@", image)
+    if m:
+        return m.group(1)
+    m = re.match(r"\$\{([A-Z_]+)_IMAGE", image)
+    if m:
+        k = m.group(1).lower()      # PAUSE_IMAGE → pause, UTIL_IMAGE → util, POSTGRES_IMAGE → postgres ...
+        # compose.inference.yaml 은 다른 서버라 이미지 변수 이름에 INFERENCE_ 가 붙는다(같은 게시 이미지)
+        return {"inference": "model-serving", "inference_gateway": "area-gateway", "inference_step": "step-ca",
+                "inference_pause": "pause", "inference_util": "util"}.get(k, k)
+    return image.split(":")[0].split("/")[-1]
+
+
+def image_volumes(key: str) -> set[str] | None:
+    r = subprocess.run(["docker", "image", "ls", "--format", "{{.Repository}}:{{.Tag}}"], capture_output=True, text=True)
+    cand = [x for x in r.stdout.split() if x.split(":")[0].endswith("/" + key) or x.split(":")[0] == key]
+    for img in cand:
+        r = subprocess.run(["docker", "image", "inspect", "--format", "{{json .Config.Volumes}}", img], capture_output=True, text=True)
+        if r.returncode == 0:
+            return set(json.loads(r.stdout.strip() or "null") or {})
+    return None
+
+
+def check(services: dict[str, dict]) -> list[str]:
+    bad: list[str] = []
+    common, _ = schema_names("CommonEnv")
+    pub = publishable()
+    for name, s in sorted(services.items()):
+        key = image_key(str(s.get("image") or ""))
+        if key in DEPLOY_TOOLS:
+            continue
+        if key not in pub:
+            bad.append(f"{name}: 이미지 '{key}' 는 계약 PublishRequest 에 없다(받는 영역 이미지로 내야 한다)")
+            continue
+        env_schema = ENV_OF.get(key)
+        if not env_schema:
+            bad.append(f"{name}: 이미지 '{key}' 의 Env 스키마가 정해지지 않았다")
+            continue
+        names, paths = schema_names(env_schema)
+        env = s.get("environment") or {}
+        env_names = list(env) if isinstance(env, dict) else [e.split("=", 1)[0] for e in env]
+        for e in env_names:
+            base = e[:-5] if e.endswith("_FILE") else e
+            if e in names | common or base in names | common or e == "SSL_CERT_FILE":
+                continue
+            bad.append(f"{name}: 환경 '{e}' 가 {env_schema}·CommonEnv 에 없다")
+        vols = None
+        for v in s.get("volumes") or []:
+            if isinstance(v, dict):
+                tgt = v.get("target")
+            else:   # 짧은 표기 '<원본>:<대상>[:ro]' — 원본의 ${VAR:-기본} 안 콜론은 나누지 않는다
+                parts = re.split(r":(?![^{]*\})", str(v))
+                tgt = parts[1] if len(parts) >= 2 else None
+            if not tgt:
+                continue
+            if any(tgt == p or tgt.startswith(p.rstrip("/") + "/") or p.startswith(tgt.rstrip("/") + "/") for p in paths):
+                continue
+            if tgt == "/etc/openit/pki" or tgt.startswith("/etc/openit/pki/"):
+                continue   # IN-ROOT(SSL_CERT_FILE 이 가리키는 루트 폴더, RUNTIME IN-ROOT)
+            if vols is None:
+                vols = image_volumes(key)
+            if vols is None:
+                bad.append(f"{name}: 마운트 '{tgt}' — 이미지 {key} 가 이 PC 에 없어 VOLUME 을 확인하지 못했다")
+            elif tgt not in vols:
+                bad.append(f"{name}: 마운트 '{tgt}' 가 {env_schema} 경로에도 이미지 VOLUME 에도 없다")
+    return bad
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--deploy", default=str(WS / "deploy" / "build" / "wt-deploy-450-lg"))
+    ap.add_argument("--self-test", action="store_true")
+    a = ap.parse_args()
+    if a.self_test:
+        bad = check({"x": {"image": "${DEPLOY_REGISTRY}/openit/survey-service@sha", "environment": {"NOT_IN_CONTRACT": "1"}},
+                     "y": {"image": "postgres:16"}})
+        ok = len(bad) == 2
+        print("self-test", "OK" if ok else f"FAIL {bad}")
+        return 0 if ok else 1
+    services: dict[str, dict] = {}
+    for f in COMPOSE:
+        p = Path(a.deploy) / f
+        if p.exists():
+            for n, s in ((yaml.safe_load(p.read_text(encoding="utf-8")) or {}).get("services") or {}).items():
+                services[f"{f}:{n}"] = s
+    bad = check(services)
+    for b in bad:
+        print(b)
+    print(f"서비스 {len(services)}개, 빈칸 {len(bad)}건")
+    return 0 if not bad else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

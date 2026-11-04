@@ -62,6 +62,12 @@ def schema_names(name: str) -> tuple[set[str], set[str]]:
     return names, paths
 
 
+def required_names(name: str) -> set[str]:
+    """받는 쪽 Env 스키마의 최상위 required(필수 입력). deploy 가 NAME 또는 NAME_FILE 로 넘겨야 한다(3.4.13 보강: 반대 방향)."""
+    s = json.loads((SCHEMAS / f"{name}.schema.json").read_text(encoding="utf-8"))
+    return {r for r in s.get("required", []) if re.match(r"^[A-Z][A-Z0-9_]*$", r)}
+
+
 def publishable() -> set[str]:
     s = (SCHEMAS / "PublishRequest.schema.json").read_text(encoding="utf-8")
     m = re.search(r'"service"\s*:\s*\{[^}]*"enum"\s*:\s*\[([^\]]*)\]', s, re.S)
@@ -93,7 +99,24 @@ def image_volumes(key: str) -> set[str] | None:
     return None
 
 
-def check(services: dict[str, dict]) -> list[str]:
+def env_file_names(s: dict, base: Path | None) -> list[str]:
+    """compose env_file 의 이름들. 경로의 ${VAR:-기본} 은 기본값으로 푼다. 파일이 없으면 이름 없음(그 서비스의 필수 입력 점검이 잡는다)."""
+    out: list[str] = []
+    files = s.get("env_file") or []
+    files = [files] if isinstance(files, (str, dict)) else files
+    for f in files:
+        f = f.get("path") if isinstance(f, dict) else f
+        f = re.sub(r"\$\{[A-Z_]+:-([^}]*)\}", r"\1", str(f))
+        p = (base / f) if base and not f.startswith("/") else Path(f)
+        if p.exists():
+            for line in p.read_text(encoding="utf-8").splitlines():
+                m = re.match(r"^\s*([A-Z][A-Z0-9_]*)\s*=", line)
+                if m:
+                    out.append(m.group(1))
+    return out
+
+
+def check(services: dict[str, dict], deploy_dir: Path | None = None) -> list[str]:
     bad: list[str] = []
     common, _ = schema_names("CommonEnv")
     pub = publishable()
@@ -110,12 +133,18 @@ def check(services: dict[str, dict]) -> list[str]:
             continue
         names, paths = schema_names(env_schema)
         env = s.get("environment") or {}
-        env_names = list(env) if isinstance(env, dict) else [e.split("=", 1)[0] for e in env]
+        env_names = (list(env) if isinstance(env, dict) else [e.split("=", 1)[0] for e in env]) + env_file_names(s, deploy_dir)
         for e in env_names:
             base = e[:-5] if e.endswith("_FILE") else e
             if e in names | common or base in names | common or e == "SSL_CERT_FILE":
                 continue
             bad.append(f"{name}: 환경 '{e}' 가 {env_schema}·CommonEnv 에 없다")
+        given = {e[:-5] if e.endswith("_FILE") else e for e in env_names} | set(env_names)
+        runs_subcommand = s.get("command") is not None   # 도우미·잡은 부명령을 돈다: 서비스 본체(serve)의 필수 입력은 요구하지 않는다(GateEnv x-note 등)
+        for r in ([] if runs_subcommand else sorted(required_names(env_schema))):
+            base = r[:-5] if r.endswith("_FILE") else r
+            if r not in given and base not in given:
+                bad.append(f"{name}: 필수 입력 '{r}' 를 deploy 가 넘기지 않는다({env_schema})")
         vols = None
         for v in s.get("volumes") or []:
             if isinstance(v, dict):
@@ -145,8 +174,10 @@ def main() -> int:
     a = ap.parse_args()
     if a.self_test:
         bad = check({"x": {"image": "${DEPLOY_REGISTRY}/openit/survey-service@sha", "environment": {"NOT_IN_CONTRACT": "1"}},
-                     "y": {"image": "postgres:16"}})
-        ok = len(bad) == 2
+                     "y": {"image": "postgres:16"},
+                     "z": {"image": "${DEPLOY_REGISTRY}/openit/public-ingress@sha", "environment": {"GATEWAY_HOSTS": "a"}}})
+        ok = (len([b for b in bad if b.startswith("x:")]) >= 1 and len([b for b in bad if b.startswith("y:")]) == 1
+              and any(b.startswith("z:") and "INGRESS_DEVICE_CA_FILE" in b for b in bad))
         print("self-test", "OK" if ok else f"FAIL {bad}")
         return 0 if ok else 1
     services: dict[str, dict] = {}
@@ -155,7 +186,7 @@ def main() -> int:
         if p.exists():
             for n, s in ((yaml.safe_load(p.read_text(encoding="utf-8")) or {}).get("services") or {}).items():
                 services[f"{f}:{n}"] = s
-    bad = check(services)
+    bad = check(services, Path(a.deploy))
     for b in bad:
         print(b)
     print(f"서비스 {len(services)}개, 빈칸 {len(bad)}건")

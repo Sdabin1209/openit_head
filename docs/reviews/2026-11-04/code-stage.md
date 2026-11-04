@@ -11,7 +11,7 @@
 | release-gate | 9005a46 (wo-344-code, v3.4.12·v0.4.18·MR v0.11.21; release-gate-db 이미지) | 헤드 새 clone: setup rc=0, PG 포함 1064 pass 50 skip rc=0 — 추가 skip 2 는 재현 공간 옆 리포에 v0.11.21 태그가 없던 탓(태그 받은 뒤 그 파일 21 pass 0 skip) | 앱 smoke rc=0, smoke-db.sh(variant db) rc=0 | 16:45 재현 rc=0 | 끝 |
 | ops-feedback | 3e7cfa0 (wo-c2-code, v3.4.9·v0.4.15; 시험 root 파일 수정) | 헤드 새 clone: setup rc=0, dev-postgres.sh 898 pass 0 skip rc=0, 실행 뒤 새 root 소유 파일 0 | smoke.sh SMOKE OK rc=0 | 12:38 재현 rc=0 | 끝 |
 | platform | 5a3b9f7 (master, v3.4.9; 651df91 뒤 스모크 준비 확인 결함 수정 5eb788f, egg-info 추적 제거 5a3b9f7 — 헤드 diff 확인: .gitignore 와 산출물 삭제뿐) | 헤드 새 clone(651df91): setup rc=0, pytest 36 pass rc=0, test-gateway-auth rc=0, test-idp-smoke(실제 Keycloak) rc=0 | 5eb788f: scripts/smoke.sh 2회 연속 rc=0(변형 5개 PASS 15) | 13:12 재현 rc=0 | 끝 |
-| survey-service | 0f1f926 (wo-344-code, v3.4.9·v0.4.15·MR v0.11.20; 6ba8cbc 뒤 시험 root 파일 수정) | 헤드 새 clone(PG): 전체 시험 rc=0, skip 5(4 실제 참조 자료 경로 없음, 1 HEAD 에 스키마 태그 없음), 실행 뒤 새 root 소유 파일 0 | smoke.sh rc=0 | 13:41 재현 rc=0 | 끝 |
+| survey-service | 724a5e8 (wo-344-code, v3.4.12·v0.4.18·MR v0.11.21; survey-db 이미지) | 헤드 새 clone(PG): setup rc=0, 전체 시험 rc=0, skip 5(4 실제 참조 자료 경로 없음, 1 HEAD 에 스키마 태그 없음) | smoke.sh rc=0 | 16:50 재현 rc=0 | 끝 |
 | question-authoring | 13ad63a (wo-321-code, v3.4.12·v0.4.18; question-authoring-db 이미지) | 헤드 새 clone: setup rc=0, 자기 dev-postgres.sh PG 포함 1043 pass 0 skip rc=0 | SMOKE_DB=postgres rc=0, sqlite rc=0 | 16:39 재현 rc=0 | 끝 |
 
 ## 최종 검증 단계에서 할 일(코드 단계에서 할 수 없는 것, 빼지 않는다)

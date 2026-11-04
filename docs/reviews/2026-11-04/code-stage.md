@@ -33,5 +33,4 @@
 | model-lab | 33a866e | 0 | 0 | 0 |
 | model-runtime | v0.11.23 (030e629) | 0 | 0 | 0 |
 | synthetic-data | f43c6bb | 0 | 0 | 0 |
-
-question-authoring 1827512(DB HEALTHCHECK) 재현은 진행 중이다.
+| question-authoring | 1827512 | 0 | 0 (1047 passed) | PG 0 · SQLite 0 |

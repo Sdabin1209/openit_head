@@ -259,6 +259,38 @@ def check_no_area_internals(deploy_dir: Path, ref: str = "HEAD") -> list[str]:
     return bad
 
 
+# 규칙 8(닫힌 목록, Compose Specification 의 service 키): 영역 이미지를 쓰는 서비스의 키를 모두 분류한다. 분류표에 없는 키는 빈칸이다(새 키가 몰래 들어오지 못하게).
+#  "rule": 다른 규칙이 내용을 대조한다(1 이미지, 2 환경, 3 마운트·비밀·설정, 6 출구, 9 망).
+#  "env": 순수 환경(자원·보안·수명·로그·순서) — 컴포넌트 내부를 몰라도 쓸 수 있다(deploy 는 환경을 구성한다).
+#  "internal": 컴포넌트 내부(실행 명령·확인 명령·이미지 사용자·다른 컨테이너 볼륨)를 알아야 쓰는 키 — 영역 이미지에 쓰면 빈칸.
+#   대신: 실행 방식은 이미지 기본값 또는 계약 Env 의 값, 확인은 이미지 HEALTHCHECK, 사용자는 이미지 USER, 볼륨은 계약 출력 마운트.
+KEY_CLASS = {
+    "image": "rule", "environment": "rule", "env_file": "rule", "volumes": "rule", "tmpfs": "rule", "secrets": "rule", "configs": "rule",
+    "networks": "rule", "network_mode": "rule", "ports": "rule", "extra_hosts": "rule",
+    "cap_add": "env", "cap_drop": "env", "cpus": "env", "mem_limit": "env", "pids_limit": "env", "shm_size": "env", "read_only": "env",
+    "security_opt": "env", "sysctls": "env", "restart": "env", "stop_grace_period": "env", "logging": "env", "depends_on": "env",
+    "profiles": "env", "container_name": "env", "group_add": "env",   # group_add: deploy 자기 비밀 파일의 읽기 그룹(deploy 소유 권한)
+    "command": "internal", "entrypoint": "internal", "healthcheck": "internal", "user": "internal", "volumes_from": "internal",
+}
+JOB_SERVICE_RE = re.compile(r"^job-")   # JobsDeclaration 잡: 명령은 이미지 라벨 io.openit.jobs 에서 온다(덧씌우기 파일). compose 의 자리표시 command 는 잡 정의가 대신한다
+
+
+def check_compose_keys(services: dict[str, dict]) -> list[str]:
+    bad = []
+    for key, s in services.items():
+        n = key.split(":", 1)[1]
+        img = str((s or {}).get("image", ""))
+        if not re.search(r"openit/(?!pause|util)|_DIGEST|INFERENCE_IMAGE", img):
+            continue
+        for k in (s or {}):
+            c = KEY_CLASS.get(k)
+            if c is None:
+                bad.append(f"{key}: compose 키 '{k}' 가 분류표(KEY_CLASS)에 없다 — 분류하고 규칙을 붙인다")
+            elif c == "internal" and not (k == "command" and JOB_SERVICE_RE.match(n)):
+                bad.append(f"{key}: '{k}' 는 영역 이미지 내부를 아는 키다(이미지 기본값·HEALTHCHECK·USER·계약 Env 로)")
+    return bad
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--deploy", default=str(WS / "deploy" / "build" / "wt-deploy-450-lg"))
@@ -287,6 +319,11 @@ def main() -> int:
             subprocess.run(["git", "-C", td, "add", "-A"]); subprocess.run(["git", "-C", td, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qm", "t"])
             xb = check_no_area_internals(Path(td))
         ok = ok and len(xb) == 1 and xb[0].startswith("scripts/a.sh:1:")
+        kb = check_compose_keys({"compose.yaml:a-cert": {"image": "${DEPLOY_REGISTRY}/openit/step-ca@sha", "command": ["cert", "a"], "cpus": 1},
+                                 "compose.yaml:job-a": {"image": "${DEPLOY_REGISTRY}/openit/a@sha", "command": ["sh"]},
+                                 "compose.yaml:b": {"image": "${DEPLOY_REGISTRY}/openit/b@sha", "weird_key": 1},
+                                 "compose.yaml:pg": {"image": "postgres:16", "command": ["x"]}})
+        ok = ok and len(kb) == 2 and any("a-cert" in x and "'command'" in x for x in kb) and any("weird_key" in x for x in kb)
         print("self-test", "OK" if ok else f"FAIL {bad} {eb}")
         return 0 if ok else 1
     services: dict[str, dict] = {}
@@ -295,7 +332,7 @@ def main() -> int:
         if p.exists():
             for n, s in ((yaml.safe_load(p.read_text(encoding="utf-8")) or {}).get("services") or {}).items():
                 services[f"{f}:{n}"] = s
-    bad = check(services, Path(a.deploy)) + check_egress_names(WS, publishable()) + check_gateway_exposure(services, (decl := exposure_services(WS))) + check_egress_proxy(services, decl) + check_no_area_internals(Path(a.deploy))
+    bad = check(services, Path(a.deploy)) + check_egress_names(WS, publishable()) + check_gateway_exposure(services, (decl := exposure_services(WS))) + check_egress_proxy(services, decl) + check_no_area_internals(Path(a.deploy)) + check_compose_keys(services)
     for b in bad:
         print(b)
     print(f"서비스 {len(services)}개, 빈칸 {len(bad)}건")

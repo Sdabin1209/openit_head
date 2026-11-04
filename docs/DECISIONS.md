@@ -122,6 +122,7 @@
 | D130 | **백업은 데이터 주인 영역이, 저장 공간은 platform**(헤드, 2026-11-04): 영역마다 backup·restore 잡(BackupJobResult, 종료 코드 0·75·1), 백업 직후 forget --prune 으로 보존 상한(원본 보존 이하), restic rest-server 는 append-only 를 쓰지 않고 --private-repos + 영역별 자격. 정본: DATA_OWNERSHIP 백업 행, RUNTIME R10.1, 각 영역 ADR, platform ADR 0011 |
 | D131 | **잡 주기는 선언된 시간 상한에서 deploy 가 만든다**(헤드, 2026-11-04): 영역은 잡의 timeout_seconds 만 선언하고 deploy 일정을 모른다(구조 규칙 4). 주기 = 선언 상한보다 큰 가장 작은 300초 배수(기본 주기보다 짧지 않게), JobStale 도 그 주기에서. 정본: RUNTIME R9.3, deploy ADR 0064(측정 안 함) |
 | D132 | **사람 인증 경로 선언은 platform 영역 안 계약**(헤드, 2026-11-04): Keycloak·oauth2-proxy 경로 선언은 public-ingress 이미지에 내장(/etc/openit/exposures-builtin/), 두 서비스는 공식 이미지 그대로. 왜: 공개 입구와 사람 인증은 같은 platform 컴포넌트이고 그 사이 계약은 platform 소유(구조 규칙 5), 영역 사이 계약(PublishRequest) 변경이 필요 없다 |
+| D133 | **deploy 가 넘기는 입력은 모두 받는 쪽의 계약 Env 스키마에**(헤드, 2026-11-04, 계약 3.4.10, 헤드 누락 수정): platform 이미지·사람 인증·영역 DB 의 입력을 계약에 두고, Keycloak·oauth2-proxy·Caddy·PostgreSQL 초기화 같은 받는 쪽 내부 설정은 그 이미지가 입력에서 만든다. 영역 DB 는 <영역>-db 이미지(라벨 io.openit.database = DatabaseDeclaration)로 영역이 낸다. 정본: CONVENTIONS 13절, 3.4.10 스키마 9개. 왜: deploy 가 이웃 영역의 내부 구조를 알면 그 영역이 바뀔 때마다 deploy 가 깨진다(구조 규칙 1·6) |
 
 ## 구조를 확정하기 전에 닫을 열린 결정(A)
 

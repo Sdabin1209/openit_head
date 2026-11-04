@@ -3,11 +3,11 @@
 | 영역 | 커밋 | 시험 | 스모크 | 헤드 재현(워크스페이스 배치 새 clone) | 상태 |
 |---|---|---|---|---|---|
 | admin-console | e8b6a8b (wo-344-code, v3.4.9) | 헤드 새 clone: npm ci·test·tsc rc=0 | scripts/smoke.sh(정적 서버 시험 포함) 3회 연속 rc=0 | 11:44 재현 rc=0 | 끝. 영역 에이전트 첫 스모크 1회 rc=1(컨테이너 서버는 떴는데 호스트에서 /healthz 접속 안 됨, 부하 load≈14 시각) — 원인 미규명, 재발 시 docker 포트 게시부터 본다 |
-| kiosk-frontend | 6cf878f (wo-344, 계약 v3.4.8) | npm test rc=0, typecheck rc=0, test:image rc=0 (test:dom·test:e2e 는 최종 검증 때 헤드 재현) | SMOKE OK rc=0 | 07:50 재현 rc=0 | 끝(e2e·dom 재현 남음) |
-| synthetic-data | dbff5b3 (wo-320c, 계약 v3.4.8·link v0.4.14) | setup-env rc=0, pytest 294 pass·1 skip rc=0 | smoke_service.sh SMOKE_OK rc=0 | 07:47 재현 rc=0 | 끝 |
+| kiosk-frontend | da40216 (wo-344, v3.4.9) | 헤드 새 clone: npm ci·test·typecheck·test:image·test:dom·test:e2e 모두 rc=0 | smoke rc=0 | 11:49 재현 rc=0 | 끝(dom·e2e 재현 포함) |
+| synthetic-data | 8a5bff7 (wo-320c, v3.4.9·v0.4.15) | 헤드 새 clone: setup rc=0, pytest 294 pass 1 skip rc=0 — skip: SD_REFERENCE_DATA_DIR(실제 참조 자료 경로) 없음 | smoke_service.sh rc=0 | 11:49 재현 rc=0 | 끝. skip 1 은 실제 참조 자료가 있는 곳에서만 도는 시험(최종 검증 때 자료 위치 확인) |
 | 배치(Ansible) | bf1d876 (wo-450-place) | test_placement_areas·names·ops rc=0, test-split-placement·pki-playbook·sslrootcert rc=0, test-split-gateway.sh rc=0(실제 platform 게이트웨이 이미지) | — | 헤드 미재현 | 코드 끝, 아래 할 일 남음 |
-| model-runtime | affec9b = v0.11.19 (계약 v3.4.8·link v0.4.14) | setup rc=0, pytest rc=0 | smoke.sh rc=0 | 07:55 재현 rc=0(385 pass) | 끝(3.4.9 뒤 고정만 올린 판 필요) |
-| model-lab | ca1d86e (wo-324, 계약 v3.4.8·MR v0.11.19; a349143 뒤 고정 파일만, 헤드 diff 확인) | a349143 에서 setup·pytest 393·smoke rc=0 재현 | SMOKE_OK | 07:51 재현(a349143) | 3.4.9 고정 뒤 재현 |
+| model-runtime | 13b3569 = v0.11.20 (v3.4.9·v0.4.15) | 헤드 새 clone: setup rc=0, pytest 385 pass 2 skip rc=0 — 같은 clone 에서 skip 난 두 파일만 다시 돌리니 50 pass 0 skip(setup-env 태그 받기 재시도 실패 skip 이 부하 때 남, 원인 미규명) | smoke.sh rc=0 | 11:46 재현 rc=0 | 끝 |
+| model-lab | 48f30fd (wo-324, v3.4.9·v0.4.15·MR v0.11.20) | 헤드 새 clone: setup rc=0, pytest 393 pass 0 skip rc=0 | smoke_registry.sh rc=0 | 11:46 재현 rc=0 | 끝(기존 패키지 재게시는 최종 검증) |
 | release-gate | 05ec36d (wo-344-code, v3.4.9·v0.4.15·MR v0.11.20) | 헤드 새 clone: setup rc=0, pytest(PG) 1053 pass 48 skip rc=0 — skip 은 전부 저장소 조합(메모리·SQLite·PG 전용) 매개변수, 환경 없음 skip 0 | smoke.sh SMOKE OK rc=0 | 11:47 재현 rc=0 | 끝 |
 | ops-feedback | 608b4c9 (wo-c2-code, v3.4.9·v0.4.15) | 헤드 새 clone: setup rc=0, dev-postgres.sh 898 pass 0 skip rc=0 | smoke.sh SMOKE OK rc=0 | 11:41 재현 rc=0 | 끝 |
 

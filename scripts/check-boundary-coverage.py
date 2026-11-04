@@ -180,6 +180,37 @@ def check_egress_names(ws: Path, pub: set[str]) -> list[str]:
     return bad
 
 
+def exposure_services(ws: Path) -> set[str]:
+    """영역이 낸 노출 선언(Exposure)의 service 이름들: 각 영역 리포의 커밋된(HEAD) *exposure*.json.
+    왜 HEAD 인가: 이미지는 커밋에서 빌드된다(deploy build-images 는 영역 사본의 HEAD). 작업 트리의 미커밋 파일은 아직 낸 것이 아니다."""
+    import subprocess
+    out = set()
+    for repo in sorted(p for p in ws.iterdir() if (p / ".git").exists() and p.name not in ("deploy", "boundary-contracts", "head")):
+        r = subprocess.run(["git", "-C", str(repo), "ls-tree", "-r", "--name-only", "HEAD"], capture_output=True, text=True)
+        for path in r.stdout.splitlines():
+            if "exposure" not in path.rsplit("/", 1)[-1] or not path.endswith(".json") or "node_modules/" in path:
+                continue
+            c = subprocess.run(["git", "-C", str(repo), "show", f"HEAD:{path}"], capture_output=True, text=True)
+            try:
+                d = json.loads(c.stdout)
+            except ValueError:
+                continue
+            if isinstance(d, dict) and isinstance(d.get("service"), str):
+                out.add(d["service"])
+    return out
+
+
+def check_gateway_exposure(services: dict[str, dict], declared: set[str]) -> list[str]:
+    """규칙 5(ImageLabels io.openit.exposure, 2026-11-05 E2E 에서 identity·identity-proxy 가 빠져 드러남): compose 에 영역 게이트웨이 <서비스>-gw 가 있으면
+    그 서비스의 영역이 노출 선언(Exposure, service=<서비스>)을 낸다. 없으면 deploy 의 gen-gateways 가 그 게이트웨이를 만들지 못한다."""
+    bad = []
+    for key in services:
+        n = key.split(":", 1)[1]
+        if n.endswith("-gw") and n[:-3] not in declared:
+            bad.append(f"{n}: 서비스 '{n[:-3]}' 의 노출 선언(Exposure service='{n[:-3]}', 이미지 라벨 io.openit.exposure)을 어느 영역도 내지 않는다")
+    return bad
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--deploy", default=str(WS / "deploy" / "build" / "wt-deploy-450-lg"))
@@ -196,6 +227,8 @@ def main() -> int:
             (Path(td) / "x").mkdir(); (Path(td) / "x" / "deploy-exposure.json").write_text('{"service": "ops-feedback-ingest", "egress": ["ops-feedback-ingest", "release-gate", "external:backup"]}')
             eb = check_egress_names(Path(td), publishable())
         ok = ok and len(eb) == 2 and all("ops-feedback-ingest" in x for x in eb)
+        gb = check_gateway_exposure({"compose.yaml:survey-service-gw": {}, "compose.yaml:identity-gw": {}}, {"survey-service"})
+        ok = ok and len(gb) == 1 and gb[0].startswith("identity-gw:")
         print("self-test", "OK" if ok else f"FAIL {bad} {eb}")
         return 0 if ok else 1
     services: dict[str, dict] = {}
@@ -204,7 +237,7 @@ def main() -> int:
         if p.exists():
             for n, s in ((yaml.safe_load(p.read_text(encoding="utf-8")) or {}).get("services") or {}).items():
                 services[f"{f}:{n}"] = s
-    bad = check(services, Path(a.deploy)) + check_egress_names(WS, publishable())
+    bad = check(services, Path(a.deploy)) + check_egress_names(WS, publishable()) + check_gateway_exposure(services, exposure_services(WS))
     for b in bad:
         print(b)
     print(f"서비스 {len(services)}개, 빈칸 {len(bad)}건")

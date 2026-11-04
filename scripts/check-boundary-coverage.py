@@ -225,6 +225,40 @@ def check_egress_proxy(services: dict[str, dict], declared: dict[str, list]) -> 
     return bad
 
 
+EXEC_RE = re.compile(r'(?:\bdocker|"\$DOCKER"|\$DOCKER|\bdc\b[^|;\n]*|\bcompose\b[^|;\n]*)\s+exec\s+(?:-[a-zA-Z]+\s+)*["$\w]' + r"|[\"']exec[\"']\s*[,)\]]")   # 문서 문장의 'exec/run' 은 명령이 아니다. 파이썬 목록 형식("exec", ...)도 잡는다
+TOOL_RE = re.compile(r'RESTIC_IMAGE|backup_restic\b|\$\{?UTIL(?:_REF)?\b|PAUSE')   # deploy 배포·백업 도구 이미지(제3자 도구, deploy 자기 데이터): 영역 이미지가 아니다
+ENTRY_RE = re.compile(r'--entrypoint\b')
+AREA_IMG_RE = re.compile(r'openit/(?!pause|util)[a-z][a-z0-9-]*@|\$\{?(?!UTIL|PAUSE)[A-Z_]*_DIGEST\b|\bIMG\b|\$\(cn ')
+
+
+def check_no_area_internals(deploy_dir: Path, ref: str = "HEAD") -> list[str]:
+    """규칙 7(CONVENTIONS 13절, 3.4.16: deploy 는 환경을 한 번 구성하고 실행 중에 영역 안으로 들어가지 않는다. 영역 사이 통신은 게이트웨이):
+    deploy 의 운영·시험 스크립트(커밋된 판)가 (a) 컨테이너 안에서 명령을 실행(docker exec, compose exec)하거나
+    (b) 영역 이미지를 진입점 바꾸기·부명령으로 띄우면(--entrypoint, openit 영역 이미지 docker run) 빈칸이다.
+    허용: 서비스 기동, JobsDeclaration 잡 실행(compose run job-*), deploy 도구 이미지(util·pause)·백업 도구 이미지 실행, deploy 자기 시험(scripts/test*)."""
+    bad = []
+    r = subprocess.run(["git", "-C", str(deploy_dir), "ls-tree", "-r", "--name-only", ref], capture_output=True, text=True)
+    for path in r.stdout.splitlines():
+        if not (path.startswith("scripts/") or path.startswith("ansible/")) or not path.endswith((".sh", ".py", ".yml")):
+            continue
+        name = path.rsplit("/", 1)[-1]
+        if name.startswith("test"):
+            continue
+        text = subprocess.run(["git", "-C", str(deploy_dir), "show", f"{ref}:{path}"], capture_output=True, text=True).stdout
+        for i, line in enumerate(text.splitlines(), 1):
+            s = line.strip()
+            if s.startswith("#") or s.startswith('"""') or not s:
+                continue
+            code = s.split("  #", 1)[0]
+            if EXEC_RE.search(code):
+                bad.append(f"{path}:{i}: 컨테이너 안 실행(exec) — deploy 는 실행 중에 영역 안으로 들어가지 않는다: {code[:110]}")
+            elif TOOL_RE.search(code):
+                continue
+            elif ENTRY_RE.search(code) or (re.search(r'(?:docker|\$DOCKER"?)\s+run\b', code) and AREA_IMG_RE.search(code)):
+                bad.append(f"{path}:{i}: 영역 이미지의 내부 명령 호출(run/--entrypoint) — 잡 선언·환경 구성만 쓴다: {code[:110]}")
+    return bad
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--deploy", default=str(WS / "deploy" / "build" / "wt-deploy-450-lg"))
@@ -246,6 +280,13 @@ def main() -> int:
         pb = check_egress_proxy({"compose.yaml:a": {"environment": {"OPENIT_EGRESS_PROXY": "http://127.0.0.1:3128"}}, "compose.yaml:b": {"environment": ["X=1"]}, "compose.yaml:c": {}},
                                 {"a": ["x"], "b": ["y"], "c": []})
         ok = ok and len(pb) == 1 and pb[0].startswith("b:")
+        with tempfile.TemporaryDirectory() as td:
+            subprocess.run(["git", "init", "-q", td]); (Path(td) / "scripts").mkdir()
+            (Path(td) / "scripts" / "a.sh").write_text('"$DOCKER" exec "$C" pg_dump -U x\n# docker exec in comment\n"$DOCKER" run --rm "$UTIL" true\n')
+            (Path(td) / "scripts" / "test-x.sh").write_text('docker exec c id\n')
+            subprocess.run(["git", "-C", td, "add", "-A"]); subprocess.run(["git", "-C", td, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qm", "t"])
+            xb = check_no_area_internals(Path(td))
+        ok = ok and len(xb) == 1 and xb[0].startswith("scripts/a.sh:1:")
         print("self-test", "OK" if ok else f"FAIL {bad} {eb}")
         return 0 if ok else 1
     services: dict[str, dict] = {}
@@ -254,7 +295,7 @@ def main() -> int:
         if p.exists():
             for n, s in ((yaml.safe_load(p.read_text(encoding="utf-8")) or {}).get("services") or {}).items():
                 services[f"{f}:{n}"] = s
-    bad = check(services, Path(a.deploy)) + check_egress_names(WS, publishable()) + check_gateway_exposure(services, (decl := exposure_services(WS))) + check_egress_proxy(services, decl)
+    bad = check(services, Path(a.deploy)) + check_egress_names(WS, publishable()) + check_gateway_exposure(services, (decl := exposure_services(WS))) + check_egress_proxy(services, decl) + check_no_area_internals(Path(a.deploy))
     for b in bad:
         print(b)
     print(f"서비스 {len(services)}개, 빈칸 {len(bad)}건")

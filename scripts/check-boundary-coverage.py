@@ -172,6 +172,8 @@ def check_egress_names(ws: Path, pub: set[str]) -> list[str]:
     bad = []
     for f in sorted(ws.glob("*/deploy-exposure.json")):
         d = json.loads(f.read_text(encoding="utf-8"))
+        if isinstance(d, dict) and d.get("service") and d["service"] not in pub:
+            bad.append(f"{f.parent.name}: Exposure service '{d['service']}' 가 게시 이미지 이름(PublishRequest.service)이 아니다")
         for e in (d.get("egress") or []) if isinstance(d, dict) else []:
             if not e.startswith("external:") and e not in pub:
                 bad.append(f"{f.parent.name}: egress '{e}' 가 게시 이미지 이름(PublishRequest.service)이 아니다")
@@ -191,9 +193,9 @@ def main() -> int:
               and any(b.startswith("z:") and "INGRESS_DEVICE_CA_FILE" in b for b in bad))
         import tempfile
         with tempfile.TemporaryDirectory() as td:
-            (Path(td) / "x").mkdir(); (Path(td) / "x" / "deploy-exposure.json").write_text('{"egress": ["ops-feedback-ingest", "release-gate", "external:backup"]}')
+            (Path(td) / "x").mkdir(); (Path(td) / "x" / "deploy-exposure.json").write_text('{"service": "ops-feedback-ingest", "egress": ["ops-feedback-ingest", "release-gate", "external:backup"]}')
             eb = check_egress_names(Path(td), publishable())
-        ok = ok and len(eb) == 1 and "ops-feedback-ingest" in eb[0]
+        ok = ok and len(eb) == 2 and all("ops-feedback-ingest" in x for x in eb)
         print("self-test", "OK" if ok else f"FAIL {bad} {eb}")
         return 0 if ok else 1
     services: dict[str, dict] = {}

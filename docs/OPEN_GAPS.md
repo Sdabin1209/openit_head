@@ -299,3 +299,4 @@ GPU 서버가 열릴 때 할 일이다. GPU 없이 닫을 수 없으므로 열�
 
 ## 2026-11-04 추가
 - G-DB-LEAST-PRIV (열림, 새 기능): 백업·정리 잡의 최소 권한 DB 계정 분리(예: question-authoring 의 QA_BACKUP_DATABASE_URL_FILE dml 계정). 지금은 영역마다 owner 계정 하나로 서비스·잡이 접속한다. 계약 DatabaseDeclaration 은 dml 계정을 이미 표현할 수 있다. question-authoring 담당 제안, 헤드가 3.4.10 범위 밖으로 둠.
+- G-REFSERVER-SCOPE (열림, 시험 범위): 계약 공용 참조 서버 PublicApiReferenceServer 는 결과 조회(B), 직원 세션 조회(C), 위험 신호 입력(D), X-Openit-User 행위자 기록(E), SSE·푸시 구독을 모사하지 않는다(HTTP.md 145행). 이 기능의 계약 준수는 survey-service 자체 시험·admin-console·kiosk-frontend 의 대역 시험과 E2E 로만 확인된다. 사용자 검사가 찾음(2026-11-04).

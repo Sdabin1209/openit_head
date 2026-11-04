@@ -438,6 +438,79 @@ def check_networks(services: dict[str, dict], declared: dict[str, list]) -> list
     return bad
 
 
+def _vol_sources(s: dict, rw_only: bool = False) -> set[str]:
+    out = set()
+    for v in (s or {}).get("volumes") or []:
+        if isinstance(v, dict):
+            src, ro = v.get("source"), bool(v.get("read_only"))
+        else:
+            parts = str(v).split(":"); src = parts[0]; ro = len(parts) > 2 and "ro" in parts[2].split(",")
+        if src and not str(src).startswith(("/", ".", "$")) and not (rw_only and ro):
+            out.add(str(src))
+    return out
+
+
+def check_tool_touches_area_volume(services: dict[str, dict]) -> list[str]:
+    """규칙 7b(2026-11-05, deploy 도구 컨테이너가 영역 인증서 볼륨을 0777 로 연 우회에서): deploy 도구 이미지(util·pause 등 영역 이미지가 아닌 것)로 띄운
+    compose 서비스가 영역 이미지 서비스도 쓰는 이름 있는 볼륨을 마운트하면 빈칸이다. 영역 볼륨의 내용·소유·모드는 그 영역 이미지가 정한다(이름 있는 볼륨 첫 마운트 복사)."""
+    area_re = re.compile(r"openit/(?!pause|util)|_DIGEST|INFERENCE_IMAGE")
+    area_vols: dict[str, set] = {}
+    for key, s in services.items():
+        if area_re.search(str((s or {}).get("image", ""))):
+            for v in _vol_sources(s, rw_only=True):   # 영역이 쓰는 볼륨(영역 소유). 영역이 읽기 전용으로만 받는 볼륨은 deploy 가 채우는 입력이다
+                area_vols.setdefault(v, set()).add(key.split(":", 1)[1])
+    bad = []
+    for key, s in services.items():
+        img = str((s or {}).get("image", ""))
+        if area_re.search(img) or not img:
+            continue
+        for v in sorted(_vol_sources(s, rw_only=True) & set(area_vols)):   # 도구가 영역 볼륨을 읽기 전용으로 읽는 것(계약 출력 OUT-FILE)은 허용
+            bad.append(f"{key}: deploy 도구 이미지({img[:40]}) 서비스가 영역 볼륨 '{v}'(쓰는 영역 서비스: {', '.join(sorted(area_vols[v]))[:80]})를 건드린다")
+    return bad
+
+
+def check_backup_obligation(ws: Path) -> list[str]:
+    """규칙 12(RUNTIME R10.1·DATA_OWNERSHIP 백업 행: 데이터 주인 영역이 백업·복구 잡을 낸다 — '있어야 할 것'의 점검):
+    (a) 영역 DB 이미지(PublishRequest 의 *-db)마다 그 리포의 커밋된 잡 선언에 needs 'postgres' 인 백업 잡과 복구 잡이 있다.
+    (b) JobsDeclaration.needs 의 파일 저장소 이름마다 어느 영역이든 그 이름을 needs 로 갖는 백업 잡과 복구 잡이 있다."""
+    jobs_by_repo: dict[str, list] = {}
+    for repo in AREA_REPOS:
+        rp = ws / repo
+        if not (rp / ".git").exists():
+            continue
+        js = []
+        for f in subprocess.run(["git", "-C", str(rp), "ls-tree", "-r", "--name-only", "HEAD"], capture_output=True, text=True).stdout.splitlines():
+            b = f.rsplit("/", 1)[-1]
+            if b.endswith(".json") and "jobs" in b and "/tests/" not in f and "node_modules/" not in f:
+                try:
+                    js += json.loads(subprocess.run(["git", "-C", str(rp), "show", f"HEAD:{f}"], capture_output=True, text=True).stdout).get("jobs", [])
+                except (ValueError, AttributeError):
+                    pass
+        jobs_by_repo[repo] = js
+
+    def has(js, need):
+        kinds = {("backup" if "backup" in j.get("name", "") else "restore" if "restore" in j.get("name", "") else "") for j in js if need in (j.get("needs") or [])}
+        return {"backup", "restore"} <= kinds
+    bad = []
+    db_owner = {"survey-db": "survey-service", "question-authoring-db": "question-authoring", "ops-feedback-db": "ops-feedback",
+                "release-gate-db": "release-gate", "identity-db": "platform"}
+    for db in sorted(n for n in publishable() if n.endswith("-db")):
+        repo = db_owner.get(db)
+        if repo is None:
+            bad.append(f"{db}: DB 이미지의 주인 영역을 이 점검이 모른다(db_owner 에 더한다)")
+        elif repo == "platform":
+            pass   # platform 은 DB 가 하나뿐이라 아래 needs 'postgres' 점검으로 함께 본다
+        if repo and not has(jobs_by_repo.get(repo, []), "postgres"):
+            bad.append(f"{db}: 주인 영역 {repo} 의 잡 선언에 needs 'postgres' 인 백업·복구 잡 쌍이 없다(R10.1)")
+    s = json.loads((SCHEMAS / "JobsDeclaration.schema.json").read_text(encoding="utf-8"))
+    for need in s["$defs"]["job"]["properties"]["needs"]["items"]["enum"]:
+        if need in ("postgres",) or need.endswith("-network"):
+            continue
+        if not any(has(js, need) for js in jobs_by_repo.values()):
+            bad.append(f"파일 저장소 '{need}': 어느 영역도 이 이름을 needs 로 갖는 백업·복구 잡 쌍을 내지 않는다(R10.1)")
+    return bad
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--deploy", default=str(WS / "deploy" / "build" / "wt-deploy-450-lg"))
@@ -476,6 +549,10 @@ def main() -> int:
         nb = check_networks({"compose.yaml:a-net": {"networks": ["x", "y"]}, "compose.yaml:b-net": {"networks": ["x"]}, "compose.yaml:c-net": {"networks": ["y"]}},
                             {"a": ["b"], "b": [], "c": []})
         ok = ok and len(nb) == 1 and "망 y" in nb[0]
+        tb = check_tool_touches_area_volume({"compose.yaml:app": {"image": "${DEPLOY_REGISTRY}/openit/step-ca@sha", "volumes": ["certs-a:/certs"]},
+                                             "compose.yaml:perms": {"image": "${UTIL_IMAGE}", "volumes": ["certs-a:/c", "registry-data:/r"]},
+                                             "compose.yaml:reader": {"image": "${UTIL_IMAGE}", "volumes": ["certs-a:/c:ro"]}})
+        ok = ok and len(tb) == 1 and "certs-a" in tb[0]
         ok = ok and len(kb) == 2 and any("a-cert" in x and "'command'" in x for x in kb) and any("weird_key" in x for x in kb)
         print("self-test", "OK" if ok else f"FAIL {bad} {eb}")
         return 0 if ok else 1
@@ -485,7 +562,7 @@ def main() -> int:
         if p.exists():
             for n, s in ((yaml.safe_load(p.read_text(encoding="utf-8")) or {}).get("services") or {}).items():
                 services[f"{f}:{n}"] = s
-    bad = check(services, Path(a.deploy)) + check_egress_names(WS, publishable()) + check_gateway_exposure(services, (decl := exposure_services(WS))) + check_egress_proxy(services, decl) + check_no_area_internals(Path(a.deploy)) + check_compose_keys(services) + check_area_env_reads(WS) + check_call_targets(services, WS, publishable(), decl) + check_networks(services, decl)
+    bad = check(services, Path(a.deploy)) + check_egress_names(WS, publishable()) + check_gateway_exposure(services, (decl := exposure_services(WS))) + check_egress_proxy(services, decl) + check_no_area_internals(Path(a.deploy)) + check_compose_keys(services) + check_area_env_reads(WS) + check_call_targets(services, WS, publishable(), decl) + check_networks(services, decl) + check_tool_touches_area_volume(services) + check_backup_obligation(WS)
     for b in bad:
         print(b)
     print(f"서비스 {len(services)}개, 빈칸 {len(bad)}건")

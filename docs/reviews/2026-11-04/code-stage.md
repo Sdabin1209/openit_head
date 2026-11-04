@@ -10,7 +10,7 @@
 | model-lab | 48f30fd (wo-324, v3.4.9·v0.4.15·MR v0.11.20) | 헤드 새 clone: setup rc=0, pytest 393 pass 0 skip rc=0 | smoke_registry.sh rc=0 | 11:46 재현 rc=0 | 끝(기존 패키지 재게시는 최종 검증) |
 | release-gate | 05ec36d (wo-344-code, v3.4.9·v0.4.15·MR v0.11.20) | 헤드 새 clone: setup rc=0, pytest(PG) 1053 pass 48 skip rc=0 — skip 은 전부 저장소 조합(메모리·SQLite·PG 전용) 매개변수, 환경 없음 skip 0 | smoke.sh SMOKE OK rc=0 | 11:47 재현 rc=0 | 끝 |
 | ops-feedback | 3e7cfa0 (wo-c2-code, v3.4.9·v0.4.15; 시험 root 파일 수정) | 헤드 새 clone: setup rc=0, dev-postgres.sh 898 pass 0 skip rc=0, 실행 뒤 새 root 소유 파일 0 | smoke.sh SMOKE OK rc=0 | 12:38 재현 rc=0 | 끝 |
-| platform | 651df91 (master, v3.4.9) | 헤드 새 clone: setup rc=0, pytest 36 pass rc=0, test-gateway-auth rc=0, test-idp-smoke(실제 Keycloak) rc=0 | scripts/smoke.sh rc=1 두 번(public-ingress /healthz 000) | 13:01 | 스모크 결함 platform 수정 중 |
+| platform | 5eb788f (master, v3.4.9; 651df91 뒤 스모크 준비 확인 결함만 수정) | 헤드 새 clone(651df91): setup rc=0, pytest 36 pass rc=0, test-gateway-auth rc=0, test-idp-smoke(실제 Keycloak) rc=0 | 5eb788f: scripts/smoke.sh 2회 연속 rc=0(변형 5개 PASS 15) | 13:12 재현 rc=0 | 끝 |
 | survey-service | 6ba8cbc (wo-344-code, v3.4.9·v0.4.15·MR v0.11.20) | 헤드 새 clone(PG): 전체 시험 rc=0, skip 5 — 4 실제 참조 자료 경로 없음, 1 HEAD 에 스키마 태그 없음(태그 커밋 전용 시험) | smoke.sh SMOKE OK rc=0 | 12:18 재현 rc=0 (앞 두 번 rc=1 은 Docker Desktop 포트 전달, 헤드 미러 설정 누락) | 0f1f926(시험 root 파일 정리) 재현 남음 |
 | question-authoring | 1862a4b (wo-321-code, v3.4.9·v0.4.15) | 헤드 새 clone: setup rc=0, 자기 dev-postgres.sh 로 PG 포함 1034 pass 0 skip rc=0 | SMOKE_DB=postgres rc=0, sqlite rc=0 | 13:02 재현 rc=0 | 끝 |
 

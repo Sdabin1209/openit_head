@@ -9,7 +9,7 @@
 | model-runtime | affec9b = v0.11.19 (계약 v3.4.8·link v0.4.14) | setup rc=0, pytest rc=0 | smoke.sh rc=0 | 07:55 재현 rc=0(385 pass) | 끝(3.4.9 뒤 고정만 올린 판 필요) |
 | model-lab | ca1d86e (wo-324, 계약 v3.4.8·MR v0.11.19; a349143 뒤 고정 파일만, 헤드 diff 확인) | a349143 에서 setup·pytest 393·smoke rc=0 재현 | SMOKE_OK | 07:51 재현(a349143) | 3.4.9 고정 뒤 재현 |
 | release-gate | cb5d1d4 (wo-344-code, v3.4.8·v0.4.14·MR v0.11.19) | pytest(PG) 1043 pass rc=0(영역 보고) | 깨끗한 clone smoke rc=0(영역 보고) | 헤드 미재현 | 실제 restic 왕복·R10.5 변이 남음 |
-| ops-feedback | a054593 (wo-c2-code, v3.4.8·v0.4.14) | pytest(PG) 894 pass 1 skip rc=0, 변이 41건, 실제 restic 왕복(영역 보고) | smoke rc=0(영역 보고) | 헤드 미재현 | skip 1 이유·restore 잡 남음 |
+| ops-feedback | 608b4c9 (wo-c2-code, v3.4.9·v0.4.15) | 헤드 새 clone: setup rc=0, dev-postgres.sh 898 pass 0 skip rc=0 | smoke.sh SMOKE OK rc=0 | 11:41 재현 rc=0 | 끝 |
 
 ## 최종 검증 단계에서 할 일(코드 단계에서 할 수 없는 것, 빼지 않는다)
 - model-lab: 기존 모델 패키지를 lineage.question_sets 를 채운 새 버전으로 다시 게시(학습 서버 어댑터 읽기, 쓰기는 ~/dabin 안만, deploy 스택의 model-registry 필요). 절차는 model-lab docs.

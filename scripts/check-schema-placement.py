@@ -27,9 +27,15 @@ GEN = re.compile(r"\.(py|ts|cjs|d\.ts)$")
 
 
 def shape(s):
+    """사본 판정 열쇠: 칸 이름·각 칸의 정의·required·additionalProperties 가 모두 같으면 사본이다(설명문은 뺀다).
+    칸 이름만 같고 조건을 더하거나 바꾼 내부 스키마(계약을 받아들이는 조건 등)는 사본이 아니다."""
     if not isinstance(s, dict) or not isinstance(s.get("properties"), dict) or len(s["properties"]) < 2:
         return None   # 칸이 2개 미만인 스키마는 모양만으로 사본이라 할 수 없다
-    return (frozenset(s["properties"]), frozenset(s.get("required") or []))
+    def strip(n):
+        if isinstance(n, dict):
+            return {k: strip(v) for k, v in n.items() if k not in ("description", "title", "$id", "$comment", "examples")}
+        return [strip(x) for x in n] if isinstance(n, list) else n
+    return json.dumps({k: strip(s.get(k)) for k in ("properties", "required", "additionalProperties")}, sort_keys=True)
 
 
 def contract():
@@ -66,13 +72,13 @@ def scan(root: pathlib.Path, names, shapes, label):
 
 
 def self_test():
-    names, shapes = {"Foo"}, {(frozenset({"a", "b"}), frozenset({"a"})): "Foo"}
+    names, shapes = {"Foo"}, {shape({"properties": {"a": {}, "b": {}}, "required": ["a"]}): "Foo"}
     with tempfile.TemporaryDirectory() as t:
         d = pathlib.Path(t)
         subprocess.run(["git", "init", "-q", str(d)], check=True)
         (d / "schemas").mkdir(); (d / "src/types").mkdir(parents=True); (d / "src/types/contract").mkdir()
         (d / "schemas/Foo.json").write_text('{"properties":{"x":{},"y":{}}}')
-        (d / "schemas/Bar.json").write_text('{"properties":{"a":{},"b":{}},"required":["a"]}')
+        (d / "schemas/Bar.json").write_text('{"properties":{"a":{},"b":{}},"required":["a"],"description":"이름만 바꾼 사본"}')
         (d / "schemas/Own.json").write_text('{"properties":{"p":{},"q":{}}}')
         (d / "src/types/Foo.ts").write_text("")
         (d / "src/types/contract/Foo.ts").write_text("")

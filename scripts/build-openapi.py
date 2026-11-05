@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""영역 서버의 실제 경로표에서 OpenAPI 3.1 문서를 만들고, 계약 문서(md)의 엔드포인트 목록과 대조한다.
+"""서비스별 OpenAPI 계약을 정본으로 읽고 실제 서버 경로와 대조한다. 계약을 코드에서 재생성하지 않는다.
 
 왜: 엔드포인트·메서드·스키마의 정본이 md 문장이었다(사용자 지적 "md 는 정본이 되면 안 된다", OPEN_GAPS G-HTTP-MD-CANONICAL).
     OpenAPI 3.1 은 JSON Schema 2020-12 와 호환이라 계약 스키마를 $ref 로 그대로 가리킨다.
-입력: 7개 서버 영역의 경로 선언(openit_link Route, survey-service _SPEC, question-authoring R()), boundary-contracts 의 md 와 스키마.
-출력: --out 파일(OpenAPI 3.1). 표준 출력에 대조 결과: md 에만 있는 경로, 코드에만 있는 경로, 스키마 이름이 계약에 없는 경로.
+입력: 서비스별 OpenAPI 계약과 7개 서버 영역의 경로 선언.
+출력: 표준 출력과 선택적인 --out 파일에 계약 참조·경로 대조 감사 결과(JSON).
 종료 코드: 대조 어긋남 0 이면 0, 있으면 1.
 """
 import ast
@@ -16,32 +16,8 @@ import sys
 
 WS = pathlib.Path(__file__).resolve().parents[2]
 BC = WS / "boundary-contracts"
-SCHEMAS = {p.name[: -len(".schema.json")] for p in (BC / "boundary_contracts/schemas").glob("*.schema.json")}
 AREAS = ["survey-service", "question-authoring", "ops-feedback", "release-gate", "model-lab", "synthetic-data", "model-runtime"]
 SKIP_PATH = re.compile(r"^/(ui/|metrics$|healthz$|readyz$)|^\?$")
-
-
-# 계약 JSON 스키마가 아닌 응답의 분류(근거: HTTP.md·PUBLIC_API.md 의 해당 행). application/json 은 문진 스키마(survey-service schema/, survey_schema 패키지) 이름이다.
-NON_CONTRACT = {
-    ("GET", "/v1/datasets/{}/versions/{}/files"): ("application/x-tar", "데이터셋 파일 묶음(HTTP.md I2)"),
-    ("GET", "/v1/datasets/{}/versions/{}/files/{}"): ("application/octet-stream", "파일 바이트(HTTP.md I2)"),
-    ("GET", "/v1/eval-reports/{}"): ("application/octet-stream", "평가 보고서 바이트(HTTP.md I3)"),
-    ("GET", "/v1/packages/{}/versions/{}/adapter"): ("application/x-tar", "어댑터 묶음(HTTP.md I3)"),
-    ("GET", "/v1/releases/{}/bundle"): ("application/x-tar", "릴리스 묶음(HTTP.md I4)"),
-    ("POST", "/v1/releases/{}/respond"): ("text/plain", "ResponseText(HTTP.md I9)"),
-    ("GET", "/v1/staff/alerts/stream"): ("text/event-stream", "이벤트마다 계약 스키마(StaffAlert·ResultReadyEvent·HeartbeatEvent·ResyncEvent)"),
-    ("POST", "/v1/staff/push-subscriptions/unsubscribe"): ("none", "204 본문 없음"),
-    ("GET", "/v1/question-sets/{}/versions/{}"): ("application/json", "QuestionBank"),
-    ("GET", "/v1/question-sets/{}/versions/{}/reviews"): ("application/json", "ListEnvelope + ReviewRecord(question-authoring 핸들러가 검증)"),
-    ("GET", "/v1/results"): ("application/json", "ListEnvelope + SessionResult"),
-    ("GET", "/v1/results/{}"): ("application/json", "SessionResult"),
-    ("POST", "/v1/results/{}/ack"): ("application/json", "SessionResult"),
-    ("GET", "/v1/staff/sessions/{}"): ("application/json", "StaffSessionView"),
-    ("POST", "/v1/sessions"): ("application/json", "FrontendInput"),
-    ("POST", "/v1/sessions/{}/turns"): ("application/json", "FrontendInput"),
-    ("POST", "/v1/sessions/{}/end"): ("application/json", "FrontendInput"),
-    ("POST", "/v1/sessions/{}/intervention"): ("application/json", "FrontendInput"),
-}
 
 
 def norm(p):
@@ -97,76 +73,38 @@ def routes_ast(area):
 
 
 def routes_survey():
-    py = WS / "survey-service/.venv/bin/python"
-    code = "import json;from survey_service.components import link_public_api as m;print(json.dumps([[s[1],s[2],s[5],s[7]] for s in m._SPEC]))"
-    r = subprocess.run([str(py), "-c", code], cwd=WS / "survey-service", capture_output=True, text=True)
-    if r.returncode != 0:
-        raise SystemExit("survey-service 경로표를 읽지 못했다: " + r.stderr[-300:])
-    return [(m, p, schema_name(q), schema_name(s), "survey-service/survey_service/components/link_public_api.py:_SPEC") for m, p, q, s in json.loads(r.stdout)]
-
-
-def md_endpoints():
-    out = set()
-    for doc in ("HTTP.md", "PUBLIC_API.md"):
-        for line in (BC / doc).read_text(encoding="utf-8").splitlines():
-            for mm in re.finditer(r"`((?:GET|POST|PUT|DELETE|PATCH)) (/[^` ]*)[^`]*`", line):
-                out.add((mm.group(1), norm(mm.group(2))))
-    return out
+    path = WS / "survey-service/survey_service/components/link_public_api.py"
+    for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+        if isinstance(node, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "_SPEC" for t in node.targets):
+            return [(row[1], row[2], schema_name(row[5]), schema_name(row[7]), str(path))
+                    for row in ast.literal_eval(node.value)]
+    raise SystemExit("survey-service 경로표 _SPEC이 없다")
 
 
 def main():
-    out_file = None
+    from boundary_contracts.http_contracts import HttpContract, catalog
+    services = {e["owner"]: name for name, e in catalog()["services"].items()}
+    bad, summaries = [], []
+    for area in AREAS:
+        service = services[area]
+        contract = HttpContract(service)
+        summaries.append(contract.lint())
+        actual = routes_survey() if area == "survey-service" else routes_ast(area)
+        actual = {(method, norm(path)) for method, path, *_ in actual if not SKIP_PATH.search(path)}
+        expected = {(method.upper(), norm(path)) for path, ops in contract.doc["paths"].items()
+                    for method in ops if path.startswith("/v1/")}
+        for method, path in sorted(actual - expected):
+            bad.append(f"{area}: undeclared implementation {method} {path}")
+        for method, path in sorted(expected - actual):
+            bad.append(f"{area}: missing implementation {method} {path}")
+    report = {"services": summaries, "violations": bad, "ok": not bad}
     if "--out" in sys.argv:
-        out_file = pathlib.Path(sys.argv[sys.argv.index("--out") + 1])
-    routes = []
-    for a in AREAS:
-        rs = routes_survey() if a == "survey-service" else routes_ast(a)
-        routes += [(a, *r) for r in rs if not SKIP_PATH.search(r[1])]
-    paths, bad = {}, []
-    code_set = set()
-    for area, m, p, req, res, where in routes:
-        code_set.add((m, norm(p)))
-        for nm in (req, res):
-            if nm and nm.split("#")[0] not in SCHEMAS:
-                bad.append(f"계약에 없는 스키마 이름 {nm}: {m} {p} ({where})")
-        op = {"x-owner": area, "x-source": where, "responses": {"default": {"description": "BoundaryError(CONVENTIONS 9절 상태 표)",
-              "content": {"application/json": {"schema": {"$ref": "../boundary_contracts/schemas/BoundaryError.schema.json"}}}}}}
-        if req:
-            base, _, frag = req.partition("#")
-            op["requestBody"] = {"content": {"application/json": {"schema": {"$ref": f"../boundary_contracts/schemas/{base}.schema.json" + (f"#/$defs/{frag}" if frag else "")}}}}
-        ok = {"description": "성공"}
-        if res:
-            base, _, frag = res.partition("#")
-            ok["content"] = {"application/json": {"schema": {"$ref": f"../boundary_contracts/schemas/{base}.schema.json" + (f"#/$defs/{frag}" if frag else "")}}}
-        elif (m, norm(p)) in NON_CONTRACT:
-            kind, ref = NON_CONTRACT[(m, norm(p))]
-            ok["content"] = {kind: ({"x-survey-schema": ref} if kind == "application/json" else {"x-body": ref})}
-        else:
-            ok["x-unschematized"] = True   # 분류표(NON_CONTRACT)에도 없다: 대조 실패로 센다
-        op["responses"]["2XX"] = ok
-        paths.setdefault(p, {})[m.lower()] = op
-    md = md_endpoints()
-    md = {x for x in md if not SKIP_PATH.search(x[1])}
-    only_md = sorted(md - code_set)
-    only_code = sorted(code_set - md)
-    doc = {"openapi": "3.1.0", "info": {"title": "openit 영역 사이 HTTP", "version": "draft",
-           "description": "영역 서버의 경로 선언에서 만든 엔드포인트 정본 초안(head/scripts/build-openapi.py). 스키마는 계약 패키지의 것을 $ref 로 가리킨다."},
-           "paths": dict(sorted(paths.items()))}
-    if out_file:
-        out_file.parent.mkdir(parents=True, exist_ok=True)
-        out_file.write_text(json.dumps(doc, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    uns = [(m, p) for p, ops in paths.items() for m, o in ops.items() if o["responses"]["2XX"].get("x-unschematized")]
-    print(f"코드 경로 {len(code_set)}, md 경로 {len(md)}, md 에만 {len(only_md)}, 코드에만 {len(only_code)}, 계약에 없는 스키마 이름 {len(bad)}, 응답 스키마 없음 {len(uns)}")
-    for x in only_md:
-        print("md 에만", *x)
-    for x in only_code:
-        print("코드에만", *x)
-    for b in bad:
-        print(b)
-    for m, p in sorted(uns):
-        print("응답 스키마 없음", m.upper(), p)
-    # md 는 정본이 아니다: 코드에만 있는 경로는 OpenAPI 가 채운다(정보로만 낸다). md 에만 있는 경로·계약에 없는 이름·분류 없는 응답은 어긋남이다
-    return 1 if (only_md or bad or uns) else 0
+        path = pathlib.Path(sys.argv[sys.argv.index("--out") + 1])
+        if path.resolve().is_relative_to(BC.resolve()):
+            raise SystemExit("--out is an audit report, not a contract generator; use a path outside boundary-contracts")
+        path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
+    print(json.dumps(report, ensure_ascii=False, indent=2))
+    return int(bool(bad))
 
 
 if __name__ == "__main__":

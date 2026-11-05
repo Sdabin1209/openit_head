@@ -1,0 +1,5 @@
+# Head audit tools use installed, tagged contracts, independently of source trees.
+jsonschema==4.26.0
+referencing==0.37.0
+boundary-contracts @ git+ssh://git@github.com/Sdabin1209/openit_boundary-contracts.git@v3.4.20
+openit-survey-schema @ git+ssh://git@github.com/Sdabin1209/openit_survey-service.git@survey-schema-v4.1.1#subdirectory=schema

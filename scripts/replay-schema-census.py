@@ -8,7 +8,7 @@ import sys
 
 HEAD = Path(__file__).resolve().parents[1]
 WORKSPACE = HEAD.parent
-EVIDENCE = HEAD / 'docs/reviews/2026-11-06/schema-census'
+EVIDENCE = HEAD / 'progress/schema-census'
 
 
 def invoke(root, command, cases):

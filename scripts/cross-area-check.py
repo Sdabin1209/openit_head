@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -37,15 +38,22 @@ NAMES = {
     "question_set_title": (["survey-service"], ["admin-console"]),
     "RESULT_READY": (["survey-service"], ["admin-console"]),
     "X-Openit-Roles": (["DEPLOY"], ["question-authoring"]),
-    "ACCOUNT_PENDING_APPROVAL": (["DEPLOY"], ["admin-console"]),
+    "ACCOUNT_PENDING_APPROVAL": (["platform"], ["admin-console"]),
     "pause_reason": (["survey-service"], ["admin-console", "kiosk-frontend"]),
     "question_banks/": (["release-gate"], []),          # 소비자는 계약 클라이언트(load_bundle)
 }
 
 
 def files(root: Path, skip=SKIP_DIRS):
-    for p in root.rglob("*"):
-        if p.is_file() and not (set(p.relative_to(root).parts) & skip) and not any(x.startswith(".") for x in p.relative_to(root).parts[:-1]) and "CHANGELOG" not in p.name:
+    # Git's source inventory excludes generated/ignored checkout copies in state/.
+    # Include untracked source changes so local fixes are checked before commit.
+    result = subprocess.run(
+        ["git", "-C", str(root), "ls-files", "--cached", "--others", "--exclude-standard", "-z"],
+        capture_output=True, text=True, check=True,
+    )
+    for relative in sorted(set(result.stdout.split("\0")) - {""}):
+        p = root / relative
+        if p.is_file() and not (set(Path(relative).parts) & skip) and not any(x.startswith(".") for x in Path(relative).parts[:-1]) and "CHANGELOG" not in p.name:
             yield p
 
 

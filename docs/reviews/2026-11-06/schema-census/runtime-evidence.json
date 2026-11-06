@@ -1,0 +1,1168 @@
+{
+  "boundary-contracts": {
+    "date_time_registered": false,
+    "uri_registered": false,
+    "results": [
+      {
+        "area": "boundary-contracts",
+        "name": "ActivePointer",
+        "fixture": "boundary-contracts/examples/ActivePointer.json",
+        "pointer": [
+          "activated_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "AuthoringResponses",
+        "fixture": "boundary-contracts/examples/AuthoringResponses.AddReviewResponse.json",
+        "pointer": [
+          "reviewed_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "AuthoringResponses",
+        "fixture": "boundary-contracts/examples/AuthoringResponses.Draft.confirmed.json",
+        "pointer": [
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "AuthoringResponses",
+        "fixture": "boundary-contracts/examples/AuthoringResponses.Draft.confirmed.json",
+        "pointer": [
+          "updated_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "AuthoringResponses",
+        "fixture": "boundary-contracts/examples/AuthoringResponses.Draft.confirmed.json",
+        "pointer": [
+          "confirming",
+          "at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "AuthoringResponses",
+        "fixture": "boundary-contracts/examples/AuthoringResponses.Draft.discarded.json",
+        "pointer": [
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "AuthoringResponses",
+        "fixture": "boundary-contracts/examples/AuthoringResponses.Draft.discarded.json",
+        "pointer": [
+          "updated_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "AuthoringResponses",
+        "fixture": "boundary-contracts/examples/AuthoringResponses.Draft.json",
+        "pointer": [
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "AuthoringResponses",
+        "fixture": "boundary-contracts/examples/AuthoringResponses.Draft.json",
+        "pointer": [
+          "updated_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "AuthoringResponses",
+        "fixture": "boundary-contracts/examples/AuthoringResponses.DraftList.json",
+        "pointer": [
+          "drafts",
+          0,
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "AuthoringResponses",
+        "fixture": "boundary-contracts/examples/AuthoringResponses.DraftList.json",
+        "pointer": [
+          "drafts",
+          0,
+          "updated_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "BackupJobResult",
+        "fixture": "boundary-contracts/examples/BackupJobResult.json",
+        "pointer": [
+          "started_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "BackupJobResult",
+        "fixture": "boundary-contracts/examples/BackupJobResult.json",
+        "pointer": [
+          "finished_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "ChangeClassification",
+        "fixture": "boundary-contracts/examples/ChangeClassification.json",
+        "pointer": [
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "DatasetManifest",
+        "fixture": "boundary-contracts/examples/DatasetManifest.json",
+        "pointer": [
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "EvaluationReport",
+        "fixture": "boundary-contracts/examples/EvaluationReport.json",
+        "pointer": [
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "FailureCase",
+        "fixture": "boundary-contracts/examples/FailureCase.json",
+        "pointer": [
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "GateApproval",
+        "fixture": "boundary-contracts/examples/GateApproval.json",
+        "pointer": [
+          "decided_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "GateDecision",
+        "fixture": "boundary-contracts/examples/GateDecision.pass.json",
+        "pointer": [
+          "decided_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "GateDecision",
+        "fixture": "boundary-contracts/examples/GateDecision.reject.json",
+        "pointer": [
+          "decided_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "GateSubmission",
+        "fixture": "boundary-contracts/examples/GateSubmission.json",
+        "pointer": [
+          "submitted_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "HeartbeatEvent",
+        "fixture": "boundary-contracts/examples/HeartbeatEvent.json",
+        "pointer": [
+          "ts"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "IngestResult",
+        "fixture": "boundary-contracts/examples/IngestResult.json",
+        "pointer": [
+          "received_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "ModelPackageManifest",
+        "fixture": "boundary-contracts/examples/ModelPackageManifest.json",
+        "pointer": [
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "ReleaseManifest",
+        "fixture": "boundary-contracts/examples/ReleaseManifest.json",
+        "pointer": [
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "ResultReadyEvent",
+        "fixture": "boundary-contracts/examples/ResultReadyEvent.json",
+        "pointer": [
+          "ended_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "ReviewRecord",
+        "fixture": "boundary-contracts/examples/ReviewRecord.json",
+        "pointer": [
+          "reviewed_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "ReviewReport",
+        "fixture": "boundary-contracts/examples/ReviewReport.json",
+        "pointer": [
+          "generated_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "RollbackReceipt",
+        "fixture": "boundary-contracts/examples/RollbackReceipt.json",
+        "pointer": [
+          "active_pointer",
+          "activated_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "RollbackReceipt",
+        "fixture": "boundary-contracts/examples/RollbackReceipt.json",
+        "pointer": [
+          "decided_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "RollbackRequest",
+        "fixture": "boundary-contracts/examples/RollbackRequest.json",
+        "pointer": [
+          "requested_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "StaffAlert",
+        "fixture": "boundary-contracts/examples/StaffAlert.json",
+        "pointer": [
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "StaffAlert",
+        "fixture": "boundary-contracts/examples/StaffAlert.json",
+        "pointer": [
+          "manual_notice_reported_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "StaffAlertPage",
+        "fixture": "boundary-contracts/examples/StaffAlertPage.json",
+        "pointer": [
+          "items",
+          0,
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "StaffAlertPage",
+        "fixture": "boundary-contracts/examples/StaffAlertPage.json",
+        "pointer": [
+          "items",
+          1,
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "StaffAlertPage",
+        "fixture": "boundary-contracts/examples/StaffAlertPage.json",
+        "pointer": [
+          "items",
+          1,
+          "manual_notice_reported_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "SubmissionView",
+        "fixture": "boundary-contracts/examples/SubmissionView.json",
+        "pointer": [
+          "submitted_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "SubmissionView",
+        "fixture": "boundary-contracts/examples/SubmissionView.json",
+        "pointer": [
+          "updated_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "SyntheticJobConfigRun",
+        "fixture": "boundary-contracts/examples/SyntheticJobConfigRun.json",
+        "pointer": [
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "TraceEnvelope",
+        "fixture": "boundary-contracts/examples/TraceEnvelope.json",
+        "pointer": [
+          "sent_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "_common",
+        "fixture": "generated from _common#/$defs/Timestamp",
+        "pointer": [],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "HttpPages",
+        "fixture": "boundary-contracts/examples/ReviewRecord.json",
+        "pointer": [
+          "items",
+          0,
+          "reviewed_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "HttpPages",
+        "fixture": "boundary-contracts/examples/ReleaseManifest.json",
+        "pointer": [
+          "items",
+          0,
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "HttpPages",
+        "fixture": "boundary-contracts/examples/SubmissionView.json",
+        "pointer": [
+          "items",
+          0,
+          "submitted_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "boundary-contracts",
+        "name": "HttpPages",
+        "fixture": "boundary-contracts/examples/GateDecision.pass.json",
+        "pointer": [
+          "items",
+          0,
+          "decided_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      }
+    ]
+  },
+  "model-lab": {
+    "date_time_registered": false,
+    "uri_registered": false,
+    "results": [
+      {
+        "area": "model-lab",
+        "name": "DatasetSamplesRequest",
+        "fixture": "model-lab/schemas/examples/DatasetSamplesRequest.valid.json",
+        "pointer": [
+          "manifest",
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "model-lab",
+        "name": "DatasetSnapshot",
+        "fixture": "model-lab/schemas/examples/DatasetSnapshot.valid.json",
+        "pointer": [
+          "manifest",
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "model-lab",
+        "name": "PackagePublication",
+        "fixture": "model-lab/schemas/examples/PackagePublication.valid.json",
+        "pointer": [
+          "manifest",
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      }
+    ]
+  },
+  "ops-feedback": {
+    "date_time_registered": false,
+    "uri_registered": false,
+    "results": [
+      {
+        "area": "ops-feedback",
+        "name": "CaseBuildRequest",
+        "fixture": "ops-feedback/schemas/examples/CaseBuildRequest.valid.json",
+        "pointer": [
+          "received_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "ops-feedback",
+        "name": "CaseBuildResult",
+        "fixture": "ops-feedback/schemas/examples/CaseBuildResult.valid.json",
+        "pointer": [
+          "case",
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "ops-feedback",
+        "name": "CaseSummary",
+        "fixture": "ops-feedback/schemas/examples/CaseSummary.valid.json",
+        "pointer": [
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "ops-feedback",
+        "name": "CaseSummary",
+        "fixture": "ops-feedback/schemas/examples/CaseSummary.valid2.json",
+        "pointer": [
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "ops-feedback",
+        "name": "DeidRequest",
+        "fixture": "ops-feedback/schemas/examples/DeidRequest.valid.json",
+        "pointer": [
+          "envelope",
+          "sent_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "ops-feedback",
+        "name": "IngestReceiptRequest",
+        "fixture": "ops-feedback/schemas/examples/IngestReceiptRequest.valid.json",
+        "pointer": [
+          "record",
+          "received_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "ops-feedback",
+        "name": "IngestReceiptRequest",
+        "fixture": "ops-feedback/schemas/examples/IngestReceiptRequest.valid.json",
+        "pointer": [
+          "record",
+          "envelope",
+          "sent_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "ops-feedback",
+        "name": "ListCasesQuery",
+        "fixture": "ops-feedback/schemas/examples/ListCasesQuery.valid.json",
+        "pointer": [
+          "updated_since"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "ops-feedback",
+        "name": "PurgeRequest",
+        "fixture": "ops-feedback/schemas/examples/PurgeRequest.valid.json",
+        "pointer": [
+          "now"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "ops-feedback",
+        "name": "RawStatusMark",
+        "fixture": "ops-feedback/schemas/examples/RawStatusMark.valid.json",
+        "pointer": [
+          "processed_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "ops-feedback",
+        "name": "RawTraceRecord",
+        "fixture": "ops-feedback/schemas/examples/RawTraceRecord.valid.json",
+        "pointer": [
+          "received_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "ops-feedback",
+        "name": "RawTraceRecord",
+        "fixture": "ops-feedback/schemas/examples/RawTraceRecord.valid.json",
+        "pointer": [
+          "envelope",
+          "sent_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "ops-feedback",
+        "name": "ReconcileRequest",
+        "fixture": "ops-feedback/schemas/examples/ReconcileRequest.valid.json",
+        "pointer": [
+          "candidate",
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "ops-feedback",
+        "name": "RetentionRequest",
+        "fixture": "ops-feedback/schemas/examples/RetentionRequest.valid.json",
+        "pointer": [
+          "now"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "ops-feedback",
+        "name": "ReviewOutcome",
+        "fixture": "ops-feedback/schemas/examples/ReviewOutcome.valid.json",
+        "pointer": [
+          "case",
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "ops-feedback",
+        "name": "ReviewRequest",
+        "fixture": "ops-feedback/schemas/examples/ReviewRequest.valid.json",
+        "pointer": [
+          "current",
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "ops-feedback",
+        "name": "ReviewRequest",
+        "fixture": "ops-feedback/schemas/examples/ReviewRequest.valid.json",
+        "pointer": [
+          "now"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "ops-feedback",
+        "name": "RollbackAssessRequest",
+        "fixture": "ops-feedback/schemas/examples/RollbackAssessRequest.valid.json",
+        "pointer": [
+          "now"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "ops-feedback",
+        "name": "RollbackAssessRequest",
+        "fixture": "ops-feedback/schemas/examples/RollbackAssessRequest.valid.json",
+        "pointer": [
+          "cases",
+          0,
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "ops-feedback",
+        "name": "RollbackAssessment",
+        "fixture": "ops-feedback/schemas/examples/RollbackAssessment.valid.json",
+        "pointer": [
+          "window_start"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "ops-feedback",
+        "name": "RollbackAssessment",
+        "fixture": "ops-feedback/schemas/examples/RollbackAssessment.valid2.json",
+        "pointer": [
+          "window_start"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "ops-feedback",
+        "name": "RollbackPlan",
+        "fixture": "ops-feedback/schemas/examples/RollbackPlan.valid.json",
+        "pointer": [
+          "request",
+          "requested_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "ops-feedback",
+        "name": "RollbackPlanRequest",
+        "fixture": "ops-feedback/schemas/examples/RollbackPlanRequest.valid.json",
+        "pointer": [
+          "now"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "ops-feedback",
+        "name": "RollbackPlanRequest",
+        "fixture": "ops-feedback/schemas/examples/RollbackPlanRequest.valid.json",
+        "pointer": [
+          "assessment",
+          "window_start"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "ops-feedback",
+        "name": "TraceIntakeRequest",
+        "fixture": "ops-feedback/schemas/examples/TraceIntakeRequest.valid.json",
+        "pointer": [
+          "envelope",
+          "sent_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "ops-feedback",
+        "name": "TraceIntakeRequest",
+        "fixture": "ops-feedback/schemas/examples/TraceIntakeRequest.valid.json",
+        "pointer": [
+          "received_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      }
+    ]
+  },
+  "question-authoring": {
+    "date_time_registered": false,
+    "uri_registered": false,
+    "results": [
+      {
+        "area": "question-authoring",
+        "name": "ChangeRecord",
+        "fixture": "question-authoring/schemas/examples/ChangeRecord.valid.json",
+        "pointer": [
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "ChangeRecordInput",
+        "fixture": "question-authoring/schemas/examples/ChangeRecordInput.valid.json",
+        "pointer": [
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "ConfirmFinalizeInput",
+        "fixture": "question-authoring/schemas/examples/ConfirmFinalizeInput.valid.json",
+        "pointer": [
+          "draft",
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "ConfirmFinalizeInput",
+        "fixture": "question-authoring/schemas/examples/ConfirmFinalizeInput.valid.json",
+        "pointer": [
+          "draft",
+          "updated_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "ConfirmFinalizeInput",
+        "fixture": "question-authoring/schemas/examples/ConfirmFinalizeInput.valid.json",
+        "pointer": [
+          "at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "ConfirmFinalizeResult",
+        "fixture": "question-authoring/schemas/examples/ConfirmFinalizeResult.valid.json",
+        "pointer": [
+          "review",
+          "reviewed_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "ConfirmPlan",
+        "fixture": "question-authoring/schemas/examples/ConfirmPlan.valid.json",
+        "pointer": [
+          "reservation",
+          "at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "ConfirmPlanInput",
+        "fixture": "question-authoring/schemas/examples/ConfirmPlanInput.valid.json",
+        "pointer": [
+          "draft",
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "ConfirmPlanInput",
+        "fixture": "question-authoring/schemas/examples/ConfirmPlanInput.valid.json",
+        "pointer": [
+          "draft",
+          "updated_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "ConfirmPlanInput",
+        "fixture": "question-authoring/schemas/examples/ConfirmPlanInput.valid.json",
+        "pointer": [
+          "now"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "DraftDiscardInput",
+        "fixture": "question-authoring/schemas/examples/DraftDiscardInput.valid.json",
+        "pointer": [
+          "draft",
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "DraftDiscardInput",
+        "fixture": "question-authoring/schemas/examples/DraftDiscardInput.valid.json",
+        "pointer": [
+          "draft",
+          "updated_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "DraftDiscardInput",
+        "fixture": "question-authoring/schemas/examples/DraftDiscardInput.valid.json",
+        "pointer": [
+          "now"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "DraftEditInput",
+        "fixture": "question-authoring/schemas/examples/DraftEditInput.valid.json",
+        "pointer": [
+          "draft",
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "DraftEditInput",
+        "fixture": "question-authoring/schemas/examples/DraftEditInput.valid.json",
+        "pointer": [
+          "draft",
+          "updated_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "DraftEditInput",
+        "fixture": "question-authoring/schemas/examples/DraftEditInput.valid.json",
+        "pointer": [
+          "now"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "DraftIngestInput",
+        "fixture": "question-authoring/schemas/examples/DraftIngestInput.valid.json",
+        "pointer": [
+          "draft",
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "DraftIngestInput",
+        "fixture": "question-authoring/schemas/examples/DraftIngestInput.valid.json",
+        "pointer": [
+          "draft",
+          "updated_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "DraftIngestInput",
+        "fixture": "question-authoring/schemas/examples/DraftIngestInput.valid.json",
+        "pointer": [
+          "now"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "DraftIngestResult",
+        "fixture": "question-authoring/schemas/examples/DraftIngestResult.valid.json",
+        "pointer": [
+          "draft",
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "DraftIngestResult",
+        "fixture": "question-authoring/schemas/examples/DraftIngestResult.valid.json",
+        "pointer": [
+          "draft",
+          "updated_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "DraftOpenInput",
+        "fixture": "question-authoring/schemas/examples/DraftOpenInput.valid.json",
+        "pointer": [
+          "now"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "FlagAcknowledgeInput",
+        "fixture": "question-authoring/schemas/examples/FlagAcknowledgeInput.valid.json",
+        "pointer": [
+          "draft",
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "FlagAcknowledgeInput",
+        "fixture": "question-authoring/schemas/examples/FlagAcknowledgeInput.valid.json",
+        "pointer": [
+          "draft",
+          "updated_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "FlagAcknowledgeInput",
+        "fixture": "question-authoring/schemas/examples/FlagAcknowledgeInput.valid.json",
+        "pointer": [
+          "now"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "PreviewBuildInput",
+        "fixture": "question-authoring/schemas/examples/PreviewBuildInput.valid.json",
+        "pointer": [
+          "draft",
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "PreviewBuildInput",
+        "fixture": "question-authoring/schemas/examples/PreviewBuildInput.valid.json",
+        "pointer": [
+          "draft",
+          "updated_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "ReviewFollowupInput",
+        "fixture": "question-authoring/schemas/examples/ReviewFollowupInput.valid.json",
+        "pointer": [
+          "now"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "ReviewFollowupResult",
+        "fixture": "question-authoring/schemas/examples/ReviewFollowupResult.valid.json",
+        "pointer": [
+          "review",
+          "reviewed_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "question-authoring",
+        "name": "SignalsBuildInput",
+        "fixture": "question-authoring/schemas/examples/SignalsBuildInput.valid.json",
+        "pointer": [
+          "now"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      }
+    ]
+  },
+  "survey-service": {
+    "date_time_registered": false,
+    "uri_registered": false,
+    "results": [
+      {
+        "area": "survey-service",
+        "name": "OutboxEnvelope",
+        "fixture": "survey-service/schemas/examples/OutboxEnvelope.valid.json",
+        "pointer": [
+          "sent_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "survey-service",
+        "name": "ReleaseBundle",
+        "fixture": "survey-service/schemas/examples/ReleaseBundle.valid.json",
+        "pointer": [
+          "manifest",
+          "created_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "survey-service",
+        "name": "StoreCommitRequest",
+        "fixture": "survey-service/schemas/examples/StoreCommitRequest.valid2.json",
+        "pointer": [
+          "trace_envelope",
+          "sent_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      },
+      {
+        "area": "survey-service",
+        "name": "TraceEnvelopeOut",
+        "fixture": "survey-service/schemas/examples/TraceEnvelopeOut.valid.json",
+        "pointer": [
+          "sent_at"
+        ],
+        "control_accepted": true,
+        "invalid_accepted": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,4160 @@
+[
+  {
+    "service": "dataset-store",
+    "method": "POST",
+    "path": "/v1/datasets",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/DatasetManifest.schema.json"
+    },
+    "fixture": "boundary-contracts/examples/DatasetManifest.json",
+    "pointer": [
+      "created_at"
+    ],
+    "control": {
+      "pipeline_schema_version": "3.0",
+      "dataset_id": "ds-1",
+      "version": "1",
+      "created_at": "2026-10-15T00:00:00Z",
+      "runtime_contract_version": 1,
+      "question_sets": [
+        {
+          "id": "qs-main",
+          "version": "3",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "id": "qs-unseen",
+          "version": "1",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ],
+      "generator_version": "0.1.0",
+      "seed_case_ids": [
+        "fc-1"
+      ],
+      "action_rules_version": "2",
+      "scenario_disjoint_across_splits": true,
+      "files": [
+        {
+          "path": "lora_a/train.jsonl",
+          "role": "LORA_A",
+          "split": "TRAIN",
+          "sample_count": 10,
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "path": "lora_a/eval.jsonl",
+          "role": "LORA_A",
+          "split": "EVAL",
+          "sample_count": 5,
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "question_sets": [
+            {
+              "id": "qs-unseen",
+              "version": "1",
+              "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          ]
+        }
+      ],
+      "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "document": {
+      "pipeline_schema_version": "3.0",
+      "dataset_id": "ds-1",
+      "version": "1",
+      "created_at": "2026-02-30T00:00:00Z",
+      "runtime_contract_version": 1,
+      "question_sets": [
+        {
+          "id": "qs-main",
+          "version": "3",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "id": "qs-unseen",
+          "version": "1",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ],
+      "generator_version": "0.1.0",
+      "seed_case_ids": [
+        "fc-1"
+      ],
+      "action_rules_version": "2",
+      "scenario_disjoint_across_splits": true,
+      "files": [
+        {
+          "path": "lora_a/train.jsonl",
+          "role": "LORA_A",
+          "split": "TRAIN",
+          "sample_count": 10,
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "path": "lora_a/eval.jsonl",
+          "role": "LORA_A",
+          "split": "EVAL",
+          "sample_count": 5,
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "question_sets": [
+            {
+              "id": "qs-unseen",
+              "version": "1",
+              "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          ]
+        }
+      ],
+      "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  },
+  {
+    "service": "dataset-store",
+    "method": "POST",
+    "path": "/v1/datasets",
+    "status": 201,
+    "schema": {
+      "$ref": "../schemas/DatasetManifest.schema.json"
+    },
+    "fixture": "boundary-contracts/examples/DatasetManifest.json",
+    "pointer": [
+      "created_at"
+    ],
+    "control": {
+      "pipeline_schema_version": "3.0",
+      "dataset_id": "ds-1",
+      "version": "1",
+      "created_at": "2026-10-15T00:00:00Z",
+      "runtime_contract_version": 1,
+      "question_sets": [
+        {
+          "id": "qs-main",
+          "version": "3",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "id": "qs-unseen",
+          "version": "1",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ],
+      "generator_version": "0.1.0",
+      "seed_case_ids": [
+        "fc-1"
+      ],
+      "action_rules_version": "2",
+      "scenario_disjoint_across_splits": true,
+      "files": [
+        {
+          "path": "lora_a/train.jsonl",
+          "role": "LORA_A",
+          "split": "TRAIN",
+          "sample_count": 10,
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "path": "lora_a/eval.jsonl",
+          "role": "LORA_A",
+          "split": "EVAL",
+          "sample_count": 5,
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "question_sets": [
+            {
+              "id": "qs-unseen",
+              "version": "1",
+              "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          ]
+        }
+      ],
+      "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "document": {
+      "pipeline_schema_version": "3.0",
+      "dataset_id": "ds-1",
+      "version": "1",
+      "created_at": "2026-02-30T00:00:00Z",
+      "runtime_contract_version": 1,
+      "question_sets": [
+        {
+          "id": "qs-main",
+          "version": "3",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "id": "qs-unseen",
+          "version": "1",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ],
+      "generator_version": "0.1.0",
+      "seed_case_ids": [
+        "fc-1"
+      ],
+      "action_rules_version": "2",
+      "scenario_disjoint_across_splits": true,
+      "files": [
+        {
+          "path": "lora_a/train.jsonl",
+          "role": "LORA_A",
+          "split": "TRAIN",
+          "sample_count": 10,
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "path": "lora_a/eval.jsonl",
+          "role": "LORA_A",
+          "split": "EVAL",
+          "sample_count": 5,
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "question_sets": [
+            {
+              "id": "qs-unseen",
+              "version": "1",
+              "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          ]
+        }
+      ],
+      "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  },
+  {
+    "service": "dataset-store",
+    "method": "GET",
+    "path": "/v1/datasets/{d}/versions/{v}",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/DatasetManifest.schema.json"
+    },
+    "fixture": "boundary-contracts/examples/DatasetManifest.json",
+    "pointer": [
+      "created_at"
+    ],
+    "control": {
+      "pipeline_schema_version": "3.0",
+      "dataset_id": "ds-1",
+      "version": "1",
+      "created_at": "2026-10-15T00:00:00Z",
+      "runtime_contract_version": 1,
+      "question_sets": [
+        {
+          "id": "qs-main",
+          "version": "3",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "id": "qs-unseen",
+          "version": "1",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ],
+      "generator_version": "0.1.0",
+      "seed_case_ids": [
+        "fc-1"
+      ],
+      "action_rules_version": "2",
+      "scenario_disjoint_across_splits": true,
+      "files": [
+        {
+          "path": "lora_a/train.jsonl",
+          "role": "LORA_A",
+          "split": "TRAIN",
+          "sample_count": 10,
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "path": "lora_a/eval.jsonl",
+          "role": "LORA_A",
+          "split": "EVAL",
+          "sample_count": 5,
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "question_sets": [
+            {
+              "id": "qs-unseen",
+              "version": "1",
+              "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          ]
+        }
+      ],
+      "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "document": {
+      "pipeline_schema_version": "3.0",
+      "dataset_id": "ds-1",
+      "version": "1",
+      "created_at": "2026-02-30T00:00:00Z",
+      "runtime_contract_version": 1,
+      "question_sets": [
+        {
+          "id": "qs-main",
+          "version": "3",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "id": "qs-unseen",
+          "version": "1",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ],
+      "generator_version": "0.1.0",
+      "seed_case_ids": [
+        "fc-1"
+      ],
+      "action_rules_version": "2",
+      "scenario_disjoint_across_splits": true,
+      "files": [
+        {
+          "path": "lora_a/train.jsonl",
+          "role": "LORA_A",
+          "split": "TRAIN",
+          "sample_count": 10,
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "path": "lora_a/eval.jsonl",
+          "role": "LORA_A",
+          "split": "EVAL",
+          "sample_count": 5,
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "question_sets": [
+            {
+              "id": "qs-unseen",
+              "version": "1",
+              "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          ]
+        }
+      ],
+      "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  },
+  {
+    "service": "model-registry",
+    "method": "POST",
+    "path": "/v1/packages",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/ModelPackageManifest.schema.json"
+    },
+    "fixture": "boundary-contracts/examples/ModelPackageManifest.json",
+    "pointer": [
+      "created_at"
+    ],
+    "control": {
+      "pipeline_schema_version": "3.0",
+      "package_id": "lora-a",
+      "version": "1.2.0",
+      "role": "LORA_A",
+      "created_at": "2026-10-15T00:00:00Z",
+      "runtime_contract_version": 1,
+      "base_model": {
+        "id": "Qwen/Qwen2.5-1.5B-Instruct",
+        "revision": "r1"
+      },
+      "adapter_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "serving_config": {},
+      "serving_config_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "system_prompt": {
+        "path": "system_prompt.txt",
+        "sha256": "sha256:3def1bd06bba07ed86b77771064fc0dc969cc80f2997f159ee80b3de5b228b93"
+      },
+      "lineage": {
+        "dataset": {
+          "id": "ds-1",
+          "version": "1",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "training_run_id": "run-1",
+        "action_rules_version": "2",
+        "model_runtime_version": "0.1.0",
+        "question_sets": [
+          {
+            "id": "qs-main",
+            "version": "3",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ]
+      },
+      "eval_report_ref": "eval-7",
+      "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "document": {
+      "pipeline_schema_version": "3.0",
+      "package_id": "lora-a",
+      "version": "1.2.0",
+      "role": "LORA_A",
+      "created_at": "2026-02-30T00:00:00Z",
+      "runtime_contract_version": 1,
+      "base_model": {
+        "id": "Qwen/Qwen2.5-1.5B-Instruct",
+        "revision": "r1"
+      },
+      "adapter_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "serving_config": {},
+      "serving_config_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "system_prompt": {
+        "path": "system_prompt.txt",
+        "sha256": "sha256:3def1bd06bba07ed86b77771064fc0dc969cc80f2997f159ee80b3de5b228b93"
+      },
+      "lineage": {
+        "dataset": {
+          "id": "ds-1",
+          "version": "1",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "training_run_id": "run-1",
+        "action_rules_version": "2",
+        "model_runtime_version": "0.1.0",
+        "question_sets": [
+          {
+            "id": "qs-main",
+            "version": "3",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ]
+      },
+      "eval_report_ref": "eval-7",
+      "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  },
+  {
+    "service": "model-registry",
+    "method": "POST",
+    "path": "/v1/packages",
+    "status": 201,
+    "schema": {
+      "$ref": "../schemas/ModelPackageManifest.schema.json"
+    },
+    "fixture": "boundary-contracts/examples/ModelPackageManifest.json",
+    "pointer": [
+      "created_at"
+    ],
+    "control": {
+      "pipeline_schema_version": "3.0",
+      "package_id": "lora-a",
+      "version": "1.2.0",
+      "role": "LORA_A",
+      "created_at": "2026-10-15T00:00:00Z",
+      "runtime_contract_version": 1,
+      "base_model": {
+        "id": "Qwen/Qwen2.5-1.5B-Instruct",
+        "revision": "r1"
+      },
+      "adapter_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "serving_config": {},
+      "serving_config_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "system_prompt": {
+        "path": "system_prompt.txt",
+        "sha256": "sha256:3def1bd06bba07ed86b77771064fc0dc969cc80f2997f159ee80b3de5b228b93"
+      },
+      "lineage": {
+        "dataset": {
+          "id": "ds-1",
+          "version": "1",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "training_run_id": "run-1",
+        "action_rules_version": "2",
+        "model_runtime_version": "0.1.0",
+        "question_sets": [
+          {
+            "id": "qs-main",
+            "version": "3",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ]
+      },
+      "eval_report_ref": "eval-7",
+      "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "document": {
+      "pipeline_schema_version": "3.0",
+      "package_id": "lora-a",
+      "version": "1.2.0",
+      "role": "LORA_A",
+      "created_at": "2026-02-30T00:00:00Z",
+      "runtime_contract_version": 1,
+      "base_model": {
+        "id": "Qwen/Qwen2.5-1.5B-Instruct",
+        "revision": "r1"
+      },
+      "adapter_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "serving_config": {},
+      "serving_config_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "system_prompt": {
+        "path": "system_prompt.txt",
+        "sha256": "sha256:3def1bd06bba07ed86b77771064fc0dc969cc80f2997f159ee80b3de5b228b93"
+      },
+      "lineage": {
+        "dataset": {
+          "id": "ds-1",
+          "version": "1",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "training_run_id": "run-1",
+        "action_rules_version": "2",
+        "model_runtime_version": "0.1.0",
+        "question_sets": [
+          {
+            "id": "qs-main",
+            "version": "3",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ]
+      },
+      "eval_report_ref": "eval-7",
+      "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  },
+  {
+    "service": "model-registry",
+    "method": "GET",
+    "path": "/v1/packages/{pid}/versions/{ver}",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/ModelPackageManifest.schema.json"
+    },
+    "fixture": "boundary-contracts/examples/ModelPackageManifest.json",
+    "pointer": [
+      "created_at"
+    ],
+    "control": {
+      "pipeline_schema_version": "3.0",
+      "package_id": "lora-a",
+      "version": "1.2.0",
+      "role": "LORA_A",
+      "created_at": "2026-10-15T00:00:00Z",
+      "runtime_contract_version": 1,
+      "base_model": {
+        "id": "Qwen/Qwen2.5-1.5B-Instruct",
+        "revision": "r1"
+      },
+      "adapter_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "serving_config": {},
+      "serving_config_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "system_prompt": {
+        "path": "system_prompt.txt",
+        "sha256": "sha256:3def1bd06bba07ed86b77771064fc0dc969cc80f2997f159ee80b3de5b228b93"
+      },
+      "lineage": {
+        "dataset": {
+          "id": "ds-1",
+          "version": "1",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "training_run_id": "run-1",
+        "action_rules_version": "2",
+        "model_runtime_version": "0.1.0",
+        "question_sets": [
+          {
+            "id": "qs-main",
+            "version": "3",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ]
+      },
+      "eval_report_ref": "eval-7",
+      "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "document": {
+      "pipeline_schema_version": "3.0",
+      "package_id": "lora-a",
+      "version": "1.2.0",
+      "role": "LORA_A",
+      "created_at": "2026-02-30T00:00:00Z",
+      "runtime_contract_version": 1,
+      "base_model": {
+        "id": "Qwen/Qwen2.5-1.5B-Instruct",
+        "revision": "r1"
+      },
+      "adapter_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "serving_config": {},
+      "serving_config_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "system_prompt": {
+        "path": "system_prompt.txt",
+        "sha256": "sha256:3def1bd06bba07ed86b77771064fc0dc969cc80f2997f159ee80b3de5b228b93"
+      },
+      "lineage": {
+        "dataset": {
+          "id": "ds-1",
+          "version": "1",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "training_run_id": "run-1",
+        "action_rules_version": "2",
+        "model_runtime_version": "0.1.0",
+        "question_sets": [
+          {
+            "id": "qs-main",
+            "version": "3",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ]
+      },
+      "eval_report_ref": "eval-7",
+      "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  },
+  {
+    "service": "ops-feedback",
+    "method": "POST",
+    "path": "/v1/traces",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/IngestResult.schema.json"
+    },
+    "fixture": "boundary-contracts/examples/IngestResult.json",
+    "pointer": [
+      "received_at"
+    ],
+    "control": {
+      "pipeline_schema_version": "3.0",
+      "session_id": "s-1",
+      "turn_id": "t-1",
+      "status": "ACCEPTED",
+      "received_at": "2026-10-15T00:00:00Z"
+    },
+    "document": {
+      "pipeline_schema_version": "3.0",
+      "session_id": "s-1",
+      "turn_id": "t-1",
+      "status": "ACCEPTED",
+      "received_at": "2026-02-30T00:00:00Z"
+    }
+  },
+  {
+    "service": "ops-feedback",
+    "method": "GET",
+    "path": "/v1/cases/{case_id}",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/FailureCase.schema.json"
+    },
+    "fixture": "boundary-contracts/examples/FailureCase.json",
+    "pointer": [
+      "created_at"
+    ],
+    "control": {
+      "pipeline_schema_version": "3.0",
+      "case_id": "fc-1",
+      "version": 1,
+      "created_at": "2026-10-15T00:00:00Z",
+      "source_release_id": "rel-0001",
+      "runtime_contract_version": 1,
+      "deidentified": true,
+      "deidentified_trace_ref": "tr-1",
+      "failure_type": "UNCLASSIFIED",
+      "detection_method": "RULE",
+      "review_status": "PENDING",
+      "question_set": {
+        "id": "qs-main",
+        "version": "3",
+        "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "expected_kind": "LORA_A",
+      "reviewed_input": {
+        "question_id": "Q4",
+        "current_question": "담배를 피우시나요?",
+        "user_utterance": "(개인정보를 뺀 문장 예시)",
+        "state": {}
+      }
+    },
+    "document": {
+      "pipeline_schema_version": "3.0",
+      "case_id": "fc-1",
+      "version": 1,
+      "created_at": "2026-02-30T00:00:00Z",
+      "source_release_id": "rel-0001",
+      "runtime_contract_version": 1,
+      "deidentified": true,
+      "deidentified_trace_ref": "tr-1",
+      "failure_type": "UNCLASSIFIED",
+      "detection_method": "RULE",
+      "review_status": "PENDING",
+      "question_set": {
+        "id": "qs-main",
+        "version": "3",
+        "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "expected_kind": "LORA_A",
+      "reviewed_input": {
+        "question_id": "Q4",
+        "current_question": "담배를 피우시나요?",
+        "user_utterance": "(개인정보를 뺀 문장 예시)",
+        "state": {}
+      }
+    }
+  },
+  {
+    "service": "ops-feedback",
+    "method": "POST",
+    "path": "/v1/cases/{case_id}/review",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/FailureCase.schema.json"
+    },
+    "fixture": "boundary-contracts/examples/FailureCase.json",
+    "pointer": [
+      "created_at"
+    ],
+    "control": {
+      "pipeline_schema_version": "3.0",
+      "case_id": "fc-1",
+      "version": 1,
+      "created_at": "2026-10-15T00:00:00Z",
+      "source_release_id": "rel-0001",
+      "runtime_contract_version": 1,
+      "deidentified": true,
+      "deidentified_trace_ref": "tr-1",
+      "failure_type": "UNCLASSIFIED",
+      "detection_method": "RULE",
+      "review_status": "PENDING",
+      "question_set": {
+        "id": "qs-main",
+        "version": "3",
+        "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "expected_kind": "LORA_A",
+      "reviewed_input": {
+        "question_id": "Q4",
+        "current_question": "담배를 피우시나요?",
+        "user_utterance": "(개인정보를 뺀 문장 예시)",
+        "state": {}
+      }
+    },
+    "document": {
+      "pipeline_schema_version": "3.0",
+      "case_id": "fc-1",
+      "version": 1,
+      "created_at": "2026-02-30T00:00:00Z",
+      "source_release_id": "rel-0001",
+      "runtime_contract_version": 1,
+      "deidentified": true,
+      "deidentified_trace_ref": "tr-1",
+      "failure_type": "UNCLASSIFIED",
+      "detection_method": "RULE",
+      "review_status": "PENDING",
+      "question_set": {
+        "id": "qs-main",
+        "version": "3",
+        "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "expected_kind": "LORA_A",
+      "reviewed_input": {
+        "question_id": "Q4",
+        "current_question": "담배를 피우시나요?",
+        "user_utterance": "(개인정보를 뺀 문장 예시)",
+        "state": {}
+      }
+    }
+  },
+  {
+    "service": "ops-feedback",
+    "method": "POST",
+    "path": "/v1/cases/{case_id}/review",
+    "status": 201,
+    "schema": {
+      "$ref": "../schemas/FailureCase.schema.json"
+    },
+    "fixture": "boundary-contracts/examples/FailureCase.json",
+    "pointer": [
+      "created_at"
+    ],
+    "control": {
+      "pipeline_schema_version": "3.0",
+      "case_id": "fc-1",
+      "version": 1,
+      "created_at": "2026-10-15T00:00:00Z",
+      "source_release_id": "rel-0001",
+      "runtime_contract_version": 1,
+      "deidentified": true,
+      "deidentified_trace_ref": "tr-1",
+      "failure_type": "UNCLASSIFIED",
+      "detection_method": "RULE",
+      "review_status": "PENDING",
+      "question_set": {
+        "id": "qs-main",
+        "version": "3",
+        "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "expected_kind": "LORA_A",
+      "reviewed_input": {
+        "question_id": "Q4",
+        "current_question": "담배를 피우시나요?",
+        "user_utterance": "(개인정보를 뺀 문장 예시)",
+        "state": {}
+      }
+    },
+    "document": {
+      "pipeline_schema_version": "3.0",
+      "case_id": "fc-1",
+      "version": 1,
+      "created_at": "2026-02-30T00:00:00Z",
+      "source_release_id": "rel-0001",
+      "runtime_contract_version": 1,
+      "deidentified": true,
+      "deidentified_trace_ref": "tr-1",
+      "failure_type": "UNCLASSIFIED",
+      "detection_method": "RULE",
+      "review_status": "PENDING",
+      "question_set": {
+        "id": "qs-main",
+        "version": "3",
+        "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "expected_kind": "LORA_A",
+      "reviewed_input": {
+        "question_id": "Q4",
+        "current_question": "담배를 피우시나요?",
+        "user_utterance": "(개인정보를 뺀 문장 예시)",
+        "state": {}
+      }
+    }
+  },
+  {
+    "service": "question-authoring",
+    "method": "GET",
+    "path": "/v1/question-sets/{qsid}/versions/{ver}/reviews",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/HttpPages.schema.json#/$defs/Reviews"
+    },
+    "fixture": "boundary-contracts/examples/ReviewRecord.json",
+    "pointer": [
+      "items",
+      0,
+      "reviewed_at"
+    ],
+    "control": {
+      "items": [
+        {
+          "pipeline_schema_version": "3.0",
+          "review_id": "rv-1",
+          "question_set": {
+            "id": "qs-main",
+            "version": "3",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "reviewer_role": "clinical-reviewer",
+          "decision": "APPROVED",
+          "clinical_basis_approved": true,
+          "reviewed_at": "2026-10-15T00:00:00Z"
+        }
+      ],
+      "next_cursor": null
+    },
+    "document": {
+      "items": [
+        {
+          "pipeline_schema_version": "3.0",
+          "review_id": "rv-1",
+          "question_set": {
+            "id": "qs-main",
+            "version": "3",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "reviewer_role": "clinical-reviewer",
+          "decision": "APPROVED",
+          "clinical_basis_approved": true,
+          "reviewed_at": "2026-02-30T00:00:00Z"
+        }
+      ],
+      "next_cursor": null
+    }
+  },
+  {
+    "service": "question-authoring",
+    "method": "GET",
+    "path": "/v1/set-decisions",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/AuthoringResponses.schema.json#/$defs/Decisions"
+    },
+    "fixture": "boundary-contracts/examples/GateDecision.pass.json",
+    "pointer": [
+      "items",
+      0,
+      "decided_at"
+    ],
+    "control": {
+      "items": [
+        {
+          "pipeline_schema_version": "3.0",
+          "decision_id": "gd-0001",
+          "decided_at": "2026-10-14T00:00:00Z",
+          "gate_policy_version": "1",
+          "subject": {
+            "question_sets": [
+              {
+                "id": "qs-main",
+                "version": "3",
+                "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              {
+                "id": "qs-alcohol",
+                "version": "1",
+                "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            ],
+            "lora_a": {
+              "id": "lora-a",
+              "version": "1.2.0",
+              "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "lora_b": {
+              "id": "lora-b",
+              "version": "1.0.1",
+              "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          },
+          "runtime_contract_version": 1,
+          "result": "PASS",
+          "checks": [
+            {
+              "kind": "CONTRACT_COMPAT",
+              "result": "PASS"
+            },
+            {
+              "kind": "ACCEPTANCE_EVAL",
+              "result": "PASS",
+              "evidence_ref": "eval-0007"
+            },
+            {
+              "kind": "HUMAN_APPROVAL",
+              "result": "PASS",
+              "evidence_ref": "ap-1"
+            }
+          ],
+          "approver": {
+            "role": "release-approver",
+            "id": "trainer-1"
+          },
+          "release_id": "rel-0001",
+          "approval_id": "ap-1"
+        }
+      ],
+      "next_cursor": null
+    },
+    "document": {
+      "items": [
+        {
+          "pipeline_schema_version": "3.0",
+          "decision_id": "gd-0001",
+          "decided_at": "2026-02-30T00:00:00Z",
+          "gate_policy_version": "1",
+          "subject": {
+            "question_sets": [
+              {
+                "id": "qs-main",
+                "version": "3",
+                "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              {
+                "id": "qs-alcohol",
+                "version": "1",
+                "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            ],
+            "lora_a": {
+              "id": "lora-a",
+              "version": "1.2.0",
+              "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "lora_b": {
+              "id": "lora-b",
+              "version": "1.0.1",
+              "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          },
+          "runtime_contract_version": 1,
+          "result": "PASS",
+          "checks": [
+            {
+              "kind": "CONTRACT_COMPAT",
+              "result": "PASS"
+            },
+            {
+              "kind": "ACCEPTANCE_EVAL",
+              "result": "PASS",
+              "evidence_ref": "eval-0007"
+            },
+            {
+              "kind": "HUMAN_APPROVAL",
+              "result": "PASS",
+              "evidence_ref": "ap-1"
+            }
+          ],
+          "approver": {
+            "role": "release-approver",
+            "id": "trainer-1"
+          },
+          "release_id": "rel-0001",
+          "approval_id": "ap-1"
+        }
+      ],
+      "next_cursor": null
+    }
+  },
+  {
+    "service": "question-authoring",
+    "method": "POST",
+    "path": "/v1/drafts",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/AuthoringResponses.schema.json#/$defs/Draft"
+    },
+    "fixture": "boundary-contracts/examples/AuthoringResponses.Draft.confirmed.json",
+    "pointer": [
+      "created_at"
+    ],
+    "control": {
+      "draft_id": "dr-2a0e2ecf280f4c98",
+      "question_set_id": "qs-main",
+      "status": "CONFIRMED",
+      "base": null,
+      "bank": {
+        "questions": [
+          {
+            "question_id": "Q1",
+            "name": "체온",
+            "guide_sentences": [],
+            "affected_followups": [],
+            "repeat_keys": [],
+            "slots": [
+              {
+                "slot_id": "body_temp",
+                "units": [
+                  {
+                    "name": "도",
+                    "synonyms": [
+                      "도씨",
+                      "섭씨"
+                    ],
+                    "range": [
+                      34,
+                      42
+                    ],
+                    "convert_to": null
+                  }
+                ],
+                "choices": [],
+                "required": true,
+                "reask_sentence": "체온을 숫자로 말씀해 주세요.",
+                "yes_no_map": null,
+                "risk_rule": {
+                  "operator": ">=",
+                  "value": {
+                    "amount": 40,
+                    "unit": "도"
+                  },
+                  "response": "IMMEDIATE"
+                }
+              }
+            ],
+            "order": 1,
+            "prerequisite": null,
+            "question_sentence": "오늘 체온이 얼마였나요?",
+            "refusal_explanation": "체온은 진료 준비에 필요합니다.",
+            "policy": {
+              "question_limit": 3,
+              "unknown_accept_after": 2,
+              "refusal_accept_after": 2
+            }
+          },
+          {
+            "question_id": "Q2",
+            "name": "기침",
+            "guide_sentences": [],
+            "affected_followups": [],
+            "repeat_keys": [],
+            "slots": [
+              {
+                "slot_id": "cough",
+                "units": [],
+                "choices": [],
+                "required": true,
+                "reask_sentence": "기침이 있으면 예, 없으면 아니오로 답해 주세요.",
+                "yes_no_map": {
+                  "yes": "yes",
+                  "no": "no"
+                },
+                "risk_rule": null
+              }
+            ],
+            "order": 2,
+            "prerequisite": {
+              "slot": {
+                "question_id": "Q1",
+                "repeat_key": "",
+                "slot_id": "body_temp"
+              },
+              "value": "high"
+            },
+            "question_sentence": "기침이 있나요?",
+            "refusal_explanation": "증상 파악에 필요합니다.",
+            "policy": {
+              "question_limit": 2,
+              "unknown_accept_after": 1,
+              "refusal_accept_after": 1
+            }
+          }
+        ],
+        "session_settings": {
+          "fixed_sentences": [
+            {
+              "key": "ASK_REPEAT",
+              "sentence": "다시 한 번 말씀해 주시겠어요?"
+            },
+            {
+              "key": "FAREWELL",
+              "sentence": "수고하셨습니다."
+            }
+          ],
+          "guide_list": [
+            {
+              "guide_id": "g-remaining",
+              "selection_criterion": "남은 문항",
+              "per_question": false,
+              "sentence": "남은 문항은 {n}개입니다.",
+              "fill_value": "REMAINING_COUNT"
+            }
+          ],
+          "risk_phrases": [
+            "가슴이 아파요",
+            "숨이 안 쉬어져요"
+          ],
+          "confirm_limit": 3,
+          "unrecognized_streak_limit": 3,
+          "ask_limit": 30
+        }
+      },
+      "flags": [
+        {
+          "flag_id": "fl-25c347e2e8a2",
+          "path": "/questions/0/slots/0/units/0/range",
+          "kind": "UNSURE",
+          "message": "범위를 '범위 최소 ~ 최대' 형식으로 읽지 못했다. 값을 비워 두었다",
+          "raw": "범위 34 ~ ??",
+          "resolved": true,
+          "resolved_by": "dr-kim",
+          "resolution": "EDITED"
+        }
+      ],
+      "source": {
+        "kind": "material",
+        "source_hash": "sha256:59ce9883af5a0a45a82988bca145d50036c53d9a3a8b961e539f281dc719cd26",
+        "filename": "form.txt",
+        "size": 1211,
+        "extractor": "text-form",
+        "extractor_version": "1"
+      },
+      "fallback": null,
+      "warnings": [],
+      "created_by": "dr-kim",
+      "created_at": "2026-10-28T14:11:56Z",
+      "updated_at": "2026-10-28T14:11:56Z",
+      "confirming": {
+        "version": 1,
+        "at": "2026-10-28T14:11:56Z"
+      },
+      "confirmed": {
+        "ref": {
+          "id": "qs-main",
+          "version": "1",
+          "content_hash": "sha256:1dfd4c32498001d366be6957c005a708ac213376d64eac2b9d9d1a960b6aba38"
+        },
+        "preview_hash": "sha256:45e1851593f9d92de2c08a54a8a00d1df477268bbfaeb6ab9db8e831768f33bc",
+        "review_id": "rv-dr-2a0e2ecf280f4c98"
+      }
+    },
+    "document": {
+      "draft_id": "dr-2a0e2ecf280f4c98",
+      "question_set_id": "qs-main",
+      "status": "CONFIRMED",
+      "base": null,
+      "bank": {
+        "questions": [
+          {
+            "question_id": "Q1",
+            "name": "체온",
+            "guide_sentences": [],
+            "affected_followups": [],
+            "repeat_keys": [],
+            "slots": [
+              {
+                "slot_id": "body_temp",
+                "units": [
+                  {
+                    "name": "도",
+                    "synonyms": [
+                      "도씨",
+                      "섭씨"
+                    ],
+                    "range": [
+                      34,
+                      42
+                    ],
+                    "convert_to": null
+                  }
+                ],
+                "choices": [],
+                "required": true,
+                "reask_sentence": "체온을 숫자로 말씀해 주세요.",
+                "yes_no_map": null,
+                "risk_rule": {
+                  "operator": ">=",
+                  "value": {
+                    "amount": 40,
+                    "unit": "도"
+                  },
+                  "response": "IMMEDIATE"
+                }
+              }
+            ],
+            "order": 1,
+            "prerequisite": null,
+            "question_sentence": "오늘 체온이 얼마였나요?",
+            "refusal_explanation": "체온은 진료 준비에 필요합니다.",
+            "policy": {
+              "question_limit": 3,
+              "unknown_accept_after": 2,
+              "refusal_accept_after": 2
+            }
+          },
+          {
+            "question_id": "Q2",
+            "name": "기침",
+            "guide_sentences": [],
+            "affected_followups": [],
+            "repeat_keys": [],
+            "slots": [
+              {
+                "slot_id": "cough",
+                "units": [],
+                "choices": [],
+                "required": true,
+                "reask_sentence": "기침이 있으면 예, 없으면 아니오로 답해 주세요.",
+                "yes_no_map": {
+                  "yes": "yes",
+                  "no": "no"
+                },
+                "risk_rule": null
+              }
+            ],
+            "order": 2,
+            "prerequisite": {
+              "slot": {
+                "question_id": "Q1",
+                "repeat_key": "",
+                "slot_id": "body_temp"
+              },
+              "value": "high"
+            },
+            "question_sentence": "기침이 있나요?",
+            "refusal_explanation": "증상 파악에 필요합니다.",
+            "policy": {
+              "question_limit": 2,
+              "unknown_accept_after": 1,
+              "refusal_accept_after": 1
+            }
+          }
+        ],
+        "session_settings": {
+          "fixed_sentences": [
+            {
+              "key": "ASK_REPEAT",
+              "sentence": "다시 한 번 말씀해 주시겠어요?"
+            },
+            {
+              "key": "FAREWELL",
+              "sentence": "수고하셨습니다."
+            }
+          ],
+          "guide_list": [
+            {
+              "guide_id": "g-remaining",
+              "selection_criterion": "남은 문항",
+              "per_question": false,
+              "sentence": "남은 문항은 {n}개입니다.",
+              "fill_value": "REMAINING_COUNT"
+            }
+          ],
+          "risk_phrases": [
+            "가슴이 아파요",
+            "숨이 안 쉬어져요"
+          ],
+          "confirm_limit": 3,
+          "unrecognized_streak_limit": 3,
+          "ask_limit": 30
+        }
+      },
+      "flags": [
+        {
+          "flag_id": "fl-25c347e2e8a2",
+          "path": "/questions/0/slots/0/units/0/range",
+          "kind": "UNSURE",
+          "message": "범위를 '범위 최소 ~ 최대' 형식으로 읽지 못했다. 값을 비워 두었다",
+          "raw": "범위 34 ~ ??",
+          "resolved": true,
+          "resolved_by": "dr-kim",
+          "resolution": "EDITED"
+        }
+      ],
+      "source": {
+        "kind": "material",
+        "source_hash": "sha256:59ce9883af5a0a45a82988bca145d50036c53d9a3a8b961e539f281dc719cd26",
+        "filename": "form.txt",
+        "size": 1211,
+        "extractor": "text-form",
+        "extractor_version": "1"
+      },
+      "fallback": null,
+      "warnings": [],
+      "created_by": "dr-kim",
+      "created_at": "2026-02-30T00:00:00Z",
+      "updated_at": "2026-10-28T14:11:56Z",
+      "confirming": {
+        "version": 1,
+        "at": "2026-10-28T14:11:56Z"
+      },
+      "confirmed": {
+        "ref": {
+          "id": "qs-main",
+          "version": "1",
+          "content_hash": "sha256:1dfd4c32498001d366be6957c005a708ac213376d64eac2b9d9d1a960b6aba38"
+        },
+        "preview_hash": "sha256:45e1851593f9d92de2c08a54a8a00d1df477268bbfaeb6ab9db8e831768f33bc",
+        "review_id": "rv-dr-2a0e2ecf280f4c98"
+      }
+    }
+  },
+  {
+    "service": "question-authoring",
+    "method": "GET",
+    "path": "/v1/drafts",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/AuthoringResponses.schema.json#/$defs/DraftList"
+    },
+    "fixture": "boundary-contracts/examples/AuthoringResponses.DraftList.json",
+    "pointer": [
+      "drafts",
+      0,
+      "created_at"
+    ],
+    "control": {
+      "drafts": [
+        {
+          "draft_id": "dr-2a0e2ecf280f4c98",
+          "question_set_id": "qs-main",
+          "status": "OPEN",
+          "base": null,
+          "bank": {
+            "questions": [
+              {
+                "question_id": "Q1",
+                "name": "체온",
+                "guide_sentences": [],
+                "affected_followups": [],
+                "repeat_keys": [],
+                "slots": [
+                  {
+                    "slot_id": "body_temp",
+                    "units": [
+                      {
+                        "name": "도",
+                        "synonyms": [
+                          "도씨",
+                          "섭씨"
+                        ],
+                        "range": null,
+                        "convert_to": null
+                      }
+                    ],
+                    "choices": [],
+                    "required": true,
+                    "reask_sentence": "체온을 숫자로 말씀해 주세요.",
+                    "yes_no_map": null,
+                    "risk_rule": {
+                      "operator": ">=",
+                      "value": {
+                        "amount": 40,
+                        "unit": "도"
+                      },
+                      "response": "IMMEDIATE"
+                    }
+                  }
+                ],
+                "order": 1,
+                "prerequisite": null,
+                "question_sentence": "오늘 체온이 얼마였나요?",
+                "refusal_explanation": "체온은 진료 준비에 필요합니다.",
+                "policy": {
+                  "question_limit": 3,
+                  "unknown_accept_after": 2,
+                  "refusal_accept_after": 2
+                }
+              },
+              {
+                "question_id": "Q2",
+                "name": "기침",
+                "guide_sentences": [],
+                "affected_followups": [],
+                "repeat_keys": [],
+                "slots": [
+                  {
+                    "slot_id": "cough",
+                    "units": [],
+                    "choices": [],
+                    "required": true,
+                    "reask_sentence": "기침이 있으면 예, 없으면 아니오로 답해 주세요.",
+                    "yes_no_map": {
+                      "yes": "yes",
+                      "no": "no"
+                    },
+                    "risk_rule": null
+                  }
+                ],
+                "order": 2,
+                "prerequisite": {
+                  "slot": {
+                    "question_id": "Q1",
+                    "repeat_key": "",
+                    "slot_id": "body_temp"
+                  },
+                  "value": "high"
+                },
+                "question_sentence": "기침이 있나요?",
+                "refusal_explanation": "증상 파악에 필요합니다.",
+                "policy": {
+                  "question_limit": 2,
+                  "unknown_accept_after": 1,
+                  "refusal_accept_after": 1
+                }
+              }
+            ],
+            "session_settings": {
+              "fixed_sentences": [
+                {
+                  "key": "ASK_REPEAT",
+                  "sentence": "다시 한 번 말씀해 주시겠어요?"
+                },
+                {
+                  "key": "FAREWELL",
+                  "sentence": "수고하셨습니다."
+                }
+              ],
+              "guide_list": [
+                {
+                  "guide_id": "g-remaining",
+                  "selection_criterion": "남은 문항",
+                  "per_question": false,
+                  "sentence": "남은 문항은 {n}개입니다.",
+                  "fill_value": "REMAINING_COUNT"
+                }
+              ],
+              "risk_phrases": [
+                "가슴이 아파요",
+                "숨이 안 쉬어져요"
+              ],
+              "confirm_limit": 3,
+              "unrecognized_streak_limit": 3,
+              "ask_limit": 30
+            }
+          },
+          "flags": [
+            {
+              "flag_id": "fl-25c347e2e8a2",
+              "path": "/questions/0/slots/0/units/0/range",
+              "kind": "UNSURE",
+              "message": "범위를 '범위 최소 ~ 최대' 형식으로 읽지 못했다. 값을 비워 두었다",
+              "raw": "범위 34 ~ ??",
+              "resolved": false
+            }
+          ],
+          "source": {
+            "kind": "material",
+            "source_hash": "sha256:59ce9883af5a0a45a82988bca145d50036c53d9a3a8b961e539f281dc719cd26",
+            "filename": "form.txt",
+            "size": 1211,
+            "extractor": "text-form",
+            "extractor_version": "1"
+          },
+          "fallback": null,
+          "warnings": [],
+          "created_by": "dr-kim",
+          "created_at": "2026-10-28T14:11:56Z",
+          "updated_at": "2026-10-28T14:11:56Z"
+        }
+      ]
+    },
+    "document": {
+      "drafts": [
+        {
+          "draft_id": "dr-2a0e2ecf280f4c98",
+          "question_set_id": "qs-main",
+          "status": "OPEN",
+          "base": null,
+          "bank": {
+            "questions": [
+              {
+                "question_id": "Q1",
+                "name": "체온",
+                "guide_sentences": [],
+                "affected_followups": [],
+                "repeat_keys": [],
+                "slots": [
+                  {
+                    "slot_id": "body_temp",
+                    "units": [
+                      {
+                        "name": "도",
+                        "synonyms": [
+                          "도씨",
+                          "섭씨"
+                        ],
+                        "range": null,
+                        "convert_to": null
+                      }
+                    ],
+                    "choices": [],
+                    "required": true,
+                    "reask_sentence": "체온을 숫자로 말씀해 주세요.",
+                    "yes_no_map": null,
+                    "risk_rule": {
+                      "operator": ">=",
+                      "value": {
+                        "amount": 40,
+                        "unit": "도"
+                      },
+                      "response": "IMMEDIATE"
+                    }
+                  }
+                ],
+                "order": 1,
+                "prerequisite": null,
+                "question_sentence": "오늘 체온이 얼마였나요?",
+                "refusal_explanation": "체온은 진료 준비에 필요합니다.",
+                "policy": {
+                  "question_limit": 3,
+                  "unknown_accept_after": 2,
+                  "refusal_accept_after": 2
+                }
+              },
+              {
+                "question_id": "Q2",
+                "name": "기침",
+                "guide_sentences": [],
+                "affected_followups": [],
+                "repeat_keys": [],
+                "slots": [
+                  {
+                    "slot_id": "cough",
+                    "units": [],
+                    "choices": [],
+                    "required": true,
+                    "reask_sentence": "기침이 있으면 예, 없으면 아니오로 답해 주세요.",
+                    "yes_no_map": {
+                      "yes": "yes",
+                      "no": "no"
+                    },
+                    "risk_rule": null
+                  }
+                ],
+                "order": 2,
+                "prerequisite": {
+                  "slot": {
+                    "question_id": "Q1",
+                    "repeat_key": "",
+                    "slot_id": "body_temp"
+                  },
+                  "value": "high"
+                },
+                "question_sentence": "기침이 있나요?",
+                "refusal_explanation": "증상 파악에 필요합니다.",
+                "policy": {
+                  "question_limit": 2,
+                  "unknown_accept_after": 1,
+                  "refusal_accept_after": 1
+                }
+              }
+            ],
+            "session_settings": {
+              "fixed_sentences": [
+                {
+                  "key": "ASK_REPEAT",
+                  "sentence": "다시 한 번 말씀해 주시겠어요?"
+                },
+                {
+                  "key": "FAREWELL",
+                  "sentence": "수고하셨습니다."
+                }
+              ],
+              "guide_list": [
+                {
+                  "guide_id": "g-remaining",
+                  "selection_criterion": "남은 문항",
+                  "per_question": false,
+                  "sentence": "남은 문항은 {n}개입니다.",
+                  "fill_value": "REMAINING_COUNT"
+                }
+              ],
+              "risk_phrases": [
+                "가슴이 아파요",
+                "숨이 안 쉬어져요"
+              ],
+              "confirm_limit": 3,
+              "unrecognized_streak_limit": 3,
+              "ask_limit": 30
+            }
+          },
+          "flags": [
+            {
+              "flag_id": "fl-25c347e2e8a2",
+              "path": "/questions/0/slots/0/units/0/range",
+              "kind": "UNSURE",
+              "message": "범위를 '범위 최소 ~ 최대' 형식으로 읽지 못했다. 값을 비워 두었다",
+              "raw": "범위 34 ~ ??",
+              "resolved": false
+            }
+          ],
+          "source": {
+            "kind": "material",
+            "source_hash": "sha256:59ce9883af5a0a45a82988bca145d50036c53d9a3a8b961e539f281dc719cd26",
+            "filename": "form.txt",
+            "size": 1211,
+            "extractor": "text-form",
+            "extractor_version": "1"
+          },
+          "fallback": null,
+          "warnings": [],
+          "created_by": "dr-kim",
+          "created_at": "2026-02-30T00:00:00Z",
+          "updated_at": "2026-10-28T14:11:56Z"
+        }
+      ]
+    }
+  },
+  {
+    "service": "question-authoring",
+    "method": "POST",
+    "path": "/v1/reviews",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/AuthoringResponses.schema.json#/$defs/AddReviewResponse"
+    },
+    "fixture": "boundary-contracts/examples/AuthoringResponses.AddReviewResponse.json",
+    "pointer": [
+      "reviewed_at"
+    ],
+    "control": {
+      "pipeline_schema_version": "3.0",
+      "review_id": "rv-da74d70965e8441a",
+      "question_set": {
+        "id": "qs-main",
+        "version": "1",
+        "content_hash": "sha256:1dfd4c32498001d366be6957c005a708ac213376d64eac2b9d9d1a960b6aba38"
+      },
+      "reviewer_role": "clinical-reviewer",
+      "reviewer_id": "dr-park",
+      "decision": "APPROVED",
+      "clinical_basis_approved": true,
+      "reviewed_at": "2026-10-28T14:11:56Z",
+      "ext": {
+        "question-authoring": {
+          "kind": "FOLLOW_UP_REVIEW"
+        }
+      }
+    },
+    "document": {
+      "pipeline_schema_version": "3.0",
+      "review_id": "rv-da74d70965e8441a",
+      "question_set": {
+        "id": "qs-main",
+        "version": "1",
+        "content_hash": "sha256:1dfd4c32498001d366be6957c005a708ac213376d64eac2b9d9d1a960b6aba38"
+      },
+      "reviewer_role": "clinical-reviewer",
+      "reviewer_id": "dr-park",
+      "decision": "APPROVED",
+      "clinical_basis_approved": true,
+      "reviewed_at": "2026-02-30T00:00:00Z",
+      "ext": {
+        "question-authoring": {
+          "kind": "FOLLOW_UP_REVIEW"
+        }
+      }
+    }
+  },
+  {
+    "service": "question-authoring",
+    "method": "GET",
+    "path": "/v1/drafts/{did}",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/AuthoringResponses.schema.json#/$defs/Draft"
+    },
+    "fixture": "boundary-contracts/examples/AuthoringResponses.Draft.confirmed.json",
+    "pointer": [
+      "created_at"
+    ],
+    "control": {
+      "draft_id": "dr-2a0e2ecf280f4c98",
+      "question_set_id": "qs-main",
+      "status": "CONFIRMED",
+      "base": null,
+      "bank": {
+        "questions": [
+          {
+            "question_id": "Q1",
+            "name": "체온",
+            "guide_sentences": [],
+            "affected_followups": [],
+            "repeat_keys": [],
+            "slots": [
+              {
+                "slot_id": "body_temp",
+                "units": [
+                  {
+                    "name": "도",
+                    "synonyms": [
+                      "도씨",
+                      "섭씨"
+                    ],
+                    "range": [
+                      34,
+                      42
+                    ],
+                    "convert_to": null
+                  }
+                ],
+                "choices": [],
+                "required": true,
+                "reask_sentence": "체온을 숫자로 말씀해 주세요.",
+                "yes_no_map": null,
+                "risk_rule": {
+                  "operator": ">=",
+                  "value": {
+                    "amount": 40,
+                    "unit": "도"
+                  },
+                  "response": "IMMEDIATE"
+                }
+              }
+            ],
+            "order": 1,
+            "prerequisite": null,
+            "question_sentence": "오늘 체온이 얼마였나요?",
+            "refusal_explanation": "체온은 진료 준비에 필요합니다.",
+            "policy": {
+              "question_limit": 3,
+              "unknown_accept_after": 2,
+              "refusal_accept_after": 2
+            }
+          },
+          {
+            "question_id": "Q2",
+            "name": "기침",
+            "guide_sentences": [],
+            "affected_followups": [],
+            "repeat_keys": [],
+            "slots": [
+              {
+                "slot_id": "cough",
+                "units": [],
+                "choices": [],
+                "required": true,
+                "reask_sentence": "기침이 있으면 예, 없으면 아니오로 답해 주세요.",
+                "yes_no_map": {
+                  "yes": "yes",
+                  "no": "no"
+                },
+                "risk_rule": null
+              }
+            ],
+            "order": 2,
+            "prerequisite": {
+              "slot": {
+                "question_id": "Q1",
+                "repeat_key": "",
+                "slot_id": "body_temp"
+              },
+              "value": "high"
+            },
+            "question_sentence": "기침이 있나요?",
+            "refusal_explanation": "증상 파악에 필요합니다.",
+            "policy": {
+              "question_limit": 2,
+              "unknown_accept_after": 1,
+              "refusal_accept_after": 1
+            }
+          }
+        ],
+        "session_settings": {
+          "fixed_sentences": [
+            {
+              "key": "ASK_REPEAT",
+              "sentence": "다시 한 번 말씀해 주시겠어요?"
+            },
+            {
+              "key": "FAREWELL",
+              "sentence": "수고하셨습니다."
+            }
+          ],
+          "guide_list": [
+            {
+              "guide_id": "g-remaining",
+              "selection_criterion": "남은 문항",
+              "per_question": false,
+              "sentence": "남은 문항은 {n}개입니다.",
+              "fill_value": "REMAINING_COUNT"
+            }
+          ],
+          "risk_phrases": [
+            "가슴이 아파요",
+            "숨이 안 쉬어져요"
+          ],
+          "confirm_limit": 3,
+          "unrecognized_streak_limit": 3,
+          "ask_limit": 30
+        }
+      },
+      "flags": [
+        {
+          "flag_id": "fl-25c347e2e8a2",
+          "path": "/questions/0/slots/0/units/0/range",
+          "kind": "UNSURE",
+          "message": "범위를 '범위 최소 ~ 최대' 형식으로 읽지 못했다. 값을 비워 두었다",
+          "raw": "범위 34 ~ ??",
+          "resolved": true,
+          "resolved_by": "dr-kim",
+          "resolution": "EDITED"
+        }
+      ],
+      "source": {
+        "kind": "material",
+        "source_hash": "sha256:59ce9883af5a0a45a82988bca145d50036c53d9a3a8b961e539f281dc719cd26",
+        "filename": "form.txt",
+        "size": 1211,
+        "extractor": "text-form",
+        "extractor_version": "1"
+      },
+      "fallback": null,
+      "warnings": [],
+      "created_by": "dr-kim",
+      "created_at": "2026-10-28T14:11:56Z",
+      "updated_at": "2026-10-28T14:11:56Z",
+      "confirming": {
+        "version": 1,
+        "at": "2026-10-28T14:11:56Z"
+      },
+      "confirmed": {
+        "ref": {
+          "id": "qs-main",
+          "version": "1",
+          "content_hash": "sha256:1dfd4c32498001d366be6957c005a708ac213376d64eac2b9d9d1a960b6aba38"
+        },
+        "preview_hash": "sha256:45e1851593f9d92de2c08a54a8a00d1df477268bbfaeb6ab9db8e831768f33bc",
+        "review_id": "rv-dr-2a0e2ecf280f4c98"
+      }
+    },
+    "document": {
+      "draft_id": "dr-2a0e2ecf280f4c98",
+      "question_set_id": "qs-main",
+      "status": "CONFIRMED",
+      "base": null,
+      "bank": {
+        "questions": [
+          {
+            "question_id": "Q1",
+            "name": "체온",
+            "guide_sentences": [],
+            "affected_followups": [],
+            "repeat_keys": [],
+            "slots": [
+              {
+                "slot_id": "body_temp",
+                "units": [
+                  {
+                    "name": "도",
+                    "synonyms": [
+                      "도씨",
+                      "섭씨"
+                    ],
+                    "range": [
+                      34,
+                      42
+                    ],
+                    "convert_to": null
+                  }
+                ],
+                "choices": [],
+                "required": true,
+                "reask_sentence": "체온을 숫자로 말씀해 주세요.",
+                "yes_no_map": null,
+                "risk_rule": {
+                  "operator": ">=",
+                  "value": {
+                    "amount": 40,
+                    "unit": "도"
+                  },
+                  "response": "IMMEDIATE"
+                }
+              }
+            ],
+            "order": 1,
+            "prerequisite": null,
+            "question_sentence": "오늘 체온이 얼마였나요?",
+            "refusal_explanation": "체온은 진료 준비에 필요합니다.",
+            "policy": {
+              "question_limit": 3,
+              "unknown_accept_after": 2,
+              "refusal_accept_after": 2
+            }
+          },
+          {
+            "question_id": "Q2",
+            "name": "기침",
+            "guide_sentences": [],
+            "affected_followups": [],
+            "repeat_keys": [],
+            "slots": [
+              {
+                "slot_id": "cough",
+                "units": [],
+                "choices": [],
+                "required": true,
+                "reask_sentence": "기침이 있으면 예, 없으면 아니오로 답해 주세요.",
+                "yes_no_map": {
+                  "yes": "yes",
+                  "no": "no"
+                },
+                "risk_rule": null
+              }
+            ],
+            "order": 2,
+            "prerequisite": {
+              "slot": {
+                "question_id": "Q1",
+                "repeat_key": "",
+                "slot_id": "body_temp"
+              },
+              "value": "high"
+            },
+            "question_sentence": "기침이 있나요?",
+            "refusal_explanation": "증상 파악에 필요합니다.",
+            "policy": {
+              "question_limit": 2,
+              "unknown_accept_after": 1,
+              "refusal_accept_after": 1
+            }
+          }
+        ],
+        "session_settings": {
+          "fixed_sentences": [
+            {
+              "key": "ASK_REPEAT",
+              "sentence": "다시 한 번 말씀해 주시겠어요?"
+            },
+            {
+              "key": "FAREWELL",
+              "sentence": "수고하셨습니다."
+            }
+          ],
+          "guide_list": [
+            {
+              "guide_id": "g-remaining",
+              "selection_criterion": "남은 문항",
+              "per_question": false,
+              "sentence": "남은 문항은 {n}개입니다.",
+              "fill_value": "REMAINING_COUNT"
+            }
+          ],
+          "risk_phrases": [
+            "가슴이 아파요",
+            "숨이 안 쉬어져요"
+          ],
+          "confirm_limit": 3,
+          "unrecognized_streak_limit": 3,
+          "ask_limit": 30
+        }
+      },
+      "flags": [
+        {
+          "flag_id": "fl-25c347e2e8a2",
+          "path": "/questions/0/slots/0/units/0/range",
+          "kind": "UNSURE",
+          "message": "범위를 '범위 최소 ~ 최대' 형식으로 읽지 못했다. 값을 비워 두었다",
+          "raw": "범위 34 ~ ??",
+          "resolved": true,
+          "resolved_by": "dr-kim",
+          "resolution": "EDITED"
+        }
+      ],
+      "source": {
+        "kind": "material",
+        "source_hash": "sha256:59ce9883af5a0a45a82988bca145d50036c53d9a3a8b961e539f281dc719cd26",
+        "filename": "form.txt",
+        "size": 1211,
+        "extractor": "text-form",
+        "extractor_version": "1"
+      },
+      "fallback": null,
+      "warnings": [],
+      "created_by": "dr-kim",
+      "created_at": "2026-02-30T00:00:00Z",
+      "updated_at": "2026-10-28T14:11:56Z",
+      "confirming": {
+        "version": 1,
+        "at": "2026-10-28T14:11:56Z"
+      },
+      "confirmed": {
+        "ref": {
+          "id": "qs-main",
+          "version": "1",
+          "content_hash": "sha256:1dfd4c32498001d366be6957c005a708ac213376d64eac2b9d9d1a960b6aba38"
+        },
+        "preview_hash": "sha256:45e1851593f9d92de2c08a54a8a00d1df477268bbfaeb6ab9db8e831768f33bc",
+        "review_id": "rv-dr-2a0e2ecf280f4c98"
+      }
+    }
+  },
+  {
+    "service": "question-authoring",
+    "method": "POST",
+    "path": "/v1/drafts/{did}/edits",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/AuthoringResponses.schema.json#/$defs/Draft"
+    },
+    "fixture": "boundary-contracts/examples/AuthoringResponses.Draft.confirmed.json",
+    "pointer": [
+      "created_at"
+    ],
+    "control": {
+      "draft_id": "dr-2a0e2ecf280f4c98",
+      "question_set_id": "qs-main",
+      "status": "CONFIRMED",
+      "base": null,
+      "bank": {
+        "questions": [
+          {
+            "question_id": "Q1",
+            "name": "체온",
+            "guide_sentences": [],
+            "affected_followups": [],
+            "repeat_keys": [],
+            "slots": [
+              {
+                "slot_id": "body_temp",
+                "units": [
+                  {
+                    "name": "도",
+                    "synonyms": [
+                      "도씨",
+                      "섭씨"
+                    ],
+                    "range": [
+                      34,
+                      42
+                    ],
+                    "convert_to": null
+                  }
+                ],
+                "choices": [],
+                "required": true,
+                "reask_sentence": "체온을 숫자로 말씀해 주세요.",
+                "yes_no_map": null,
+                "risk_rule": {
+                  "operator": ">=",
+                  "value": {
+                    "amount": 40,
+                    "unit": "도"
+                  },
+                  "response": "IMMEDIATE"
+                }
+              }
+            ],
+            "order": 1,
+            "prerequisite": null,
+            "question_sentence": "오늘 체온이 얼마였나요?",
+            "refusal_explanation": "체온은 진료 준비에 필요합니다.",
+            "policy": {
+              "question_limit": 3,
+              "unknown_accept_after": 2,
+              "refusal_accept_after": 2
+            }
+          },
+          {
+            "question_id": "Q2",
+            "name": "기침",
+            "guide_sentences": [],
+            "affected_followups": [],
+            "repeat_keys": [],
+            "slots": [
+              {
+                "slot_id": "cough",
+                "units": [],
+                "choices": [],
+                "required": true,
+                "reask_sentence": "기침이 있으면 예, 없으면 아니오로 답해 주세요.",
+                "yes_no_map": {
+                  "yes": "yes",
+                  "no": "no"
+                },
+                "risk_rule": null
+              }
+            ],
+            "order": 2,
+            "prerequisite": {
+              "slot": {
+                "question_id": "Q1",
+                "repeat_key": "",
+                "slot_id": "body_temp"
+              },
+              "value": "high"
+            },
+            "question_sentence": "기침이 있나요?",
+            "refusal_explanation": "증상 파악에 필요합니다.",
+            "policy": {
+              "question_limit": 2,
+              "unknown_accept_after": 1,
+              "refusal_accept_after": 1
+            }
+          }
+        ],
+        "session_settings": {
+          "fixed_sentences": [
+            {
+              "key": "ASK_REPEAT",
+              "sentence": "다시 한 번 말씀해 주시겠어요?"
+            },
+            {
+              "key": "FAREWELL",
+              "sentence": "수고하셨습니다."
+            }
+          ],
+          "guide_list": [
+            {
+              "guide_id": "g-remaining",
+              "selection_criterion": "남은 문항",
+              "per_question": false,
+              "sentence": "남은 문항은 {n}개입니다.",
+              "fill_value": "REMAINING_COUNT"
+            }
+          ],
+          "risk_phrases": [
+            "가슴이 아파요",
+            "숨이 안 쉬어져요"
+          ],
+          "confirm_limit": 3,
+          "unrecognized_streak_limit": 3,
+          "ask_limit": 30
+        }
+      },
+      "flags": [
+        {
+          "flag_id": "fl-25c347e2e8a2",
+          "path": "/questions/0/slots/0/units/0/range",
+          "kind": "UNSURE",
+          "message": "범위를 '범위 최소 ~ 최대' 형식으로 읽지 못했다. 값을 비워 두었다",
+          "raw": "범위 34 ~ ??",
+          "resolved": true,
+          "resolved_by": "dr-kim",
+          "resolution": "EDITED"
+        }
+      ],
+      "source": {
+        "kind": "material",
+        "source_hash": "sha256:59ce9883af5a0a45a82988bca145d50036c53d9a3a8b961e539f281dc719cd26",
+        "filename": "form.txt",
+        "size": 1211,
+        "extractor": "text-form",
+        "extractor_version": "1"
+      },
+      "fallback": null,
+      "warnings": [],
+      "created_by": "dr-kim",
+      "created_at": "2026-10-28T14:11:56Z",
+      "updated_at": "2026-10-28T14:11:56Z",
+      "confirming": {
+        "version": 1,
+        "at": "2026-10-28T14:11:56Z"
+      },
+      "confirmed": {
+        "ref": {
+          "id": "qs-main",
+          "version": "1",
+          "content_hash": "sha256:1dfd4c32498001d366be6957c005a708ac213376d64eac2b9d9d1a960b6aba38"
+        },
+        "preview_hash": "sha256:45e1851593f9d92de2c08a54a8a00d1df477268bbfaeb6ab9db8e831768f33bc",
+        "review_id": "rv-dr-2a0e2ecf280f4c98"
+      }
+    },
+    "document": {
+      "draft_id": "dr-2a0e2ecf280f4c98",
+      "question_set_id": "qs-main",
+      "status": "CONFIRMED",
+      "base": null,
+      "bank": {
+        "questions": [
+          {
+            "question_id": "Q1",
+            "name": "체온",
+            "guide_sentences": [],
+            "affected_followups": [],
+            "repeat_keys": [],
+            "slots": [
+              {
+                "slot_id": "body_temp",
+                "units": [
+                  {
+                    "name": "도",
+                    "synonyms": [
+                      "도씨",
+                      "섭씨"
+                    ],
+                    "range": [
+                      34,
+                      42
+                    ],
+                    "convert_to": null
+                  }
+                ],
+                "choices": [],
+                "required": true,
+                "reask_sentence": "체온을 숫자로 말씀해 주세요.",
+                "yes_no_map": null,
+                "risk_rule": {
+                  "operator": ">=",
+                  "value": {
+                    "amount": 40,
+                    "unit": "도"
+                  },
+                  "response": "IMMEDIATE"
+                }
+              }
+            ],
+            "order": 1,
+            "prerequisite": null,
+            "question_sentence": "오늘 체온이 얼마였나요?",
+            "refusal_explanation": "체온은 진료 준비에 필요합니다.",
+            "policy": {
+              "question_limit": 3,
+              "unknown_accept_after": 2,
+              "refusal_accept_after": 2
+            }
+          },
+          {
+            "question_id": "Q2",
+            "name": "기침",
+            "guide_sentences": [],
+            "affected_followups": [],
+            "repeat_keys": [],
+            "slots": [
+              {
+                "slot_id": "cough",
+                "units": [],
+                "choices": [],
+                "required": true,
+                "reask_sentence": "기침이 있으면 예, 없으면 아니오로 답해 주세요.",
+                "yes_no_map": {
+                  "yes": "yes",
+                  "no": "no"
+                },
+                "risk_rule": null
+              }
+            ],
+            "order": 2,
+            "prerequisite": {
+              "slot": {
+                "question_id": "Q1",
+                "repeat_key": "",
+                "slot_id": "body_temp"
+              },
+              "value": "high"
+            },
+            "question_sentence": "기침이 있나요?",
+            "refusal_explanation": "증상 파악에 필요합니다.",
+            "policy": {
+              "question_limit": 2,
+              "unknown_accept_after": 1,
+              "refusal_accept_after": 1
+            }
+          }
+        ],
+        "session_settings": {
+          "fixed_sentences": [
+            {
+              "key": "ASK_REPEAT",
+              "sentence": "다시 한 번 말씀해 주시겠어요?"
+            },
+            {
+              "key": "FAREWELL",
+              "sentence": "수고하셨습니다."
+            }
+          ],
+          "guide_list": [
+            {
+              "guide_id": "g-remaining",
+              "selection_criterion": "남은 문항",
+              "per_question": false,
+              "sentence": "남은 문항은 {n}개입니다.",
+              "fill_value": "REMAINING_COUNT"
+            }
+          ],
+          "risk_phrases": [
+            "가슴이 아파요",
+            "숨이 안 쉬어져요"
+          ],
+          "confirm_limit": 3,
+          "unrecognized_streak_limit": 3,
+          "ask_limit": 30
+        }
+      },
+      "flags": [
+        {
+          "flag_id": "fl-25c347e2e8a2",
+          "path": "/questions/0/slots/0/units/0/range",
+          "kind": "UNSURE",
+          "message": "범위를 '범위 최소 ~ 최대' 형식으로 읽지 못했다. 값을 비워 두었다",
+          "raw": "범위 34 ~ ??",
+          "resolved": true,
+          "resolved_by": "dr-kim",
+          "resolution": "EDITED"
+        }
+      ],
+      "source": {
+        "kind": "material",
+        "source_hash": "sha256:59ce9883af5a0a45a82988bca145d50036c53d9a3a8b961e539f281dc719cd26",
+        "filename": "form.txt",
+        "size": 1211,
+        "extractor": "text-form",
+        "extractor_version": "1"
+      },
+      "fallback": null,
+      "warnings": [],
+      "created_by": "dr-kim",
+      "created_at": "2026-02-30T00:00:00Z",
+      "updated_at": "2026-10-28T14:11:56Z",
+      "confirming": {
+        "version": 1,
+        "at": "2026-10-28T14:11:56Z"
+      },
+      "confirmed": {
+        "ref": {
+          "id": "qs-main",
+          "version": "1",
+          "content_hash": "sha256:1dfd4c32498001d366be6957c005a708ac213376d64eac2b9d9d1a960b6aba38"
+        },
+        "preview_hash": "sha256:45e1851593f9d92de2c08a54a8a00d1df477268bbfaeb6ab9db8e831768f33bc",
+        "review_id": "rv-dr-2a0e2ecf280f4c98"
+      }
+    }
+  },
+  {
+    "service": "question-authoring",
+    "method": "POST",
+    "path": "/v1/drafts/{did}/acknowledge",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/AuthoringResponses.schema.json#/$defs/Draft"
+    },
+    "fixture": "boundary-contracts/examples/AuthoringResponses.Draft.confirmed.json",
+    "pointer": [
+      "created_at"
+    ],
+    "control": {
+      "draft_id": "dr-2a0e2ecf280f4c98",
+      "question_set_id": "qs-main",
+      "status": "CONFIRMED",
+      "base": null,
+      "bank": {
+        "questions": [
+          {
+            "question_id": "Q1",
+            "name": "체온",
+            "guide_sentences": [],
+            "affected_followups": [],
+            "repeat_keys": [],
+            "slots": [
+              {
+                "slot_id": "body_temp",
+                "units": [
+                  {
+                    "name": "도",
+                    "synonyms": [
+                      "도씨",
+                      "섭씨"
+                    ],
+                    "range": [
+                      34,
+                      42
+                    ],
+                    "convert_to": null
+                  }
+                ],
+                "choices": [],
+                "required": true,
+                "reask_sentence": "체온을 숫자로 말씀해 주세요.",
+                "yes_no_map": null,
+                "risk_rule": {
+                  "operator": ">=",
+                  "value": {
+                    "amount": 40,
+                    "unit": "도"
+                  },
+                  "response": "IMMEDIATE"
+                }
+              }
+            ],
+            "order": 1,
+            "prerequisite": null,
+            "question_sentence": "오늘 체온이 얼마였나요?",
+            "refusal_explanation": "체온은 진료 준비에 필요합니다.",
+            "policy": {
+              "question_limit": 3,
+              "unknown_accept_after": 2,
+              "refusal_accept_after": 2
+            }
+          },
+          {
+            "question_id": "Q2",
+            "name": "기침",
+            "guide_sentences": [],
+            "affected_followups": [],
+            "repeat_keys": [],
+            "slots": [
+              {
+                "slot_id": "cough",
+                "units": [],
+                "choices": [],
+                "required": true,
+                "reask_sentence": "기침이 있으면 예, 없으면 아니오로 답해 주세요.",
+                "yes_no_map": {
+                  "yes": "yes",
+                  "no": "no"
+                },
+                "risk_rule": null
+              }
+            ],
+            "order": 2,
+            "prerequisite": {
+              "slot": {
+                "question_id": "Q1",
+                "repeat_key": "",
+                "slot_id": "body_temp"
+              },
+              "value": "high"
+            },
+            "question_sentence": "기침이 있나요?",
+            "refusal_explanation": "증상 파악에 필요합니다.",
+            "policy": {
+              "question_limit": 2,
+              "unknown_accept_after": 1,
+              "refusal_accept_after": 1
+            }
+          }
+        ],
+        "session_settings": {
+          "fixed_sentences": [
+            {
+              "key": "ASK_REPEAT",
+              "sentence": "다시 한 번 말씀해 주시겠어요?"
+            },
+            {
+              "key": "FAREWELL",
+              "sentence": "수고하셨습니다."
+            }
+          ],
+          "guide_list": [
+            {
+              "guide_id": "g-remaining",
+              "selection_criterion": "남은 문항",
+              "per_question": false,
+              "sentence": "남은 문항은 {n}개입니다.",
+              "fill_value": "REMAINING_COUNT"
+            }
+          ],
+          "risk_phrases": [
+            "가슴이 아파요",
+            "숨이 안 쉬어져요"
+          ],
+          "confirm_limit": 3,
+          "unrecognized_streak_limit": 3,
+          "ask_limit": 30
+        }
+      },
+      "flags": [
+        {
+          "flag_id": "fl-25c347e2e8a2",
+          "path": "/questions/0/slots/0/units/0/range",
+          "kind": "UNSURE",
+          "message": "범위를 '범위 최소 ~ 최대' 형식으로 읽지 못했다. 값을 비워 두었다",
+          "raw": "범위 34 ~ ??",
+          "resolved": true,
+          "resolved_by": "dr-kim",
+          "resolution": "EDITED"
+        }
+      ],
+      "source": {
+        "kind": "material",
+        "source_hash": "sha256:59ce9883af5a0a45a82988bca145d50036c53d9a3a8b961e539f281dc719cd26",
+        "filename": "form.txt",
+        "size": 1211,
+        "extractor": "text-form",
+        "extractor_version": "1"
+      },
+      "fallback": null,
+      "warnings": [],
+      "created_by": "dr-kim",
+      "created_at": "2026-10-28T14:11:56Z",
+      "updated_at": "2026-10-28T14:11:56Z",
+      "confirming": {
+        "version": 1,
+        "at": "2026-10-28T14:11:56Z"
+      },
+      "confirmed": {
+        "ref": {
+          "id": "qs-main",
+          "version": "1",
+          "content_hash": "sha256:1dfd4c32498001d366be6957c005a708ac213376d64eac2b9d9d1a960b6aba38"
+        },
+        "preview_hash": "sha256:45e1851593f9d92de2c08a54a8a00d1df477268bbfaeb6ab9db8e831768f33bc",
+        "review_id": "rv-dr-2a0e2ecf280f4c98"
+      }
+    },
+    "document": {
+      "draft_id": "dr-2a0e2ecf280f4c98",
+      "question_set_id": "qs-main",
+      "status": "CONFIRMED",
+      "base": null,
+      "bank": {
+        "questions": [
+          {
+            "question_id": "Q1",
+            "name": "체온",
+            "guide_sentences": [],
+            "affected_followups": [],
+            "repeat_keys": [],
+            "slots": [
+              {
+                "slot_id": "body_temp",
+                "units": [
+                  {
+                    "name": "도",
+                    "synonyms": [
+                      "도씨",
+                      "섭씨"
+                    ],
+                    "range": [
+                      34,
+                      42
+                    ],
+                    "convert_to": null
+                  }
+                ],
+                "choices": [],
+                "required": true,
+                "reask_sentence": "체온을 숫자로 말씀해 주세요.",
+                "yes_no_map": null,
+                "risk_rule": {
+                  "operator": ">=",
+                  "value": {
+                    "amount": 40,
+                    "unit": "도"
+                  },
+                  "response": "IMMEDIATE"
+                }
+              }
+            ],
+            "order": 1,
+            "prerequisite": null,
+            "question_sentence": "오늘 체온이 얼마였나요?",
+            "refusal_explanation": "체온은 진료 준비에 필요합니다.",
+            "policy": {
+              "question_limit": 3,
+              "unknown_accept_after": 2,
+              "refusal_accept_after": 2
+            }
+          },
+          {
+            "question_id": "Q2",
+            "name": "기침",
+            "guide_sentences": [],
+            "affected_followups": [],
+            "repeat_keys": [],
+            "slots": [
+              {
+                "slot_id": "cough",
+                "units": [],
+                "choices": [],
+                "required": true,
+                "reask_sentence": "기침이 있으면 예, 없으면 아니오로 답해 주세요.",
+                "yes_no_map": {
+                  "yes": "yes",
+                  "no": "no"
+                },
+                "risk_rule": null
+              }
+            ],
+            "order": 2,
+            "prerequisite": {
+              "slot": {
+                "question_id": "Q1",
+                "repeat_key": "",
+                "slot_id": "body_temp"
+              },
+              "value": "high"
+            },
+            "question_sentence": "기침이 있나요?",
+            "refusal_explanation": "증상 파악에 필요합니다.",
+            "policy": {
+              "question_limit": 2,
+              "unknown_accept_after": 1,
+              "refusal_accept_after": 1
+            }
+          }
+        ],
+        "session_settings": {
+          "fixed_sentences": [
+            {
+              "key": "ASK_REPEAT",
+              "sentence": "다시 한 번 말씀해 주시겠어요?"
+            },
+            {
+              "key": "FAREWELL",
+              "sentence": "수고하셨습니다."
+            }
+          ],
+          "guide_list": [
+            {
+              "guide_id": "g-remaining",
+              "selection_criterion": "남은 문항",
+              "per_question": false,
+              "sentence": "남은 문항은 {n}개입니다.",
+              "fill_value": "REMAINING_COUNT"
+            }
+          ],
+          "risk_phrases": [
+            "가슴이 아파요",
+            "숨이 안 쉬어져요"
+          ],
+          "confirm_limit": 3,
+          "unrecognized_streak_limit": 3,
+          "ask_limit": 30
+        }
+      },
+      "flags": [
+        {
+          "flag_id": "fl-25c347e2e8a2",
+          "path": "/questions/0/slots/0/units/0/range",
+          "kind": "UNSURE",
+          "message": "범위를 '범위 최소 ~ 최대' 형식으로 읽지 못했다. 값을 비워 두었다",
+          "raw": "범위 34 ~ ??",
+          "resolved": true,
+          "resolved_by": "dr-kim",
+          "resolution": "EDITED"
+        }
+      ],
+      "source": {
+        "kind": "material",
+        "source_hash": "sha256:59ce9883af5a0a45a82988bca145d50036c53d9a3a8b961e539f281dc719cd26",
+        "filename": "form.txt",
+        "size": 1211,
+        "extractor": "text-form",
+        "extractor_version": "1"
+      },
+      "fallback": null,
+      "warnings": [],
+      "created_by": "dr-kim",
+      "created_at": "2026-02-30T00:00:00Z",
+      "updated_at": "2026-10-28T14:11:56Z",
+      "confirming": {
+        "version": 1,
+        "at": "2026-10-28T14:11:56Z"
+      },
+      "confirmed": {
+        "ref": {
+          "id": "qs-main",
+          "version": "1",
+          "content_hash": "sha256:1dfd4c32498001d366be6957c005a708ac213376d64eac2b9d9d1a960b6aba38"
+        },
+        "preview_hash": "sha256:45e1851593f9d92de2c08a54a8a00d1df477268bbfaeb6ab9db8e831768f33bc",
+        "review_id": "rv-dr-2a0e2ecf280f4c98"
+      }
+    }
+  },
+  {
+    "service": "question-authoring",
+    "method": "POST",
+    "path": "/v1/drafts/{did}/discard",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/AuthoringResponses.schema.json#/$defs/Draft"
+    },
+    "fixture": "boundary-contracts/examples/AuthoringResponses.Draft.confirmed.json",
+    "pointer": [
+      "created_at"
+    ],
+    "control": {
+      "draft_id": "dr-2a0e2ecf280f4c98",
+      "question_set_id": "qs-main",
+      "status": "CONFIRMED",
+      "base": null,
+      "bank": {
+        "questions": [
+          {
+            "question_id": "Q1",
+            "name": "체온",
+            "guide_sentences": [],
+            "affected_followups": [],
+            "repeat_keys": [],
+            "slots": [
+              {
+                "slot_id": "body_temp",
+                "units": [
+                  {
+                    "name": "도",
+                    "synonyms": [
+                      "도씨",
+                      "섭씨"
+                    ],
+                    "range": [
+                      34,
+                      42
+                    ],
+                    "convert_to": null
+                  }
+                ],
+                "choices": [],
+                "required": true,
+                "reask_sentence": "체온을 숫자로 말씀해 주세요.",
+                "yes_no_map": null,
+                "risk_rule": {
+                  "operator": ">=",
+                  "value": {
+                    "amount": 40,
+                    "unit": "도"
+                  },
+                  "response": "IMMEDIATE"
+                }
+              }
+            ],
+            "order": 1,
+            "prerequisite": null,
+            "question_sentence": "오늘 체온이 얼마였나요?",
+            "refusal_explanation": "체온은 진료 준비에 필요합니다.",
+            "policy": {
+              "question_limit": 3,
+              "unknown_accept_after": 2,
+              "refusal_accept_after": 2
+            }
+          },
+          {
+            "question_id": "Q2",
+            "name": "기침",
+            "guide_sentences": [],
+            "affected_followups": [],
+            "repeat_keys": [],
+            "slots": [
+              {
+                "slot_id": "cough",
+                "units": [],
+                "choices": [],
+                "required": true,
+                "reask_sentence": "기침이 있으면 예, 없으면 아니오로 답해 주세요.",
+                "yes_no_map": {
+                  "yes": "yes",
+                  "no": "no"
+                },
+                "risk_rule": null
+              }
+            ],
+            "order": 2,
+            "prerequisite": {
+              "slot": {
+                "question_id": "Q1",
+                "repeat_key": "",
+                "slot_id": "body_temp"
+              },
+              "value": "high"
+            },
+            "question_sentence": "기침이 있나요?",
+            "refusal_explanation": "증상 파악에 필요합니다.",
+            "policy": {
+              "question_limit": 2,
+              "unknown_accept_after": 1,
+              "refusal_accept_after": 1
+            }
+          }
+        ],
+        "session_settings": {
+          "fixed_sentences": [
+            {
+              "key": "ASK_REPEAT",
+              "sentence": "다시 한 번 말씀해 주시겠어요?"
+            },
+            {
+              "key": "FAREWELL",
+              "sentence": "수고하셨습니다."
+            }
+          ],
+          "guide_list": [
+            {
+              "guide_id": "g-remaining",
+              "selection_criterion": "남은 문항",
+              "per_question": false,
+              "sentence": "남은 문항은 {n}개입니다.",
+              "fill_value": "REMAINING_COUNT"
+            }
+          ],
+          "risk_phrases": [
+            "가슴이 아파요",
+            "숨이 안 쉬어져요"
+          ],
+          "confirm_limit": 3,
+          "unrecognized_streak_limit": 3,
+          "ask_limit": 30
+        }
+      },
+      "flags": [
+        {
+          "flag_id": "fl-25c347e2e8a2",
+          "path": "/questions/0/slots/0/units/0/range",
+          "kind": "UNSURE",
+          "message": "범위를 '범위 최소 ~ 최대' 형식으로 읽지 못했다. 값을 비워 두었다",
+          "raw": "범위 34 ~ ??",
+          "resolved": true,
+          "resolved_by": "dr-kim",
+          "resolution": "EDITED"
+        }
+      ],
+      "source": {
+        "kind": "material",
+        "source_hash": "sha256:59ce9883af5a0a45a82988bca145d50036c53d9a3a8b961e539f281dc719cd26",
+        "filename": "form.txt",
+        "size": 1211,
+        "extractor": "text-form",
+        "extractor_version": "1"
+      },
+      "fallback": null,
+      "warnings": [],
+      "created_by": "dr-kim",
+      "created_at": "2026-10-28T14:11:56Z",
+      "updated_at": "2026-10-28T14:11:56Z",
+      "confirming": {
+        "version": 1,
+        "at": "2026-10-28T14:11:56Z"
+      },
+      "confirmed": {
+        "ref": {
+          "id": "qs-main",
+          "version": "1",
+          "content_hash": "sha256:1dfd4c32498001d366be6957c005a708ac213376d64eac2b9d9d1a960b6aba38"
+        },
+        "preview_hash": "sha256:45e1851593f9d92de2c08a54a8a00d1df477268bbfaeb6ab9db8e831768f33bc",
+        "review_id": "rv-dr-2a0e2ecf280f4c98"
+      }
+    },
+    "document": {
+      "draft_id": "dr-2a0e2ecf280f4c98",
+      "question_set_id": "qs-main",
+      "status": "CONFIRMED",
+      "base": null,
+      "bank": {
+        "questions": [
+          {
+            "question_id": "Q1",
+            "name": "체온",
+            "guide_sentences": [],
+            "affected_followups": [],
+            "repeat_keys": [],
+            "slots": [
+              {
+                "slot_id": "body_temp",
+                "units": [
+                  {
+                    "name": "도",
+                    "synonyms": [
+                      "도씨",
+                      "섭씨"
+                    ],
+                    "range": [
+                      34,
+                      42
+                    ],
+                    "convert_to": null
+                  }
+                ],
+                "choices": [],
+                "required": true,
+                "reask_sentence": "체온을 숫자로 말씀해 주세요.",
+                "yes_no_map": null,
+                "risk_rule": {
+                  "operator": ">=",
+                  "value": {
+                    "amount": 40,
+                    "unit": "도"
+                  },
+                  "response": "IMMEDIATE"
+                }
+              }
+            ],
+            "order": 1,
+            "prerequisite": null,
+            "question_sentence": "오늘 체온이 얼마였나요?",
+            "refusal_explanation": "체온은 진료 준비에 필요합니다.",
+            "policy": {
+              "question_limit": 3,
+              "unknown_accept_after": 2,
+              "refusal_accept_after": 2
+            }
+          },
+          {
+            "question_id": "Q2",
+            "name": "기침",
+            "guide_sentences": [],
+            "affected_followups": [],
+            "repeat_keys": [],
+            "slots": [
+              {
+                "slot_id": "cough",
+                "units": [],
+                "choices": [],
+                "required": true,
+                "reask_sentence": "기침이 있으면 예, 없으면 아니오로 답해 주세요.",
+                "yes_no_map": {
+                  "yes": "yes",
+                  "no": "no"
+                },
+                "risk_rule": null
+              }
+            ],
+            "order": 2,
+            "prerequisite": {
+              "slot": {
+                "question_id": "Q1",
+                "repeat_key": "",
+                "slot_id": "body_temp"
+              },
+              "value": "high"
+            },
+            "question_sentence": "기침이 있나요?",
+            "refusal_explanation": "증상 파악에 필요합니다.",
+            "policy": {
+              "question_limit": 2,
+              "unknown_accept_after": 1,
+              "refusal_accept_after": 1
+            }
+          }
+        ],
+        "session_settings": {
+          "fixed_sentences": [
+            {
+              "key": "ASK_REPEAT",
+              "sentence": "다시 한 번 말씀해 주시겠어요?"
+            },
+            {
+              "key": "FAREWELL",
+              "sentence": "수고하셨습니다."
+            }
+          ],
+          "guide_list": [
+            {
+              "guide_id": "g-remaining",
+              "selection_criterion": "남은 문항",
+              "per_question": false,
+              "sentence": "남은 문항은 {n}개입니다.",
+              "fill_value": "REMAINING_COUNT"
+            }
+          ],
+          "risk_phrases": [
+            "가슴이 아파요",
+            "숨이 안 쉬어져요"
+          ],
+          "confirm_limit": 3,
+          "unrecognized_streak_limit": 3,
+          "ask_limit": 30
+        }
+      },
+      "flags": [
+        {
+          "flag_id": "fl-25c347e2e8a2",
+          "path": "/questions/0/slots/0/units/0/range",
+          "kind": "UNSURE",
+          "message": "범위를 '범위 최소 ~ 최대' 형식으로 읽지 못했다. 값을 비워 두었다",
+          "raw": "범위 34 ~ ??",
+          "resolved": true,
+          "resolved_by": "dr-kim",
+          "resolution": "EDITED"
+        }
+      ],
+      "source": {
+        "kind": "material",
+        "source_hash": "sha256:59ce9883af5a0a45a82988bca145d50036c53d9a3a8b961e539f281dc719cd26",
+        "filename": "form.txt",
+        "size": 1211,
+        "extractor": "text-form",
+        "extractor_version": "1"
+      },
+      "fallback": null,
+      "warnings": [],
+      "created_by": "dr-kim",
+      "created_at": "2026-02-30T00:00:00Z",
+      "updated_at": "2026-10-28T14:11:56Z",
+      "confirming": {
+        "version": 1,
+        "at": "2026-10-28T14:11:56Z"
+      },
+      "confirmed": {
+        "ref": {
+          "id": "qs-main",
+          "version": "1",
+          "content_hash": "sha256:1dfd4c32498001d366be6957c005a708ac213376d64eac2b9d9d1a960b6aba38"
+        },
+        "preview_hash": "sha256:45e1851593f9d92de2c08a54a8a00d1df477268bbfaeb6ab9db8e831768f33bc",
+        "review_id": "rv-dr-2a0e2ecf280f4c98"
+      }
+    }
+  },
+  {
+    "service": "release-gate",
+    "method": "GET",
+    "path": "/v1/releases",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/HttpPages.schema.json#/$defs/Releases"
+    },
+    "fixture": "boundary-contracts/examples/ReleaseManifest.json",
+    "pointer": [
+      "items",
+      0,
+      "created_at"
+    ],
+    "control": {
+      "items": [
+        {
+          "pipeline_schema_version": "3.0",
+          "release_id": "rel-0001",
+          "created_at": "2026-10-14T00:00:00Z",
+          "gate_decision_id": "gd-0001",
+          "question_sets": [
+            {
+              "id": "qs-main",
+              "version": "3",
+              "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+              "title": "건강검진 문진표"
+            },
+            {
+              "id": "qs-alcohol",
+              "version": "1",
+              "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+              "title": "음주 문진표"
+            }
+          ],
+          "lora_a": {
+            "id": "lora-a",
+            "version": "1.2.0",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "lora_b": {
+            "id": "lora-b",
+            "version": "1.0.1",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "runtime_contract_version": 1,
+          "action_rules_version": "2",
+          "model_runtime_version": "0.1.0",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "adapters": {
+            "LORA_A": {
+              "adapter_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+              "serving_config": {
+                "protection_policy_version": "protect-1"
+              },
+              "serving_config_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+              "system_prompt": {
+                "path": "system_prompt.txt",
+                "sha256": "sha256:3def1bd06bba07ed86b77771064fc0dc969cc80f2997f159ee80b3de5b228b93"
+              }
+            },
+            "LORA_B": {
+              "adapter_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+              "serving_config": {
+                "protection_policy_version": "protect-1"
+              },
+              "serving_config_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+              "system_prompt": {
+                "path": "system_prompt.txt",
+                "sha256": "sha256:3def1bd06bba07ed86b77771064fc0dc969cc80f2997f159ee80b3de5b228b93"
+              }
+            }
+          }
+        }
+      ],
+      "next_cursor": null
+    },
+    "document": {
+      "items": [
+        {
+          "pipeline_schema_version": "3.0",
+          "release_id": "rel-0001",
+          "created_at": "2026-02-30T00:00:00Z",
+          "gate_decision_id": "gd-0001",
+          "question_sets": [
+            {
+              "id": "qs-main",
+              "version": "3",
+              "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+              "title": "건강검진 문진표"
+            },
+            {
+              "id": "qs-alcohol",
+              "version": "1",
+              "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+              "title": "음주 문진표"
+            }
+          ],
+          "lora_a": {
+            "id": "lora-a",
+            "version": "1.2.0",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "lora_b": {
+            "id": "lora-b",
+            "version": "1.0.1",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "runtime_contract_version": 1,
+          "action_rules_version": "2",
+          "model_runtime_version": "0.1.0",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "adapters": {
+            "LORA_A": {
+              "adapter_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+              "serving_config": {
+                "protection_policy_version": "protect-1"
+              },
+              "serving_config_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+              "system_prompt": {
+                "path": "system_prompt.txt",
+                "sha256": "sha256:3def1bd06bba07ed86b77771064fc0dc969cc80f2997f159ee80b3de5b228b93"
+              }
+            },
+            "LORA_B": {
+              "adapter_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+              "serving_config": {
+                "protection_policy_version": "protect-1"
+              },
+              "serving_config_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+              "system_prompt": {
+                "path": "system_prompt.txt",
+                "sha256": "sha256:3def1bd06bba07ed86b77771064fc0dc969cc80f2997f159ee80b3de5b228b93"
+              }
+            }
+          }
+        }
+      ],
+      "next_cursor": null
+    }
+  },
+  {
+    "service": "release-gate",
+    "method": "GET",
+    "path": "/v1/releases/{rid}",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/ReleaseManifest.schema.json"
+    },
+    "fixture": "boundary-contracts/examples/ReleaseManifest.json",
+    "pointer": [
+      "created_at"
+    ],
+    "control": {
+      "pipeline_schema_version": "3.0",
+      "release_id": "rel-0001",
+      "created_at": "2026-10-14T00:00:00Z",
+      "gate_decision_id": "gd-0001",
+      "question_sets": [
+        {
+          "id": "qs-main",
+          "version": "3",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "title": "건강검진 문진표"
+        },
+        {
+          "id": "qs-alcohol",
+          "version": "1",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "title": "음주 문진표"
+        }
+      ],
+      "lora_a": {
+        "id": "lora-a",
+        "version": "1.2.0",
+        "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "lora_b": {
+        "id": "lora-b",
+        "version": "1.0.1",
+        "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "runtime_contract_version": 1,
+      "action_rules_version": "2",
+      "model_runtime_version": "0.1.0",
+      "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "adapters": {
+        "LORA_A": {
+          "adapter_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "serving_config": {
+            "protection_policy_version": "protect-1"
+          },
+          "serving_config_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "system_prompt": {
+            "path": "system_prompt.txt",
+            "sha256": "sha256:3def1bd06bba07ed86b77771064fc0dc969cc80f2997f159ee80b3de5b228b93"
+          }
+        },
+        "LORA_B": {
+          "adapter_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "serving_config": {
+            "protection_policy_version": "protect-1"
+          },
+          "serving_config_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "system_prompt": {
+            "path": "system_prompt.txt",
+            "sha256": "sha256:3def1bd06bba07ed86b77771064fc0dc969cc80f2997f159ee80b3de5b228b93"
+          }
+        }
+      }
+    },
+    "document": {
+      "pipeline_schema_version": "3.0",
+      "release_id": "rel-0001",
+      "created_at": "2026-02-30T00:00:00Z",
+      "gate_decision_id": "gd-0001",
+      "question_sets": [
+        {
+          "id": "qs-main",
+          "version": "3",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "title": "건강검진 문진표"
+        },
+        {
+          "id": "qs-alcohol",
+          "version": "1",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "title": "음주 문진표"
+        }
+      ],
+      "lora_a": {
+        "id": "lora-a",
+        "version": "1.2.0",
+        "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "lora_b": {
+        "id": "lora-b",
+        "version": "1.0.1",
+        "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "runtime_contract_version": 1,
+      "action_rules_version": "2",
+      "model_runtime_version": "0.1.0",
+      "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "adapters": {
+        "LORA_A": {
+          "adapter_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "serving_config": {
+            "protection_policy_version": "protect-1"
+          },
+          "serving_config_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "system_prompt": {
+            "path": "system_prompt.txt",
+            "sha256": "sha256:3def1bd06bba07ed86b77771064fc0dc969cc80f2997f159ee80b3de5b228b93"
+          }
+        },
+        "LORA_B": {
+          "adapter_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "serving_config": {
+            "protection_policy_version": "protect-1"
+          },
+          "serving_config_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "system_prompt": {
+            "path": "system_prompt.txt",
+            "sha256": "sha256:3def1bd06bba07ed86b77771064fc0dc969cc80f2997f159ee80b3de5b228b93"
+          }
+        }
+      }
+    }
+  },
+  {
+    "service": "release-gate",
+    "method": "GET",
+    "path": "/v1/submissions",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/HttpPages.schema.json#/$defs/Submissions"
+    },
+    "fixture": "boundary-contracts/examples/SubmissionView.json",
+    "pointer": [
+      "items",
+      0,
+      "submitted_at"
+    ],
+    "control": {
+      "items": [
+        {
+          "submission_id": "sub-1",
+          "submitted_at": "2026-10-15T00:00:00Z",
+          "submitted_by_role": "operator",
+          "subject": {
+            "question_sets": [
+              {
+                "id": "qs-main",
+                "version": "3",
+                "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            ],
+            "lora_a": {
+              "id": "lora-a",
+              "version": "1",
+              "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "lora_b": {
+              "id": "lora-b",
+              "version": "1",
+              "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          },
+          "status": "AWAITING_APPROVAL",
+          "decision_id": null,
+          "approval_id": null,
+          "release_id": null,
+          "updated_at": "2026-10-15T00:01:00Z"
+        }
+      ],
+      "next_cursor": null
+    },
+    "document": {
+      "items": [
+        {
+          "submission_id": "sub-1",
+          "submitted_at": "2026-02-30T00:00:00Z",
+          "submitted_by_role": "operator",
+          "subject": {
+            "question_sets": [
+              {
+                "id": "qs-main",
+                "version": "3",
+                "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            ],
+            "lora_a": {
+              "id": "lora-a",
+              "version": "1",
+              "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "lora_b": {
+              "id": "lora-b",
+              "version": "1",
+              "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          },
+          "status": "AWAITING_APPROVAL",
+          "decision_id": null,
+          "approval_id": null,
+          "release_id": null,
+          "updated_at": "2026-10-15T00:01:00Z"
+        }
+      ],
+      "next_cursor": null
+    }
+  },
+  {
+    "service": "release-gate",
+    "method": "POST",
+    "path": "/v1/submissions",
+    "status": 202,
+    "schema": {
+      "$ref": "../schemas/GateSubmission.schema.json"
+    },
+    "fixture": "boundary-contracts/examples/GateSubmission.json",
+    "pointer": [
+      "submitted_at"
+    ],
+    "control": {
+      "pipeline_schema_version": "3.0",
+      "submission_id": "sub-1",
+      "submitted_at": "2026-10-15T00:00:00Z",
+      "submitted_by_role": "operator",
+      "subject": {
+        "question_sets": [
+          {
+            "id": "qs-main",
+            "version": "3",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "id": "qs-alcohol",
+            "version": "1",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "lora_a": {
+          "id": "lora-a",
+          "version": "3",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "lora_b": {
+          "id": "lora-b",
+          "version": "3",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      }
+    },
+    "document": {
+      "pipeline_schema_version": "3.0",
+      "submission_id": "sub-1",
+      "submitted_at": "2026-02-30T00:00:00Z",
+      "submitted_by_role": "operator",
+      "subject": {
+        "question_sets": [
+          {
+            "id": "qs-main",
+            "version": "3",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "id": "qs-alcohol",
+            "version": "1",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "lora_a": {
+          "id": "lora-a",
+          "version": "3",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "lora_b": {
+          "id": "lora-b",
+          "version": "3",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      }
+    }
+  },
+  {
+    "service": "release-gate",
+    "method": "GET",
+    "path": "/v1/submissions/{sid}",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/SubmissionView.schema.json"
+    },
+    "fixture": "boundary-contracts/examples/SubmissionView.json",
+    "pointer": [
+      "submitted_at"
+    ],
+    "control": {
+      "submission_id": "sub-1",
+      "submitted_at": "2026-10-15T00:00:00Z",
+      "submitted_by_role": "operator",
+      "subject": {
+        "question_sets": [
+          {
+            "id": "qs-main",
+            "version": "3",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "lora_a": {
+          "id": "lora-a",
+          "version": "1",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "lora_b": {
+          "id": "lora-b",
+          "version": "1",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      },
+      "status": "AWAITING_APPROVAL",
+      "decision_id": null,
+      "approval_id": null,
+      "release_id": null,
+      "updated_at": "2026-10-15T00:01:00Z"
+    },
+    "document": {
+      "submission_id": "sub-1",
+      "submitted_at": "2026-02-30T00:00:00Z",
+      "submitted_by_role": "operator",
+      "subject": {
+        "question_sets": [
+          {
+            "id": "qs-main",
+            "version": "3",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "lora_a": {
+          "id": "lora-a",
+          "version": "1",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "lora_b": {
+          "id": "lora-b",
+          "version": "1",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      },
+      "status": "AWAITING_APPROVAL",
+      "decision_id": null,
+      "approval_id": null,
+      "release_id": null,
+      "updated_at": "2026-10-15T00:01:00Z"
+    }
+  },
+  {
+    "service": "release-gate",
+    "method": "GET",
+    "path": "/v1/submissions/{sid}/review-report",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/ReviewReport.schema.json"
+    },
+    "fixture": "boundary-contracts/examples/ReviewReport.json",
+    "pointer": [
+      "generated_at"
+    ],
+    "control": {
+      "pipeline_schema_version": "3.0",
+      "submission_id": "sub-1",
+      "generated_at": "2026-10-15T00:00:00Z",
+      "subject": {
+        "question_sets": [
+          {
+            "id": "qs-main",
+            "version": "3",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "id": "qs-alcohol",
+            "version": "1",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "lora_a": {
+          "id": "lora-a",
+          "version": "1.2.0",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "lora_b": {
+          "id": "lora-b",
+          "version": "1.0.1",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      },
+      "active_release_id": "rel-0001",
+      "checks": [
+        {
+          "kind": "CONTRACT_COMPAT",
+          "result": "PASS"
+        },
+        {
+          "kind": "ACCEPTANCE_EVAL",
+          "result": "PASS",
+          "evidence_ref": "eval-0001"
+        }
+      ],
+      "reports": {
+        "LORA_A": "eval-0001"
+      },
+      "comparisons": [
+        {
+          "role": "LORA_A",
+          "name": "action_accuracy",
+          "group": "SAFETY",
+          "slice": {
+            "kind": "ALL",
+            "value": "ALL"
+          },
+          "candidate": 0.97,
+          "candidate_n": 120,
+          "baseline": 0.99,
+          "baseline_n": 120,
+          "delta": -0.02,
+          "higher_is_better": true,
+          "worse": true
+        }
+      ],
+      "notes": []
+    },
+    "document": {
+      "pipeline_schema_version": "3.0",
+      "submission_id": "sub-1",
+      "generated_at": "2026-02-30T00:00:00Z",
+      "subject": {
+        "question_sets": [
+          {
+            "id": "qs-main",
+            "version": "3",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "id": "qs-alcohol",
+            "version": "1",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "lora_a": {
+          "id": "lora-a",
+          "version": "1.2.0",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "lora_b": {
+          "id": "lora-b",
+          "version": "1.0.1",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      },
+      "active_release_id": "rel-0001",
+      "checks": [
+        {
+          "kind": "CONTRACT_COMPAT",
+          "result": "PASS"
+        },
+        {
+          "kind": "ACCEPTANCE_EVAL",
+          "result": "PASS",
+          "evidence_ref": "eval-0001"
+        }
+      ],
+      "reports": {
+        "LORA_A": "eval-0001"
+      },
+      "comparisons": [
+        {
+          "role": "LORA_A",
+          "name": "action_accuracy",
+          "group": "SAFETY",
+          "slice": {
+            "kind": "ALL",
+            "value": "ALL"
+          },
+          "candidate": 0.97,
+          "candidate_n": 120,
+          "baseline": 0.99,
+          "baseline_n": 120,
+          "delta": -0.02,
+          "higher_is_better": true,
+          "worse": true
+        }
+      ],
+      "notes": []
+    }
+  },
+  {
+    "service": "release-gate",
+    "method": "GET",
+    "path": "/v1/decisions",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/HttpPages.schema.json#/$defs/Decisions"
+    },
+    "fixture": "boundary-contracts/examples/GateDecision.pass.json",
+    "pointer": [
+      "items",
+      0,
+      "decided_at"
+    ],
+    "control": {
+      "items": [
+        {
+          "pipeline_schema_version": "3.0",
+          "decision_id": "gd-0001",
+          "decided_at": "2026-10-14T00:00:00Z",
+          "gate_policy_version": "1",
+          "subject": {
+            "question_sets": [
+              {
+                "id": "qs-main",
+                "version": "3",
+                "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              {
+                "id": "qs-alcohol",
+                "version": "1",
+                "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            ],
+            "lora_a": {
+              "id": "lora-a",
+              "version": "1.2.0",
+              "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "lora_b": {
+              "id": "lora-b",
+              "version": "1.0.1",
+              "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          },
+          "runtime_contract_version": 1,
+          "result": "PASS",
+          "checks": [
+            {
+              "kind": "CONTRACT_COMPAT",
+              "result": "PASS"
+            },
+            {
+              "kind": "ACCEPTANCE_EVAL",
+              "result": "PASS",
+              "evidence_ref": "eval-0007"
+            },
+            {
+              "kind": "HUMAN_APPROVAL",
+              "result": "PASS",
+              "evidence_ref": "ap-1"
+            }
+          ],
+          "approver": {
+            "role": "release-approver",
+            "id": "trainer-1"
+          },
+          "release_id": "rel-0001",
+          "approval_id": "ap-1"
+        }
+      ],
+      "next_cursor": null
+    },
+    "document": {
+      "items": [
+        {
+          "pipeline_schema_version": "3.0",
+          "decision_id": "gd-0001",
+          "decided_at": "2026-02-30T00:00:00Z",
+          "gate_policy_version": "1",
+          "subject": {
+            "question_sets": [
+              {
+                "id": "qs-main",
+                "version": "3",
+                "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              {
+                "id": "qs-alcohol",
+                "version": "1",
+                "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            ],
+            "lora_a": {
+              "id": "lora-a",
+              "version": "1.2.0",
+              "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "lora_b": {
+              "id": "lora-b",
+              "version": "1.0.1",
+              "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          },
+          "runtime_contract_version": 1,
+          "result": "PASS",
+          "checks": [
+            {
+              "kind": "CONTRACT_COMPAT",
+              "result": "PASS"
+            },
+            {
+              "kind": "ACCEPTANCE_EVAL",
+              "result": "PASS",
+              "evidence_ref": "eval-0007"
+            },
+            {
+              "kind": "HUMAN_APPROVAL",
+              "result": "PASS",
+              "evidence_ref": "ap-1"
+            }
+          ],
+          "approver": {
+            "role": "release-approver",
+            "id": "trainer-1"
+          },
+          "release_id": "rel-0001",
+          "approval_id": "ap-1"
+        }
+      ],
+      "next_cursor": null
+    }
+  },
+  {
+    "service": "release-gate",
+    "method": "GET",
+    "path": "/v1/decisions/{did}",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/GateDecision.schema.json"
+    },
+    "fixture": "boundary-contracts/examples/GateDecision.pass.json",
+    "pointer": [
+      "decided_at"
+    ],
+    "control": {
+      "pipeline_schema_version": "3.0",
+      "decision_id": "gd-0001",
+      "decided_at": "2026-10-14T00:00:00Z",
+      "gate_policy_version": "1",
+      "subject": {
+        "question_sets": [
+          {
+            "id": "qs-main",
+            "version": "3",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "id": "qs-alcohol",
+            "version": "1",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "lora_a": {
+          "id": "lora-a",
+          "version": "1.2.0",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "lora_b": {
+          "id": "lora-b",
+          "version": "1.0.1",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      },
+      "runtime_contract_version": 1,
+      "result": "PASS",
+      "checks": [
+        {
+          "kind": "CONTRACT_COMPAT",
+          "result": "PASS"
+        },
+        {
+          "kind": "ACCEPTANCE_EVAL",
+          "result": "PASS",
+          "evidence_ref": "eval-0007"
+        },
+        {
+          "kind": "HUMAN_APPROVAL",
+          "result": "PASS",
+          "evidence_ref": "ap-1"
+        }
+      ],
+      "approver": {
+        "role": "release-approver",
+        "id": "trainer-1"
+      },
+      "release_id": "rel-0001",
+      "approval_id": "ap-1"
+    },
+    "document": {
+      "pipeline_schema_version": "3.0",
+      "decision_id": "gd-0001",
+      "decided_at": "2026-02-30T00:00:00Z",
+      "gate_policy_version": "1",
+      "subject": {
+        "question_sets": [
+          {
+            "id": "qs-main",
+            "version": "3",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "id": "qs-alcohol",
+            "version": "1",
+            "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "lora_a": {
+          "id": "lora-a",
+          "version": "1.2.0",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "lora_b": {
+          "id": "lora-b",
+          "version": "1.0.1",
+          "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      },
+      "runtime_contract_version": 1,
+      "result": "PASS",
+      "checks": [
+        {
+          "kind": "CONTRACT_COMPAT",
+          "result": "PASS"
+        },
+        {
+          "kind": "ACCEPTANCE_EVAL",
+          "result": "PASS",
+          "evidence_ref": "eval-0007"
+        },
+        {
+          "kind": "HUMAN_APPROVAL",
+          "result": "PASS",
+          "evidence_ref": "ap-1"
+        }
+      ],
+      "approver": {
+        "role": "release-approver",
+        "id": "trainer-1"
+      },
+      "release_id": "rel-0001",
+      "approval_id": "ap-1"
+    }
+  },
+  {
+    "service": "release-gate",
+    "method": "POST",
+    "path": "/v1/approvals",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/GateApproval.schema.json"
+    },
+    "fixture": "boundary-contracts/examples/GateApproval.json",
+    "pointer": [
+      "decided_at"
+    ],
+    "control": {
+      "pipeline_schema_version": "3.0",
+      "approval_id": "ap-1",
+      "submission_id": "sub-1",
+      "decision": "APPROVE",
+      "approver_id": "trainer-1",
+      "approver_role": "release-approver",
+      "decided_at": "2026-10-15T00:00:00Z",
+      "report_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "document": {
+      "pipeline_schema_version": "3.0",
+      "approval_id": "ap-1",
+      "submission_id": "sub-1",
+      "decision": "APPROVE",
+      "approver_id": "trainer-1",
+      "approver_role": "release-approver",
+      "decided_at": "2026-02-30T00:00:00Z",
+      "report_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  },
+  {
+    "service": "release-gate",
+    "method": "POST",
+    "path": "/v1/approvals",
+    "status": 201,
+    "schema": {
+      "$ref": "../schemas/GateApproval.schema.json"
+    },
+    "fixture": "boundary-contracts/examples/GateApproval.json",
+    "pointer": [
+      "decided_at"
+    ],
+    "control": {
+      "pipeline_schema_version": "3.0",
+      "approval_id": "ap-1",
+      "submission_id": "sub-1",
+      "decision": "APPROVE",
+      "approver_id": "trainer-1",
+      "approver_role": "release-approver",
+      "decided_at": "2026-10-15T00:00:00Z",
+      "report_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "document": {
+      "pipeline_schema_version": "3.0",
+      "approval_id": "ap-1",
+      "submission_id": "sub-1",
+      "decision": "APPROVE",
+      "approver_id": "trainer-1",
+      "approver_role": "release-approver",
+      "decided_at": "2026-02-30T00:00:00Z",
+      "report_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  },
+  {
+    "service": "release-gate",
+    "method": "POST",
+    "path": "/v1/activate",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/ActivePointer.schema.json"
+    },
+    "fixture": "boundary-contracts/examples/ActivePointer.json",
+    "pointer": [
+      "activated_at"
+    ],
+    "control": {
+      "pipeline_schema_version": "3.0",
+      "release_id": "rel-0001",
+      "pointer_version": 1,
+      "activated_at": "2026-10-15T00:00:00Z",
+      "cause": "ACTIVATE"
+    },
+    "document": {
+      "pipeline_schema_version": "3.0",
+      "release_id": "rel-0001",
+      "pointer_version": 1,
+      "activated_at": "2026-02-30T00:00:00Z",
+      "cause": "ACTIVATE"
+    }
+  },
+  {
+    "service": "release-gate",
+    "method": "POST",
+    "path": "/v1/rollback",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/RollbackReceipt.schema.json"
+    },
+    "fixture": "boundary-contracts/examples/RollbackReceipt.json",
+    "pointer": [
+      "active_pointer",
+      "activated_at"
+    ],
+    "control": {
+      "pipeline_schema_version": "3.0",
+      "request_id": "rb-1",
+      "status": "APPLIED",
+      "active_pointer": {
+        "pipeline_schema_version": "3.0",
+        "release_id": "rel-0001",
+        "pointer_version": 1,
+        "activated_at": "2026-10-15T00:00:00Z",
+        "cause": "ACTIVATE"
+      },
+      "decided_at": "2026-10-15T00:00:00Z"
+    },
+    "document": {
+      "pipeline_schema_version": "3.0",
+      "request_id": "rb-1",
+      "status": "APPLIED",
+      "active_pointer": {
+        "pipeline_schema_version": "3.0",
+        "release_id": "rel-0001",
+        "pointer_version": 1,
+        "activated_at": "2026-02-30T00:00:00Z",
+        "cause": "ACTIVATE"
+      },
+      "decided_at": "2026-10-15T00:00:00Z"
+    }
+  },
+  {
+    "service": "survey-service",
+    "method": "POST",
+    "path": "/v1/sessions/{sid}/staff-call/report",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/StaffAlert.schema.json"
+    },
+    "fixture": "boundary-contracts/examples/StaffAlert.json",
+    "pointer": [
+      "created_at"
+    ],
+    "control": {
+      "alert_id": "al-1",
+      "session_id": "kiosk-s1",
+      "kind": "RISK_STOP",
+      "created_at": "2026-10-15T00:00:00Z",
+      "status": "OPEN",
+      "resolved_by_decision": null,
+      "resolved_at": null,
+      "pause_reason": "RISK",
+      "delivery_attempts": 2,
+      "last_delivery_status": "DELIVERY_FAILED",
+      "manual_notice_outcome": "NOT_NOTIFIED",
+      "manual_notice_reported_at": "2026-10-15T00:01:00Z"
+    },
+    "document": {
+      "alert_id": "al-1",
+      "session_id": "kiosk-s1",
+      "kind": "RISK_STOP",
+      "created_at": "2026-02-30T00:00:00Z",
+      "status": "OPEN",
+      "resolved_by_decision": null,
+      "resolved_at": null,
+      "pause_reason": "RISK",
+      "delivery_attempts": 2,
+      "last_delivery_status": "DELIVERY_FAILED",
+      "manual_notice_outcome": "NOT_NOTIFIED",
+      "manual_notice_reported_at": "2026-10-15T00:01:00Z"
+    }
+  },
+  {
+    "service": "survey-service",
+    "method": "GET",
+    "path": "/v1/staff/alerts",
+    "status": 200,
+    "schema": {
+      "$ref": "../schemas/StaffAlertPage.schema.json"
+    },
+    "fixture": "boundary-contracts/examples/StaffAlertPage.json",
+    "pointer": [
+      "items",
+      0,
+      "created_at"
+    ],
+    "control": {
+      "items": [
+        {
+          "alert_id": "al-1",
+          "session_id": "kiosk-s1",
+          "kind": "RISK_STOP",
+          "created_at": "2026-10-15T00:00:00Z",
+          "status": "OPEN",
+          "resolved_by_decision": null,
+          "resolved_at": null
+        },
+        {
+          "alert_id": "al-1",
+          "session_id": "kiosk-s1",
+          "kind": "RISK_STOP",
+          "created_at": "2026-10-15T00:00:00Z",
+          "status": "OPEN",
+          "resolved_by_decision": null,
+          "resolved_at": null,
+          "pause_reason": "RISK",
+          "delivery_attempts": 2,
+          "last_delivery_status": "DELIVERY_FAILED",
+          "manual_notice_outcome": "NOT_NOTIFIED",
+          "manual_notice_reported_at": "2026-10-15T00:01:00Z"
+        }
+      ],
+      "next_cursor": null
+    },
+    "document": {
+      "items": [
+        {
+          "alert_id": "al-1",
+          "session_id": "kiosk-s1",
+          "kind": "RISK_STOP",
+          "created_at": "2026-02-30T00:00:00Z",
+          "status": "OPEN",
+          "resolved_by_decision": null,
+          "resolved_at": null
+        },
+        {
+          "alert_id": "al-1",
+          "session_id": "kiosk-s1",
+          "kind": "RISK_STOP",
+          "created_at": "2026-10-15T00:00:00Z",
+          "status": "OPEN",
+          "resolved_by_decision": null,
+          "resolved_at": null,
+          "pause_reason": "RISK",
+          "delivery_attempts": 2,
+          "last_delivery_status": "DELIVERY_FAILED",
+          "manual_notice_outcome": "NOT_NOTIFIED",
+          "manual_notice_reported_at": "2026-10-15T00:01:00Z"
+        }
+      ],
+      "next_cursor": null
+    }
+  }
+]

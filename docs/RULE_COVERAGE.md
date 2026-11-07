@@ -2,7 +2,7 @@
 
 생성: `python3 scripts/rules-coverage.py`. 입력은 스크립트 머리 설명. **손으로 고치지 않는다.** 규칙을 추가하면 다시 만든다(`--check` 가 RULE_CHECKS 의 점검이다).
 
-규칙 168개: 점검 있음 77, **점검 없음 15**, 기록 76. (헤드 CLAUDE/루트 CLAUDE 규칙은 C·H 접두)
+규칙 170개: 점검 있음 80, **점검 없음 14**, 기록 76. (헤드 CLAUDE/루트 CLAUDE 규칙은 C·H 접두)
 
 대응 규칙: 규칙 문장과 점검 설명이 같은 ID(D##·U##·L##·G##·ADR)를 가리킬 때만 대응으로 센다. 낱말 겹침은 쓰지 않는다. `RECORD` 는 점검 대상이 아닌 결정 기록(스크립트의 RECORD_IDS, 이유 포함).
 
@@ -23,7 +23,7 @@
 | D13 | 모델 평가의 문항 접근 | - | RECORD: 모델 평가의 문항 접근 범위 선언(model-lab 평가 코드가 따름, ID 미표기) |
 | D14 | 계약 버전 체계 | RULE_CHECKS#14 | 있음 |
 | D15 | 비식별 처리의 위치 | ops-feedback/tests/test_raw_access.py | 있음 |
-| D16 | Trace 전달 보장 | - | 없음 |
+| D16 | Trace 전달 보장 | survey-service/tests/test_trace_export.py | 있음 |
 | D17 | 문항 변경 분류 | question-authoring/tests/test_classify.py | 있음 |
 | D18 | SDK 언어와 배포 | - | RECORD: SDK 언어 선택 기록 |
 | D19 | 계약 소유와 위치 | - | RECORD: 계약 소유·위치 선언(구조 규칙 6 이 점검) |
@@ -83,7 +83,7 @@
 | D73 | 서버 디스크 사용 위임 | - | RECORD: 디스크 사용 위임 |
 | D74 | 서비스 구조를 학습 데이터셋 v2 기준으로 바꾼다 | model-lab/tests/test_transform_v2.py<br>release-gate/tests/test_v2_contract.py<br>survey-service/tests/test_extraction.py<br>survey-service/tests/test_orchestrator.py | 있음 |
 | D75 | 계약 2.0.0의 열린 항목 다섯 가지 | model-lab/tests/test_packager_v2.py<br>release-gate/tests/test_v2_contract.py<br>survey-service/tests/test_inference_client.py<br>turn-engine/tests/test_validation.py | 있음 |
-| D76 | 문항 순서·건너뛰기 표의 소유 / 영역 이전 순서 (turn-engine CR-010 회신) | - | 없음 |
+| D76 | 문항 순서·건너뛰기 표의 소유 / 영역 이전 순서 (turn-engine CR-010 회신) | survey-service/tests/test_extraction.py | 있음 |
 | D77 | 서빙의 모델 입력 글자는 학습 데이터와 글자 단위로 같아야 한다 / 학습 정본 | model-runtime/tests/test_prompt4.py | 있음 |
 | D78 | 학습 정본과 비전문가 대상 / 빈 곳 대장 / 판단 위임 | - | RECORD: 정본·대상·위임 선언 |
 | D79 | 문진 스키마 정수 버전 / 직원 알림 입력원 / 서비스 구조 이전 후속 | - | RECORD: 정수 버전 1 유지 결정(CONVENTIONS 12절·G11 로 규칙화) |
@@ -93,8 +93,8 @@
 | D83 | `allOf`/`if-then` 의미 규칙을 제약 디코딩이 지키는 형태로 바꿔 건다: model-runtim | model-runtime/tests/test_anyof_constraint.py | 있음 |
 | D84 | 비밀(서비스 토큰·salt)은 환경 변수가 아니라 **파일**로 받는다: 서비스는 `<이름>_FILE`로 받 | deploy/scripts/test_e2e_diag_safety.py<br>model-lab/tests/test_gateway_publish.py<br>model-lab/tests/test_secrets.py<br>model-runtime/tests/test_secrets_hidden.py | 있음 |
 | D85 | 사용자 지시(2026-10-27)로 결함 목록의 결정을 닫는다 | deploy/scripts/test-gateway-auth.sh<br>release-gate/tests/test_actor.py<br>survey-service/tests/test_results_signals_retention.py | 있음 |
-| D86 | 장애 대응 정책을 표준 관행으로 정한다(2026-10-28, 헤드 판단. 사용자 결정 항목은 FAULT_PO | - | 없음 |
-| D87 | 직원 알림 SSE에 `heartbeat`, `resync` 이벤트를 추가한다(2026-10-28, 헤드 판단 | - | 없음 |
+| D86 | 장애 대응 정책을 표준 관행으로 정한다(2026-10-28, 헤드 판단. 사용자 결정 항목은 FAULT_PO | survey-service/tests/test_readyz_db_outage.py<br>survey-service/tests/test_turn_db_outage_bounds.py | 있음 |
+| D87 | 직원 알림 SSE에 `heartbeat`, `resync` 이벤트를 추가한다(2026-10-28, 헤드 판단 | survey-service/tests/test_fault_a6_a8_a10.py<br>survey-service/tests/test_staff_alerts.py | 있음 |
 | D88 | 전수 점검(AUDIT_SUMMARY)의 사용자 결정 항목 U1~U12를 **가장 표준적인 방법으로 정해 적용 | boundary-contracts/tests/test_decide_303.py<br>question-authoring/tests/test_ops_hardening.py<br>question-authoring/tests/test_two_person.py<br>release-gate/tests/test_audit_fixes.py | 있음 |
 | D89 | 구조 선택에는 항상 '왜'가 있어야 한다. 영역마다 `docs/adr/`에 ADR(Nygard 형식: 상태, | deploy/scripts/test-hash-password-argv.sh | 있음 |
 | D90 | 스키마에서 생성한 검증기(admin-console `generated/contract-validators.c | - | 없음 |
@@ -102,7 +102,7 @@
 | D92 | **D30을 대체한다**: 임상 근거 승인은 저자와 다른 검수자가 한다(4-eyes, 기본 켬, `QA_RE | question-authoring/tests/test_two_person.py | 있음 |
 | D93 | **G04 respond 대체 문구**: 재료가 없을 때의 문구는 현행 "죄송합니다. 다시 한 번 말씀해 주 | model-runtime/tests/test_fallback_d93.py | 있음 |
 | D94 | **G05 v1 G1(응답 숫자가 재료에 있는지) 검사는 v2 런타임에 두지 않는다. 대신 평가 지표 `un | model-lab/tests/test_metrics_v2.py | 있음 |
-| D95 | **G12 되묻기 상한 N=3 확정**: N번 되묻고 N+1번째에 직원을 부른다(정지 `PAUSED_RISK | - | 없음 |
+| D95 | **G12 되묻기 상한 N=3 확정**: N번 되묻고 N+1번째에 직원을 부른다(정지 `PAUSED_RISK | survey-service/tests/test_reask_limit.py<br>survey-service/tests/test_reask_limit_result.py | 있음 |
 | D96 | **D-C: METRICS.md는 `metrics-v2-proposal.md`의 처분대로 v2로 바꾼다.** | model-lab/tests/test_metrics_v2.py | 있음 |
 | D97 | **U11 의미 위반율 `semantic_violation_rate`를 평가에 넣는다**(그룹 `ACCURA | model-lab/tests/test_metrics_v2.py | 있음 |
 | D98 | **D-E: 회귀 평가가 읽는 TurnTrace 입력 키는 `extract_input`, `extract_o | model-lab/tests/test_metrics_v2.py | 있음 |
@@ -115,6 +115,7 @@
 | D123 | **시험은 샌드박스 방식**(사용자 지시 2026-11-01): 제품(운영 compose·config)에는  | RULE_CHECKS#11 | 있음 |
 | D124 | **저자 환류 읽기 `GET /v1/signals`를 게이트웨이 저자 경로로 연다**(헤드 2026-11-0 | - | 없음 |
 | D125 | **시간 상한: 목표(SLO)와 실패 판정을 나눈다**(사용자 지시 2026-11-02 00:3x: "응답  | deploy/scripts/test_time_chain.py<br>model-runtime/tests/test_deadline_budget.py<br>survey-service/tests/test_inference_time_budget.py<br>survey-service/tests/test_time_chain_vs_contract_u20.py | 있음 |
+| D134 | **세 번째 계약(영역 밖에서 컨테이너에 주입하는 것)은 환경 변수만이 아니라 주입 전체다**(헤드, 202 | - | 없음 |
 | D107 | **영역 경계 스키마 59개의 계약 승격(구조 규칙 6)**: 헤드 결정(2026-10-29). 각 영역이  | boundary-contracts/tests/test_promoted_schemas.py<br>model-lab/tests/test_u3_contracts.py<br>ops-feedback/tests/test_contract_schemas.py<br>question-authoring/tests/test_contract_u3.py | 있음 |
 | D108 | **2.2.0 계약 묶음의 범위 결정**(헤드, 2026-10-29): (1) I9 extract 요청에 ` | model-runtime/tests/test_image_labels.py | 있음 |
 | D109 | **turn-engine 퇴역의 2.x 범위**(헤드, 2026-10-29): 계약 2.x의 `turn_en | deploy/scripts/test_e2e_action_rules_version.py<br>model-lab/tests/test_semantic_diff.py<br>survey-service/tests/test_adr10_caller.py | 있음 |
@@ -131,7 +132,7 @@
 | D120 | **사람용 요청에 서버 쪽 요청 전체 마감(마감 전파)**(헤드 결정 2026-10-31): release- | RULE_CHECKS#4<br>ops-feedback/tests/test_request_deadline.py<br>question-authoring/tests/test_request_deadline.py<br>release-gate/tests/test_deadline_hashing.py | 있음 |
 | D121 | **최종 고정 패치 판**(2026-10-31 14:5x): boundary-contracts v3.1.2( | - | RECORD: 고정 판 기록 |
 | C1 | 영역은 서로의 구조를 모른다. | RULE_CHECKS#1<br>model-runtime/tests/test_reference_data.py<br>release-gate/tests/test_upstream_faults.py<br>survey-service/tests/test_reference_data.py | 있음 |
-| C2 | 영역은 작업의 단위인 컴포넌트를 가진다. | model-lab/tests/test_yaml12.py<br>release-gate/tests/test_upstream_faults.py<br>survey-service/tests/test_skipped_details_u35.py | 있음 |
+| C2 | 영역은 작업의 단위인 컴포넌트를 가진다. | model-lab/tests/test_yaml12.py<br>release-gate/tests/test_upstream_faults.py<br>survey-service/tests/test_device_header.py<br>survey-service/tests/test_skipped_details_u35.py | 있음 |
 | C3 | 컴포넌트는 다른 컴포넌트와 독립적이며 서로의 구조를 모른다. | RULE_CHECKS#1<br>release-gate/tests/test_audit_fixes.py<br>release-gate/tests/test_upstream_faults.py | 있음 |
 | C4 | 컴포넌트는 자신에게 할당된 입력·출력 스키마와 자신이 할 업무밖에 모른다. | RULE_CHECKS#1<br>release-gate/tests/test_pg_timeouts.py<br>synthetic-data/tests/test_pii_strict_default.py | 있음 |
 | C5 | 영역은 자기 컴포넌트 사이의 스키마를 알고, 컴포넌트가 교류할 수 있게 그 스키마를 책임진다. | release-gate/tests/test_upstream_faults.py | 있음 |
@@ -153,21 +154,22 @@
 | C21 | 개발은 컨테이너 밖에서 한다(가상환경, 이웃 영역의 메모리 구현). 컨테이너는 개발 환경이 아니라 매 변경마 | - | RECORD: 개발 방식 규칙 |
 | C22 | 서비스를 가진 영역은 자기 리포지토리에 `Dockerfile`을 두고, 변경을 완료했다고 말하기 전에 이미지 | RULE_CHECKS#13 | 있음 |
 | C23 | 이웃 영역이 필요하면 그 영역의 메모리 구현(가짜 SDK)으로 대신해, 다른 영역 없이 혼자 시험할 수 있어 | - | RECORD: 단독 시험 방식(계약 기준 서버) — 영역 스모크가 맡음 |
-| C24 | 이미지는 다음을 지킨다: 설정은 환경 변수로 받는다. **비밀(토큰·salt 등)은 환경 변수가 아니라 파일 | deploy/scripts/test_e2e_diag_safety.py<br>model-lab/tests/test_gateway_publish.py<br>model-lab/tests/test_secrets.py<br>model-runtime/tests/test_secrets_hidden.py | 있음 |
-| C25 | `boundary-contracts`는 태그로 설치한다(현재 기준은 `deploy/scripts/lib.sh | RULE_CHECKS#5 | 있음 |
-| C26 | 라이브러리와 SDK는 Git 태그로 설치하고, 이미지를 빌드할 때 태그를 고정한다. 의존 버전은 잠금 파일로 | RULE_CHECKS#5 | 있음 |
-| C27 | 스모크 시험은 고정 포트를 쓰지 않는다. 여러 영역이 같은 서버에서 동시에 돌리면 충돌한다. 호스트 포트를  | RULE_CHECKS#13 | 있음 |
-| C28 | 이미지 라벨 키는 `io.openit.service`, `io.openit.revision`, `io.ope | deploy/scripts/test_e2e_action_rules_version.py<br>model-lab/tests/test_semantic_diff.py<br>survey-service/tests/test_adr10_caller.py | 있음 |
-| C29 | 영역 사이 호출은 `boundary-contracts/HTTP.md`의 HTTP API로 한다. 서버는 소유 | RULE_CHECKS#1 | 있음 |
-| C30 | 이미지는 CI에서 빌드해 digest를 게시한다. 서버 안의 로컬 레지스트리에 올리고 digest를 depl | RULE_CHECKS#5 | 있음 |
-| C31 | 문진 스키마(`../survey-service/schema`) 변경은 survey-service가 반영한다( | - | RECORD: 문진 스키마 담당 선언 |
-| C32 | 작업 단위가 끝날 때마다 자기 리포지토리에 커밋한다(설계서 한 편, 기능 하나, 시험 통과 한 묶음). 커밋 | - | 없음 |
-| C33 | 작성자는 `git -c user.name=Sdabin1209 -c user.email=99588729+Sda | RULE_CHECKS#12 | 있음 |
-| C34 | push는 헤드의 허락을 받아 한다(사용자가 헤드에게 위임, D41). 커밋하고 시험이 통과한 상태에서 헤드 | - | RECORD: push 허락(사람 절차) |
-| C35 | Python 의존은 리포지토리의 가상환경(`python3 -m venv .venv`)에 설치하고 `.venv | RULE_CHECKS#13 | 있음 |
-| C36 | 영역 사이의 자동 연결은 직접 호출이 아니라 **저장소를 보고 일하는 잡**으로 한다. 각 영역은 자기 잡을 | - | 없음 |
-| C37 | 잡을 언제 돌리는지는 deploy의 스케줄러가 정한다. 영역은 스스로 다른 영역을 깨우지 않는다. | - | 없음 |
-| C38 | 모델의 성능 시행착오는 설정으로 바꾸며 반복한다. 파이프라인을 손으로 이어 치는 방식은 두지 않는다. | - | RECORD: 모델 시행착오 방식 |
+| C24 | **docker 호출은 프로젝트 자체 설정만 쓴다(2026-11-05).** 모든 리포의 스크립트·시험이 d | - | 없음 |
+| C25 | 이미지는 다음을 지킨다: 설정은 환경 변수로 받는다. **비밀(토큰·salt 등)은 환경 변수가 아니라 파일 | RULE_CHECKS#5<br>deploy/scripts/test_e2e_diag_safety.py<br>model-lab/tests/test_gateway_publish.py<br>model-lab/tests/test_secrets.py | 있음 |
+| C26 | `boundary-contracts`는 태그로 설치한다(현재 기준은 `deploy/scripts/lib.sh | RULE_CHECKS#5 | 있음 |
+| C27 | 라이브러리와 SDK는 Git 태그로 설치하고, 이미지를 빌드할 때 태그를 고정한다. 의존 버전은 잠금 파일로 | RULE_CHECKS#13 | 있음 |
+| C28 | 스모크 시험은 고정 포트를 쓰지 않는다. 여러 영역이 같은 서버에서 동시에 돌리면 충돌한다. 호스트 포트를  | - | 없음 |
+| C29 | 이미지 라벨 키는 `io.openit.service`, `io.openit.revision`, `io.ope | RULE_CHECKS#1<br>deploy/scripts/test_e2e_action_rules_version.py<br>model-lab/tests/test_semantic_diff.py<br>survey-service/tests/test_adr10_caller.py | 있음 |
+| C30 | 영역 사이 호출은 `boundary-contracts/HTTP.md`의 HTTP API로 한다. 서버는 소유 | RULE_CHECKS#1<br>RULE_CHECKS#5 | 있음 |
+| C31 | 이미지는 CI에서 빌드해 digest를 게시한다. 서버 안의 로컬 레지스트리에 올리고 digest를 depl | - | RECORD: 문진 스키마 담당 선언 |
+| C32 | 문진 스키마(`../survey-service/schema`) 변경은 survey-service가 반영한다( | - | 없음 |
+| C33 | 작업 단위가 끝날 때마다 자기 리포지토리에 커밋한다(설계서 한 편, 기능 하나, 시험 통과 한 묶음). 커밋 | RULE_CHECKS#12 | 있음 |
+| C34 | 작성자는 `git -c user.name=Sdabin1209 -c user.email=99588729+Sda | - | RECORD: push 허락(사람 절차) |
+| C35 | push는 헤드의 허락을 받아 한다(사용자가 헤드에게 위임, D41). 커밋하고 시험이 통과한 상태에서 헤드 | RULE_CHECKS#13 | 있음 |
+| C36 | Python 의존은 리포지토리의 가상환경(`python3 -m venv .venv`)에 설치하고 `.venv | - | 없음 |
+| C37 | 영역 사이의 자동 연결은 직접 호출이 아니라 **저장소를 보고 일하는 잡**으로 한다. 각 영역은 자기 잡을 | - | 없음 |
+| C38 | 잡을 언제 돌리는지는 deploy의 스케줄러가 정한다. 영역은 스스로 다른 영역을 깨우지 않는다. | - | RECORD: 모델 시행착오 방식 |
+| C39 | 모델의 성능 시행착오는 설정으로 바꾸며 반복한다. 파이프라인을 손으로 이어 치는 방식은 두지 않는다. | - | 없음 |
 | H1 | 영역 내부 설계와 구현을 정하지 않는다. 컴포넌트 표는 참고용 시드다. | - | RECORD: 헤드 역할 규칙 |
 | H2 | 영역 리포지토리의 코드를 수정하지 않는다. 브리프를 넣는 것만 예외다. | - | RECORD: 헤드 역할 규칙 |
 | H3 | 사용자의 확인 없이 결정을 기록하거나 구조를 바꾸지 않는다. | - | RECORD: 사용자 확인 절차 |

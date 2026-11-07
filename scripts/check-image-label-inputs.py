@@ -22,6 +22,7 @@ import sys
 
 import jsonschema
 from referencing import Registry, Resource
+from boundary_contracts import format_checker as _bc_format_checker  # 형식(format) 검증기가 없으면 조용히 넘기지 않고 실패한다(계약 3.5.0)
 
 WS = pathlib.Path(__file__).resolve().parents[2]
 BC = WS / "boundary-contracts/boundary_contracts/schemas"
@@ -38,11 +39,11 @@ def load_dir(d):
 def validator(schemas, name):
     reg = Registry().with_resources([(n, Resource.from_contents(s)) for n, s in schemas.items()] + [(s.get("$id", n), Resource.from_contents(s)) for n, s in schemas.items()])
     s = schemas[name if name.endswith(".json") else name + ".schema.json"]
-    return jsonschema.Draft202012Validator(s, registry=reg, format_checker=jsonschema.FormatChecker())
+    return jsonschema.Draft202012Validator(s, registry=reg, format_checker=_bc_format_checker(s))
 
 
 def errs(v, doc):
-    return ["/".join(map(str, e.absolute_path)) + ": " + e.message[:160] for e in v.iter_errors(doc)][:3]
+    return ["/".join(map(str, e.absolute_path)) + ": " + str(e.validator) for e in v.iter_errors(doc)][:3]
 
 
 def module_dict(path, name):
@@ -51,6 +52,29 @@ def module_dict(path, name):
         if isinstance(st, ast.Assign) and any(isinstance(t, ast.Name) and t.id == name for t in st.targets):
             return ast.literal_eval(st.value)
     raise SystemExit(f"{path}: {name} 를 상수로 읽지 못했다")
+
+
+def job_input_link_errors(inputs, jobs):
+    """각 문서의 스키마 검사 뒤, 두 이미지 라벨의 잡 집합을 대조한다."""
+    declared = {job["name"] for job in (jobs or {}).get("jobs", [])}
+    profiles = set(inputs["jobs"])
+    errors = []
+    if declared - profiles:
+        errors.append("입력 프로필 없는 잡: " + ", ".join(sorted(declared - profiles)))
+    if profiles - declared:
+        errors.append("잡 선언 없는 입력 프로필: " + ", ".join(sorted(profiles - declared)))
+    return errors
+
+
+def self_test():
+    inputs = {"jobs": {"judge": {}}}
+    jobs = {"jobs": [{"name": "judge"}]}
+    assert not job_input_link_errors(inputs, jobs)
+    assert job_input_link_errors({"jobs": {}}, jobs) == ["입력 프로필 없는 잡: judge"]
+    assert job_input_link_errors(inputs, None) == ["잡 선언 없는 입력 프로필: judge"]
+    assert not job_input_link_errors({"jobs": {}}, None)
+    print("self-test 통과: 정상·누락·미선언 프로필·잡 없음")
+    return 0
 
 
 def main():
@@ -69,11 +93,11 @@ def main():
             images[f[0]] = f[1]
     bc = load_dir(BC)
     dep = load_dir(D / "schemas")
-    V = {n: validator(bc, n) for n in ("ImageLabels", "Exposure", "JobsDeclaration", "DatabaseDeclaration")}
+    V = {n: validator(bc, n) for n in ("ImageLabels", "Exposure", "JobsDeclaration", "DatabaseDeclaration", "ContainerInputs")}
     VO = validator(dep, "JobOverlayRequest")
     gj = D / "openit_deploy/wiring/cli_gen_jobs.py"
     JOB_NAMES = module_dict(gj, "JOB_NAMES")
-    labels, bad, checked = {}, [], 0
+    labels, documents, bad, checked = {}, {}, [], 0
     for svc, ref in sorted(images.items()):
         r = subprocess.run(["docker", "image", "inspect", ref, "--format", "{{json .Config.Labels}}"], capture_output=True, text=True)
         if r.returncode != 0:
@@ -81,9 +105,10 @@ def main():
             continue
         lb = json.loads(r.stdout) or {}
         labels[svc] = lb
+        documents[svc] = {}
         checked += 1
         bad += [f"{svc}: ImageLabels {e}" for e in errs(V["ImageLabels"], lb)]
-        for key, sch in (("io.openit.exposure", "Exposure"), ("io.openit.jobs", "JobsDeclaration"), ("io.openit.database", "DatabaseDeclaration")):
+        for key, sch in (("io.openit.exposure", "Exposure"), ("io.openit.jobs", "JobsDeclaration"), ("io.openit.database", "DatabaseDeclaration"), ("io.openit.inputs", "ContainerInputs")):
             if key in lb:
                 checked += 1
                 try:
@@ -91,7 +116,20 @@ def main():
                 except ValueError:
                     bad.append(f"{svc}: {key} 가 JSON 이 아니다")
                     continue
-                bad += [f"{svc}: {key} -> {sch} {e}" for e in errs(V[sch], doc)]
+                errors = errs(V[sch], doc)
+                bad += [f"{svc}: {key} -> {sch} {e}" for e in errors]
+                if not errors:
+                    documents[svc][sch] = doc
+        inputs = documents[svc].get("ContainerInputs")
+        if inputs is not None:
+            checked += 1
+            bad += [f"{svc}: {error}" for error in job_input_link_errors(inputs, documents[svc].get("JobsDeclaration"))]
+            for kind in ("roles", "jobs"):
+                for name, profile in inputs[kind].items():
+                    try:
+                        validator(bc, profile["env_schema"])
+                    except KeyError:
+                        bad.append(f"{svc}: {kind}/{name}: 존재하지 않는 환경 계약 {profile['env_schema']}")
     # compose 서비스 -> 이미지 서비스 이름(…/openit/<이름>@${…})
     svc_img, svc_img_all, variants = {}, set(), []
     import yaml
@@ -121,7 +159,7 @@ def main():
         if lb is None:
             bad.append(f"{cf}:{cs}: 이미지 {img} 가 빌드 목록(images.env)에 없다")
             continue
-        decl = json.loads(lb.get("io.openit.jobs", "null") or "null")
+        decl = documents[img].get("JobsDeclaration")
         if not decl:
             bad.append(f"{cf}:{cs}: 이미지 {img} 에 io.openit.jobs 가 없다")
             continue
@@ -163,4 +201,4 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(self_test() if sys.argv[1:] == ["--self-test"] else main())

@@ -12,6 +12,7 @@ import jsonschema
 from referencing import Registry,Resource
 from referencing.jsonschema import DRAFT202012
 import survey_schema
+from boundary_contracts import format_checker as _bc_format_checker  # 형식(format) 검증기가 없으면 조용히 넘기지 않고 실패한다(계약 3.5.0)
 
 WS=Path(__file__).resolve().parents[2]
 AREAS=['survey-service','question-authoring','ops-feedback','release-gate','model-runtime','model-lab','synthetic-data','admin-console','kiosk-frontend']
@@ -141,7 +142,7 @@ def main():
             transformed={**transform(raw),'$id':path.as_uri()}
             unresolved=reference_errors(transformed,path.as_uri(),reg)
             if unresolved:row['issues'].append({'kind':'unresolved_reference','details':unresolved})
-            v=jsonschema.Draft202012Validator(transformed,registry=reg,format_checker=jsonschema.FormatChecker())
+            v=jsonschema.Draft202012Validator(transformed,registry=reg,format_checker=_bc_format_checker(transformed))
             good,bad=fixtures(area,name)
             row.update(valid_examples=len(good),invalid_examples=len(bad),formats=sorted({n['format'] for n in nodes(raw) if 'format'in n}))
             if area in AREAS+['deploy'] and (not good or not bad):row['issues'].append({'kind':'missing_required_fixture_polarity'})

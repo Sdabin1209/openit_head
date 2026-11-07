@@ -13,11 +13,16 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 SKIP = {"outside", "defs", "none"}   # 리포 밖 생산자, 정의 묶음, 지금 만드는 코드가 없음(생기면 그 영역으로 바꾼다)
+TREES = dict(argument.split("=", 1) for argument in sys.argv[1:] if "=" in argument)
+
+def tree(repo):
+    return pathlib.Path(TREES.get(repo, ROOT / repo))
+
 TEST_OR_DOC = re.compile(r"(^|/)(tests?|test-e2e|docs?|scripts/test[_-][^/]*)(/|$)|(^|/)test_[^/]*$|\.test\.ts$|\.md$|(^|/)(types|schemas)/|\.gen\.|(^|/)conformance/")
 
 
 def code_files(repo):
-    out = subprocess.run(["git", "-C", str(ROOT / repo), "ls-files"], capture_output=True, text=True, check=True).stdout.split("\n")
+    out = subprocess.run(["git", "-C", str(tree(repo)), "ls-files"], capture_output=True, text=True, check=True).stdout.split("\n")
     return [f for f in out if (f.endswith((".py", ".ts", ".tsx", ".js", ".mjs", ".cjs", ".sh", ".json", ".yaml", ".yml")) or f.endswith("Dockerfile"))
             and not TEST_OR_DOC.search(f) and "node_modules/" not in f]
 
@@ -31,14 +36,31 @@ def main():
         if not ent:
             bad.append(f"{name}: producers.json에 없음")
             continue
-        for repo in ent["producers"]:
+        producers = ent["producers"]
+        if "*" in producers:
+            # '*' is an open producer set in the contract, not every repository emitting every record.
+            # Retain concrete sources in the report; no producer is an error, never a silent skip.
+            areas = json.loads((ROOT / "head/shared/areas.json").read_text())["areas"]
+            producers = []
+            pattern = re.compile(rf"(?<![A-Za-z0-9_]){re.escape(name)}(?![A-Za-z0-9_])")
+            for area in areas:
+                repo = area["name"]
+                if repo in {"head", "boundary-contracts"}:
+                    continue
+                if repo not in cache:
+                    cache[repo] = {f: (tree(repo) / f).read_text(encoding="utf-8", errors="replace") for f in code_files(repo)}
+                if any(pattern.search(text) for text in cache[repo].values()):
+                    producers.append(repo)
+            if not producers:
+                bad.append(f"{name}: 열린 생산자 집합에 검증 구현 참조가 없다")
+        for repo in producers:
             if repo in SKIP:
                 continue
             if repo not in cache:
-                cache[repo] = {f: (ROOT / repo / f).read_text(encoding="utf-8", errors="replace") for f in code_files(repo)}
+                cache[repo] = {f: (tree(repo) / f).read_text(encoding="utf-8", errors="replace") for f in code_files(repo)}
             pat = re.compile(rf"(?<![A-Za-z0-9_]){re.escape(name)}(?![A-Za-z0-9_])")   # \b는 유니코드라 이름 뒤에 한글 조사가 붙으면 못 잡는다(ASCII 경계로)
             hits = [f for f, t in cache[repo].items() if pat.search(t)]
-            via = [v for v in ent.get("via", {}).get(repo, []) if (ROOT / repo / v).exists()]
+            via = [v for v in ent.get("via", {}).get(repo, []) if (tree(repo) / v).exists()]
             if not hits and not via:
                 bad.append(f"{name}: 생산자 {repo}의 동작 코드가 이 스키마를 참조하지 않는다(내보내기 전 검증 없음)")
     for n in sorted(set(table) - set(schemas)):

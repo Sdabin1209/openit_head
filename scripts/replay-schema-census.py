@@ -37,7 +37,7 @@ for case in json.load(sys.stdin):
     row = {key: case[key] for key in ['service', 'method', 'path', 'status', 'fixture', 'pointer']}
     for field, verdict in [('control', 'control_accepted'), ('document', 'invalid_accepted')]:
         try:
-            contract.response(case['method'], case['path'], case['status'], case[field], content_type='application/json')
+            contract.response(case['method'], case['path'], case['status'], case[field], content_type='application/json', headers=case.get('headers'))
             row[verdict] = True
         except Exception as error:
             row[verdict] = False

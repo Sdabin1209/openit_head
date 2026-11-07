@@ -116,6 +116,54 @@ def env_file_names(s: dict, base: Path | None) -> list[str]:
     return out
 
 
+def declared_env_schema(name: str, key: str, s: dict, deploy_dir: Path | None) -> str | None:
+    """서비스가 받는 Env 계약 이름: 이미지 주입 선언(계약 ContainerInputs 3.5.0, 영역 리포의 정본 파일)의 역할·잡 묶음이 정한다.
+    왜: 같은 이미지라도 잡은 서버와 다른 Env 를 받는다(예: identity-db 의 backup·restore 잡은 IdentityDatabaseBackupEnv). 이미지 하나에 Env 하나로 보면 잡 입력을 빈칸으로 잘못 센다."""
+    import ast
+    decl_path = DECL_FILES.get(key)
+    if not decl_path:
+        return None
+    repo, sub = decl_path.split("/", 1)
+    d = json.loads((WS / repo / sub).read_text(encoding="utf-8"))
+    jobs = {}
+    gj = (deploy_dir or WS / "deploy") / "openit_deploy/wiring/cli_gen_jobs.py"
+    if gj.exists():
+        for n in ast.parse(gj.read_text(encoding="utf-8")).body:
+            if isinstance(n, ast.Assign) and getattr(n.targets[0], "id", "") == "JOB_NAMES":
+                jobs = ast.literal_eval(n.value)
+    svc = name.rsplit(":", 1)[-1]   # 이름이 "<compose 파일>:<서비스>" 로 온다
+    if svc in jobs:
+        st = d["jobs"].get(jobs[svc])
+    else:
+        env = s.get("environment") or {}
+        env = env if isinstance(env, dict) else dict(e.split("=", 1) if "=" in e else (e, "") for e in env)
+        role = None
+        if d.get("role_env"):
+            role = env.get(d["role_env"])
+            if d["role_env"] not in env:   # 역할 변수를 주지 않으면(빈 값을 준 것은 기본값으로 바꾸지 않는다: 계약상 잘못된 역할이다, 2026-11-07 교차검증) 그 Env 계약의 기본값이 역할이다(예: StepCaEnv.STEP_ROLE 기본 serve, 2026-11-07 교차검증)
+                for r in d["roles"].values():
+                    prop = json.loads((SCHEMAS / f"{r['env_schema']}.schema.json").read_text(encoding="utf-8")).get("properties", {}).get(d["role_env"], {})
+                    if isinstance(prop.get("default"), str):
+                        role = prop["default"]; break
+        st = d["roles"].get(role if role is not None else "default")
+    if st is None:
+        raise LookupError(f"주입 선언 {decl_path} 에 이 서비스의 {'잡 ' + jobs[svc] if svc in jobs else '역할'} 묶음이 없다")
+    return st["env_schema"]
+
+
+DECL_FILES = {"survey-service": "survey-service/deploy-inputs.json", "survey-db": "survey-service/db/inputs.json",
+              "question-authoring": "question-authoring/deploy-inputs.json", "question-authoring-db": "question-authoring/db/inputs.json",
+              "ops-feedback": "ops-feedback/deploy-inputs.json", "ops-feedback-db": "ops-feedback/db/inputs.json",
+              "release-gate": "release-gate/deploy-inputs.json", "release-gate-db": "release-gate/db/inputs.json",
+              "model-registry": "model-lab/deploy-inputs.json", "dataset-store": "synthetic-data/deploy-inputs.json",
+              "model-serving": "model-runtime/deploy-inputs.json", "model-serving-gpu": "model-runtime/deploy-inputs.json",
+              "kiosk-frontend": "kiosk-frontend/deploy-inputs.json", "admin-console": "admin-console/deploy-inputs.json",
+              "area-gateway": "platform/area-gateway/inputs-area-gateway.json", "public-ingress": "platform/ingress/inputs-public-ingress.json",
+              "monitoring": "platform/monitoring/inputs-monitoring.json", "backup-store": "platform/backup-store/inputs-backup-store.json",
+              "step-ca": "platform/pki/inputs-step-ca.json", "identity": "platform/identity/inputs-identity.json",
+              "identity-proxy": "platform/identity/inputs-identity-proxy.json", "identity-db": "platform/identity/inputs-identity-db.json"}
+
+
 def check(services: dict[str, dict], deploy_dir: Path | None = None) -> list[str]:
     bad: list[str] = []
     common, _ = schema_names("CommonEnv")
@@ -127,7 +175,12 @@ def check(services: dict[str, dict], deploy_dir: Path | None = None) -> list[str
         if key not in pub:
             bad.append(f"{name}: 이미지 '{key}' 는 계약 PublishRequest 에 없다(받는 영역 이미지로 내야 한다)")
             continue
-        env_schema = ENV_OF.get(key)
+        try:
+            declared = declared_env_schema(name, key, s, deploy_dir)
+        except LookupError as e:   # 선언이 있는데 묶음을 못 고르면(잘못된 역할 값 등) 빈칸이다. 기본 Env 로 되돌리지 않는다(2026-11-07 교차검증)
+            bad.append(f"{name}: {e}")
+            continue
+        env_schema = declared or ENV_OF.get(key)
         if not env_schema:
             bad.append(f"{name}: 이미지 '{key}' 의 Env 스키마가 정해지지 않았다")
             continue
@@ -136,11 +189,12 @@ def check(services: dict[str, dict], deploy_dir: Path | None = None) -> list[str
         env_names = (list(env) if isinstance(env, dict) else [e.split("=", 1)[0] for e in env]) + env_file_names(s, deploy_dir)
         for e in env_names:
             base = e[:-5] if e.endswith("_FILE") else e
-            if e in names | common or base in names | common or e == "SSL_CERT_FILE":
+            if e in names | common or base in names | common:   # SSL_CERT_FILE 은 3.5.0 부터 CommonEnv 에 있다(예외로 두지 않는다)
                 continue
             bad.append(f"{name}: 환경 '{e}' 가 {env_schema}·CommonEnv 에 없다")
         given = {e[:-5] if e.endswith("_FILE") else e for e in env_names} | set(env_names)
-        runs_subcommand = s.get("command") is not None   # 도우미·잡은 부명령을 돈다: 서비스 본체(serve)의 필수 입력은 요구하지 않는다(GateEnv x-note 등)
+        # 도우미·잡은 부명령을 돈다: 선언 묶음이 없을 때만 서비스 본체의 필수 입력을 면제한다. 선언된 잡 Env(3.5.1)는 그 필수 입력을 검사한다(2026-11-07 교차검증)
+        runs_subcommand = s.get("command") is not None and declared is None
         for r in ([] if runs_subcommand else sorted(required_names(env_schema))):
             base = r[:-5] if r.endswith("_FILE") else r
             if r not in given and base not in given:

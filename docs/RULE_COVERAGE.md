@@ -2,7 +2,7 @@
 
 생성: `python3 scripts/rules-coverage.py`. 입력은 스크립트 머리 설명. **손으로 고치지 않는다.** 규칙을 추가하면 다시 만든다(`--check` 가 RULE_CHECKS 의 점검이다).
 
-규칙 170개: 점검 있음 80, **점검 없음 14**, 기록 76. (헤드 CLAUDE/루트 CLAUDE 규칙은 C·H 접두)
+규칙 170개: 점검 있음 81, **점검 없음 13**, 기록 76. (헤드 CLAUDE/루트 CLAUDE 규칙은 C·H 접두)
 
 대응 규칙: 규칙 문장과 점검 설명이 같은 ID(D##·U##·L##·G##·ADR)를 가리킬 때만 대응으로 센다. 낱말 겹침은 쓰지 않는다. `RECORD` 는 점검 대상이 아닌 결정 기록(스크립트의 RECORD_IDS, 이유 포함).
 
@@ -115,7 +115,7 @@
 | D123 | **시험은 샌드박스 방식**(사용자 지시 2026-11-01): 제품(운영 compose·config)에는  | RULE_CHECKS#11 | 있음 |
 | D124 | **저자 환류 읽기 `GET /v1/signals`를 게이트웨이 저자 경로로 연다**(헤드 2026-11-0 | - | 없음 |
 | D125 | **시간 상한: 목표(SLO)와 실패 판정을 나눈다**(사용자 지시 2026-11-02 00:3x: "응답  | deploy/scripts/test_time_chain.py<br>model-runtime/tests/test_deadline_budget.py<br>survey-service/tests/test_inference_time_budget.py<br>survey-service/tests/test_time_chain_vs_contract_u20.py | 있음 |
-| D134 | **세 번째 계약(영역 밖에서 컨테이너에 주입하는 것)은 환경 변수만이 아니라 주입 전체다**(헤드, 202 | - | 없음 |
+| D134 | **세 번째 계약(영역 밖에서 컨테이너에 주입하는 것)은 환경 변수만이 아니라 주입 전체다**(헤드, 202 | RULE_CHECKS#24 | 있음 |
 | D107 | **영역 경계 스키마 59개의 계약 승격(구조 규칙 6)**: 헤드 결정(2026-10-29). 각 영역이  | boundary-contracts/tests/test_promoted_schemas.py<br>model-lab/tests/test_u3_contracts.py<br>ops-feedback/tests/test_contract_schemas.py<br>question-authoring/tests/test_contract_u3.py | 있음 |
 | D108 | **2.2.0 계약 묶음의 범위 결정**(헤드, 2026-10-29): (1) I9 extract 요청에 ` | model-runtime/tests/test_image_labels.py | 있음 |
 | D109 | **turn-engine 퇴역의 2.x 범위**(헤드, 2026-10-29): 계약 2.x의 `turn_en | deploy/scripts/test_e2e_action_rules_version.py<br>model-lab/tests/test_semantic_diff.py<br>survey-service/tests/test_adr10_caller.py | 있음 |

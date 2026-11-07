@@ -30,3 +30,8 @@
 | 21 | 규칙 전수 대응표가 입력(DECISIONS·CLAUDE·RULE_CHECKS·self-checks)과 같다 (U76) | `head/scripts/rules-coverage.py --check` | 있음 |
 | 22 | 게이트웨이 사이트 목록은 host:port(와일드카드·포트만 금지) (L20) | deploy `schemas/GatewayEnv` via `scripts/check_config_contracts.py` | 있음 |
 | 23 | 모든 영역의 의존 고정이 deploy 기준표와 같고, 영역 사이 이름(문진표 선택·결과 푸시·역할 헤더·승인 대기 사유)을 생산자·소비자가 둘 다 쓴다 (정적 일관성, 2026-11-03) | `head/scripts/cross-area-check.py --deploy <deploy 작업 트리>` | 있음 |
+| 24 | 주입 계약(ContainerInputs): compose 조합 11개의 주입이 영역 이미지 선언과 같다(D134) | `head/scripts/check-container-inputs.py`, deploy `scripts/check_container_inputs.py`(up.sh 기동 전) | 있음 |
+| 25 | 진입점이 쓰는 경로가 선언한 쓰기 경로 안이다(읽기 전용 루트) | `head/scripts/check-image-write-paths.py` | 있음 |
+| 26 | 스키마 형식(format) 검증기가 빠지지 않는다(검증기 생성마다 boundary_contracts.format_checker, 잠금에 검증기) | `head/scripts/check-format-enforcement.py` | 있음 |
+| 27 | 고정 포트 금지: 직접 고른 호스트 포트를 Docker 에 넘기지 않는다(Docker 배정 또는 그 변수로 실제 게시 확인) | `head/scripts/check-host-ports.py`(변수 단위, 한계는 파일 설명) | 있음 |
+| 28 | 영역 전체 시험에 건너뛴 시험이 없다(필수 의존은 선언한 시험 명령이 준비, 선택 외부 데이터·GPU 전용은 명시적으로 뺀다) | deploy `check-all --strict` 규칙 8(`scripts/test_area_test_skips.py`) | 있음 |

@@ -40,18 +40,23 @@ def var_pat(v):
 
 
 def verified_vars(lines):
-    """같은 변수로 실제 게시해 보고 그 성공에 이어 쓰는 줄에서 확인된 변수(시험한 변수와 그 결과를 받는 변수). '__echo__' 는 확인 뒤 그 값을 echo 했다는 표시."""
-    ok = set()
-    for _, l in lines:
+    """같은 변수로 실제 게시해 보고 그 성공에 이어 쓰는 줄에서 확인된 변수 -> 확인한 줄 번호. '__echo__' 는 확인 뒤 값을 돌려준 표시.
+    확인으로 치는 것: 실패하면 쓰이지 않게 막는 형태뿐(성공에 && 로 대입하거나 echo 뒤 return). '&& echo' 만 하고 실패해도 계속 쓰면 확인이 아니다."""
+    ok = {}
+    for i, l in lines:
         if not PROBE_LINE.search(l) or NONE_NET.search(l) or re.search(r"\|\|\s*true", l) or "&&" not in l:
             continue
         for m in re.finditer(r"\s-p\s+[\"']?[^\s\"']*\$\{?([A-Za-z_]\w*)\}?:", l):
             v = m.group(1)
-            ok.add(v)
-            for a in re.finditer(r"([A-Za-z_]\w*)=" + var_pat(v), l):
-                ok.add(a.group(1))
-            if re.search(r'echo\s+"?' + var_pat(v), l):
-                ok.add("__echo__")
+            tail = l[l.index("&&"):]
+            assigned = [a.group(1) for a in re.finditer(r"([A-Za-z_]\w*)=" + var_pat(v), tail)]
+            returns = re.search(r'echo\s+"?' + var_pat(v), tail) and re.search(r"\breturn\s+0\b|\bbreak\b", tail)
+            if assigned or returns:
+                ok.setdefault(v, i)
+                for a in assigned:
+                    ok.setdefault(a, i)
+            if returns:
+                ok["__echo__"] = i
     return ok
 
 
@@ -96,10 +101,17 @@ def scan_text(text, label, p, known_ok_funcs):
     if not picked:
         return bad
     ok = verified_vars(lines)
+    assigns = {}   # 변수 -> 대입한 줄 번호들(확인 뒤 새 포트를 넣으면 확인이 무효)
+    for i, l in lines:
+        for m in ASSIGN_SH.finditer(l):
+            assigns.setdefault(m.group(1), []).append(i)
     for i, l in lines:
         if PROBE_LINE.search(l) and not NONE_NET.search(l):
             continue   # 확인 줄 자체
-        for v in sorted(picked - ok):
+        for v in sorted(picked):
+            if v in ok and ok[v] < i and not any(ok[v] < a < i for a in assigns.get(v, [])):
+                continue   # 이 줄보다 앞에서 확인했고 그 사이에 새로 대입하지 않았다
+
             sh_pub = re.search(r"(-p|--publish)[ =][\"']?[^\s\"']*" + var_pat(v) + r"[\"']?:", l) and DOCKER_CTX.search(l)
             compose = re.search(r"ports:.*" + var_pat(v), l)
             py = any(x.group(1) == v for x in PY_FSTR.finditer(l))
@@ -145,6 +157,9 @@ def self_test():
         "uses_lib.sh": ('P=$(free_port)\ndocker run -d -p "127.0.0.1:$P:80" app\n', True),
         "ok.sh": (f'p=$({sock})\ndocker run --rm -p "127.0.0.1:$p:1" img true && PORT=$p\ndocker run -d -p "127.0.0.1:$PORT:8080" app\n', False),
         "okfunc.sh": (f'docker_free_port() {{\n  local p\n  for t in 1 2; do p=$({sock})\n    "$DOCKER" run --rm -p "127.0.0.1:$p:1" img true >/dev/null 2>&1 && {{ echo "$p"; return 0; }}\n  done\n}}\nG=$(docker_free_port)\ndocker run -d -p "127.0.0.1:$G:80" app\n', False),
+        "probe_after.sh": (f'p=$({sock})\ndocker run -d -p "127.0.0.1:$p:80" app\ndocker run --rm -p "127.0.0.1:$p:1" img true && Q=$p\n', True),
+        "echo_only.sh": (f'p=$({sock})\ndocker run --rm -p "127.0.0.1:$p:1" img true && echo "$p"\ndocker run -d -p "127.0.0.1:$p:80" app\n', True),
+        "reassigned.sh": (f'p=$({sock})\ndocker run --rm -p "127.0.0.1:$p:1" img true && Q=$p\nQ=$({sock})\ndocker run -d -p "127.0.0.1:$Q:80" app\n', True),
         "assigned.py": ('args=["docker","run","-p","127.0.0.1::5432"]\n', False),
         "mkdir.sh": (f'p=$({sock})\nmkdir -p "$p"\n', False),
     }

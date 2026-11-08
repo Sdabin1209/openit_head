@@ -13,7 +13,16 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 NON_AREAS = {"head", "boundary-contracts", "link"}   # 영역이 아닌 헤드 소유물(문서·계약·통신 기반 라이브러리)
 HTTP_PY = re.compile(r"^\s*(from|import)\s+(openit_link|boundary_contracts\.clients|urllib\.request|http\.client|http\.server|requests|waitress|wsgiref)\b", re.M)
 HTTP_TS = re.compile(r"\bfetch\s*\(|from\s+['\"](node:)?http['\"]")
-ENTRY = re.compile(r"(^|/)(__main__|main|app|server|config|settings|migrate|cli|index|setup|conftest)\.(py|ts)$|(^|/)migrations?/")
+ENTRY = re.compile(r"(^|/)(__main__|main|app|server|config|settings|migrate|cli|index|setup|conftest|sw)\.(py|ts)$|(^|/)migrations?/")
+# sw: 서비스 워커 스크립트. 브라우저가 페이지와 따로 실행하는 독립 시작점이다(W3C Service Workers, navigator.serviceWorker.register 의 스크립트 URL).
+LAUNCHERS = re.compile(r"(^|/)(Dockerfile[^/]*|[^/]+\.sh|package\.json)$")
+
+
+def launched(repo, fs):
+    """이미지·빌드가 이름으로 부르는 코드 파일(Dockerfile·엔트리포인트·빌드 셸·package.json 이 파일 이름으로 가리키는 것)은 그 프로그램의 진입점이다.
+    왜: db/gen.py 같은 이미지 빌드 생성기와 컨테이너 시작 때 도는 설정 생성기는 영역 서비스의 컴포넌트가 아니라 이미지가 직접 실행하는 프로그램이다(2026-11-09 헤드 결정)."""
+    text = "\n".join((base(repo) / f).read_text(encoding="utf-8", errors="replace") for f in fs if LAUNCHERS.search(f) and not re.search(r"(^|/)tests?/", f))
+    return {f for f in fs if f.endswith((".py", ".ts")) and re.search(rf"(^|[\s/\"'=]){re.escape(pathlib.Path(f).name)}\b", text)}
 
 
 def areas():
@@ -36,6 +45,7 @@ def check(repo):
     fs = files(repo)
     code = [f for f in fs if f.endswith((".py", ".ts")) and not re.search(r"(^|/)(tests?|test)/|(^|/)test_|\.test\.ts$|(^|/)scripts/|\.d\.ts$|(^|/)conftest\.py$", f)]
     bad = []
+    entries = launched(repo, fs)
     dirs = {name: [f for f in fs if f"/{name}/" in f"/{f}"] for name in ("schemas", "types", "components", "wiring")}
     for name, got in dirs.items():
         if not got:
@@ -51,10 +61,10 @@ def check(repo):
     for f in code:
         t = (base(repo) / f).read_text(encoding="utf-8", errors="replace")
         uses = HTTP_PY.search(t) if f.endswith(".py") else HTTP_TS.search(t)
-        if uses and not pathlib.Path(f).name.startswith("link_") and not ENTRY.search(f):
+        if uses and not pathlib.Path(f).name.startswith("link_") and not ENTRY.search(f) and f not in entries:
             bad.append(f"{f}: 통신 컴포넌트(link_*) 밖에서 HTTP")
     for f in code:
-        if not re.search(r"/(components|wiring|types|ui)/", f"/{f}") and not ENTRY.search(f) and not f.endswith("__init__.py"):   # ui/: 화면 부품(DESIGN.md 3절)
+        if not re.search(r"/(components|wiring|types|ui)/", f"/{f}") and not ENTRY.search(f) and f not in entries and not f.endswith("__init__.py"):   # ui/: 화면 부품(DESIGN.md 3절)
             bad.append(f"{f}: components/·wiring/·types/·ui/·진입점 어디에도 속하지 않음")
     schemas = [f for f in fs if re.search(r"(^|/)schemas/[^/]+\.json$", f)]
     for s in schemas:

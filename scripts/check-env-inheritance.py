@@ -20,7 +20,7 @@
   - 이름만 읽는 함수에 넘김: NAME_ONLY 목록(함수 본문을 읽어 확인한 근거는 목록 주석). egress_proxy_from(os.environ)은 CONVENTIONS 13절이 정한 R9.1 준수 방식이다.
   - 주입 기본값: `X = os.environ if X is None else X`(대입·인자·`(a if a is not None else os.environ).get` 등 어느 자리든), `dict(os.environ if base is None else base)`,
     `def f(env=os.environ)`, JS `function f(base = process.env)`. 주입된 환경을 그 뒤 통째로 넘기는 일은 따라가지 않는다(보지 않는 것).
-  - 조건으로 거른 환경: `{k: v for k, v in os.environ.items() if …}`(허용 목록으로 최소 환경 만들기, 시험 격리용 접두 변수 지우기).
+  - 허용 목록으로 거른 환경: `{k: v for k, v in os.environ.items() if k in <허용 이름>}` 만(제외 목록·접두 조건은 통째 전달로 센다).
   - 시험 격리용 지우기: 환경을 훑으며 delenv·pop·del 하는 순회, `env -u NAME cmd`, os.environ.update(저장해 둔 사본).
   - 통째 복사를 지역 이름에 담은 경우(env = dict(os.environ) 등): 담는 줄이 아니라 그 이름이 이름으로만 읽히는지(.get·[]·in·NAME_ONLY 호출) 본다. 통째로 넘기면 그 줄이 위반이다.
   - 셸 heredoc 본문(다른 언어 코드·데이터)과 따옴표 안 글자, 주석.
@@ -130,7 +130,15 @@ def py_hits(text):
             return False
         c = parent.get(p)
         g = parent.get(c)
-        return isinstance(c, ast.Call) and isinstance(g, ast.comprehension) and c is g.iter and bool(g.ifs)
+        if not (isinstance(c, ast.Call) and isinstance(g, ast.comprehension) and c is g.iter and g.ifs):
+            return False
+        # 허용 목록만 인정한다(codex C2 H1): 모든 if 가 `키 in <허용 이름 모음>` 이어야 한다. 제외 목록(!=, not in)·접두 조건·항상 참은 통째 전달과 같다
+        key = g.target.elts[0] if isinstance(g.target, ast.Tuple) and g.target.elts else g.target
+        return isinstance(key, ast.Name) and all(
+            isinstance(cond, ast.Compare) and len(cond.ops) == 1 and isinstance(cond.ops[0], ast.In)
+            and isinstance(cond.left, ast.Name) and cond.left.id == key.id
+            and isinstance(cond.comparators[0], (ast.Tuple, ast.List, ast.Set, ast.Name, ast.Attribute))
+            for cond in g.ifs)
 
     def isolation_loop(n):
         """`for k in list(os.environ): if k.startswith("OPS_"): monkeypatch.delenv(k)` 와 `for k in [k for k in os.environ if …]: os.environ.pop(k)`:
@@ -447,7 +455,10 @@ def self_test():
     py_pos = ["for k in list(os.environ):\n    print(k)", "for k in os.environ:\n    x[k] = 1", "snap = dict(os.environ)\nsend(snap)", "os.environ.items()", "x.update(os.environ)", "os.environ | {'A': '1'}", "dict(os.environ)", "{**os.environ, 'A': '1'}",
               "subprocess.run(c, env=os.environ)", "os.environ.copy()", "e = os.environ\nsend(e)", "e = dict(os.environ)\nsubprocess.run(c, env=e)", "e = os.environ.copy()\nfor k in e: pass", "e = {**os.environ, 'A': '1'}\nsend(**e)", "for k in os.environ: pass", "return os.environ",
               "subprocess.run(['x'])", "sp.check_output(['x'])", "run(['x'])", "dict(environ)", "dict(E)", "Popen(c, env=None)", "os.system('x')",
-              "subprocess.run(['x'],\n    check=True)", "e = os.environ if flag else {}", "dict(os.environ, A='1')"]
+              "subprocess.run(['x'],\n    check=True)", "e = os.environ if flag else {}", "dict(os.environ, A='1')",
+              # 제외 목록·접두 조건·항상 참은 허용 목록이 아니다(codex C2 H1)
+              "{k: v for k, v in os.environ.items() if not k.startswith('OPS_')}", "subprocess.run(c, env={k: v for k, v in os.environ.items() if k != 'PYTHONPATH'})",
+              "{k: v for k, v in os.environ.items() if k not in ('X',)}", "{k: v for k, v in os.environ.items() if True}"]
     py_neg = ["os.environ['A']", "os.environ.get('A')", "'A' in os.environ", "os.environ.setdefault('A', 'b')", "os.environ['A'] = 'b'",
               "subprocess.run(c, env=env)", "subprocess.run(c, **kw)", "os.environ.update({'A': 'b'})", "x = 1  # R9.1-예외: 이유",
               "# os.environ.copy()", "s = 'os.environ.copy()'", "x = dict(os.environ)  # R9.1-예외: 이유", "subprocess.run(['x'],  # R9.1-예외: 이유\n    check=True)", "# R9.1-예외: 이유\nx = dict(os.environ)", "subprocess.run(['x'], env={'PATH': p})", "len(os.environ)",
@@ -462,8 +473,7 @@ def self_test():
               # 조건으로 거른 환경: 허용 목록(최소 환경), 시험 격리용 접두 변수 지우기
               "for k in list(os.environ):\n    if k.startswith('A'):\n        monkeypatch.delenv(k)", "for k in [k for k in os.environ if k.startswith('A')]:\n    os.environ.pop(k)",
               "snap = dict(os.environ)\nos.environ.update(snap)",
-              "{k: v for k, v in os.environ.items() if k in ('PATH', 'HOME')}", "{k: v for k, v in os.environ.items() if not k.startswith('OPS_')}",
-              "subprocess.run(c, env={k: v for k, v in os.environ.items() if k != 'PYTHONPATH'})",
+              "{k: v for k, v in os.environ.items() if k in ('PATH', 'HOME')}", "{k: v for k, v in os.environ.items() if k in ALLOWED}",
               # 통째 복사를 이름에 담고 이름으로만 읽거나 이름만 읽는 함수에 넘김
               "env = os.environ\nv = env.get('A')\nx = env['B']\ny = 'C' in env", "env = dict(os.environ)\nvalidate_server_env(env)\nenv['A'] = 'b'\nenv.pop('X', None)"]
     pre = "import os, subprocess\nimport subprocess as sp\nfrom subprocess import run, Popen\nfrom os import environ\nfrom os import environ as E\n"

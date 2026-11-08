@@ -78,6 +78,48 @@ def _container_map(repo_files, df, instrs):
     return out
 
 
+INTERP = re.compile(r"^(python[\d.]*|node|tsx|ts-node|bash|sh|dash|ash|deno|bun)$")   # 이들의 첫 비옵션 인자가 실행 대상이다
+WRAPPER = {"exec", "env", "nice", "nohup", "npx", "time", "tini", "gosu", "su-exec", "--", "export", "if", "!", "while", "until"}   # 앞에 붙어 다음 명령을 실행하는 것
+
+
+def _exec_targets(cmdline):
+    """명령 줄에서 실제로 실행되는 파일 토큰만 낸다(codex C2 H2). echo·test·cp·LABEL 의 인자처럼 이름만 나오는 경로는 진입점이 아니다.
+    단순 명령마다(; && || | 줄바꿈으로 나눔) 앞의 VAR=값·감싸는 명령(exec, env -i …)을 건너뛰고,
+    첫 토큰이 인터프리터면 그 첫 비옵션 인자를, 아니면 첫 토큰 자체(직접 실행한 스크립트)를 실행 대상으로 본다."""
+    s = cmdline.strip()
+    if s.startswith("["):   # Dockerfile exec 형식 ["python", "/app/x.py"]
+        try:
+            arr = json.loads(s)
+            if isinstance(arr, list):
+                s = " ".join(str(a) for a in arr)
+        except ValueError:
+            pass
+    out = []
+    for part in re.split(r"&&|\|\||\$\(|[;|\n`]|\b(?:then|do|else)\b", s):   # 명령 치환 $( … ) 안도 한 명령이다
+        toks = [t.strip("\"'") for t in TOKEN.findall(part)]
+        i = 0
+        while i < len(toks):
+            t = toks[i]
+            if re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", t) or t in WRAPPER or (i > 0 and toks[i - 1] in WRAPPER and t.startswith("-")):
+                i += 1
+                continue
+            break
+        if i >= len(toks):
+            continue
+        head = toks[i]
+        if INTERP.match(posixpath.basename(head)) or re.match(r"^\$\{?[A-Z_]*(PY|PYTHON|NODE|SH)\}?$", head):   # "$PYTHON" x.py 처럼 변수로 고른 인터프리터
+            for a in toks[i + 1:]:
+                if a.startswith("-"):
+                    if a in ("-m", "-c", "-e"):   # 모듈·인라인 코드는 파일 경로가 아니다
+                        break
+                    continue
+                out.append(a)
+                break
+        else:
+            out.append(head)
+    return out
+
+
 def launched(repo, fs):
     """이미지·빌드가 **경로로** 실행하는 코드 파일은 그 프로그램의 진입점이다. 근거(시험 셸·tests/ 는 뺀다):
       1. Dockerfile 의 ENTRYPOINT·CMD·RUN·HEALTHCHECK 줄이 부르는 경로(이미지 안 경로는 COPY 로 리포 파일에 대응시킨다)
@@ -114,7 +156,7 @@ def launched(repo, fs):
             ln = ln.strip()
             if ln.startswith("#"):
                 continue
-            for t in TOKEN.findall(ln):
+            for t in _exec_targets(ln):
                 ref(t, cmap, posixpath.dirname(f))
 
     for df in (f for f in fs if posixpath.basename(f).startswith("Dockerfile") and not re.search(r"(^|/)(tests?|test-e2e)/", f)):
@@ -123,7 +165,9 @@ def launched(repo, fs):
         seen = set()
         for ins, args in instrs:
             if ins in DOCKER_INSTR:
-                for t in TOKEN.findall(args):
+                if ins == "HEALTHCHECK":
+                    args = re.sub(r"^(--\S+\s+)*CMD\s+", "", args.strip())
+                for t in _exec_targets(args):
                     ref(t, cmap, "")
         for src in cmap.values():   # 이미지에 들어간 셸(ENTRYPOINT 로 지정한 것 포함)은 그 이미지의 명령이다(예: --entrypoint 로 부르는 selfcheck)
             if src.endswith(".sh"):
@@ -132,7 +176,7 @@ def launched(repo, fs):
         if f.endswith(".sh") and not TEST_SH.search(f) and BUILD_SH.search(read(f)):
             for ln in read(f).splitlines():
                 if not ln.strip().startswith("#"):
-                    for t in TOKEN.findall(ln):
+                    for t in _exec_targets(ln):
                         ref(t, {}, posixpath.dirname(f))
         if posixpath.basename(f) == "package.json" and "node_modules/" not in f:
             try:
@@ -140,7 +184,7 @@ def launched(repo, fs):
             except ValueError:
                 scripts = []
             for v in scripts:
-                for t in TOKEN.findall(str(v)):
+                for t in _exec_targets(str(v)):
                     ref(t, {}, posixpath.dirname(f))
     return {f for f in found if f.endswith((".py", ".ts")) and not re.search(r"/(components|wiring)/", "/" + f) and not f.endswith("__init__.py")}
 
@@ -207,8 +251,8 @@ def self_test():
                       "COPY copyonly.py /app/copyonly.py\nCOPY tests/img.sh /t/img.sh\n# RUN python /usr/local/bin/cmt.py\nCOPY cmt.py /usr/local/bin/cmt.py\n# lonely.py 는 주석에만 있다\nLABEL note=\"lonely.py\"\nENTRYPOINT [\"/usr/local/bin/entry.sh\"]\n",
         "entry.sh": "#!/bin/sh\n# python /usr/local/bin/cmt.py\nexec python /usr/local/bin/gen_cfg.py \"$@\"\n",
         "gen_cfg.py": "", "chk.sh": "#!/bin/sh\nexec python /usr/local/bin/chk.py\n", "chk.py": "", "copyonly.py": "", "lonely.py": "",
-        "scripts/build-image.sh": "#!/bin/sh\ndocker build -f Dockerfile .\npython tools/mk.py out\necho bare_name.py\n",
-        "tools/mk.py": "", "bare_name.py": "",
+        "scripts/build-image.sh": "#!/bin/sh\ndocker build -f Dockerfile .\npython tools/mk.py out\n\"$PYTHON\" tools/varpy.py a\nX=$(python3 tools/subst.py)\necho bare_name.py\ntest -f tools/tested.py\ncp tools/copied.py /x/\n",
+        "tools/mk.py": "", "bare_name.py": "", "tools/tested.py": "", "tools/varpy.py": "", "tools/subst.py": "", "tools/copied.py": "", "tools/loose.py": "", "tools/echoed.py": "",
         "tests/img.sh": "#!/bin/sh\npython tools/via_test_sh.py\n", "tools/via_test_sh.py": "",   # 이미지에 들어간 시험 셸은 근거가 아니다
         "scripts/helper.sh": "#!/bin/sh\npython tools/helper_only.py\n", "tools/helper_only.py": "",   # Dockerfile 을 안 부르는 일반 셸은 근거가 아니다
         "cmt.py": "",
@@ -221,8 +265,12 @@ def self_test():
         "tools/gen.sh": "#!/bin/sh\npython pkg/components/x.py\npython pkg/wiring/w.py\npython pkg/__init__.py\n",   # Dockerfile 을 안 부르는 셸은 근거가 아니다
     }
     # components·wiring·__init__ 가 Dockerfile 에서 직접 불려도 인정하지 않는다
+    # echo·test 의 인자는 실행이 아니다(codex C2 H2)
+    files["Dockerfile"] += "COPY tools/ /app/tools/\nRUN echo /app/tools/loose.py && test -f /app/tools/loose.py\n"
+    files["entry.sh"] += "echo /usr/local/bin/chk.py\n"
+    files["package.json"] = "{\"scripts\": {\"gen\": \"tsx tools/gen.ts\", \"say\": \"echo tools/echoed.py\"}}"
     files["Dockerfile"] += "RUN python /app/pkg/components/x.py && python /app/pkg/wiring/w.py && python /app/pkg/__init__.py\nCOPY pkg/ /app/pkg/\n"
-    want = {"db/gen.py", "gen_cfg.py", "chk.py", "tools/mk.py", "tools/gen.ts"}
+    want = {"db/gen.py", "gen_cfg.py", "chk.py", "tools/mk.py", "tools/gen.ts", "tools/varpy.py", "tools/subst.py"}
     with tempfile.TemporaryDirectory() as t:
         d = pathlib.Path(t)
         for rel, body in files.items():

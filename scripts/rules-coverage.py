@@ -5,6 +5,9 @@
 출력: docs/RULE_COVERAGE.md(생성물). `--check` 는 생성물이 현재 입력과 같은지 확인한다(다르면 종료 1: 규칙을 적었으면 표도 다시 만들어야 한다).
 대응 방식: 규칙 문장에 적힌 ID(D##, U##, ADR 번호)와 점검 설명에 적힌 ID 가 겹치면 대응. 그 밖은 수동 표(RULE_CHECKS.md)의 ID 참조만 인정한다. 낱말 겹침으로 추측하지 않는다.
 분류: `RECORD`(점검 대상이 아닌 결정 기록: 역할·범위·시점·채택 사실)는 아래 RECORD_IDS 에 헤드가 근거와 함께 적는다. 나머지는 모두 점검이 있어야 한다."""
+# 규칙 번호(C·H): docs/RULE_IDS.json 이 문장 앞 24자에 번호를 묶는다. 위치가 바뀌어도 번호는 그대로다.
+#   새 규칙 → --relock 으로 다음 번호를 받는다. 문장 앞 24자를 고치고 번호를 유지하려면 RULE_IDS.json 에서 그 번호의 값을 새 앞부분으로 고친다.
+#   앞 24자 뒤만 고치면 번호는 그대로이고 경고가 없다(의도: 뜻이 바뀌면 고친 사람이 참조를 본다). 인용된 번호가 사라지면 --check 가 rc=1.
 from __future__ import annotations
 import re, sys, pathlib, glob
 ROOT = pathlib.Path(__file__).resolve().parents[1]; WS = ROOT.parent
@@ -66,10 +69,10 @@ RECORD_IDS = {
  "C20":"기록 위치 규칙",
  "C21":"개발 방식 규칙",
  "C23":"단독 시험 방식(계약 기준 서버) — 영역 스모크가 맡음",
- "C31":"문진 스키마 담당 선언",
- "C34":"push 허락(사람 절차)",
- "C38":"모델 시행착오 방식",
- "C7":"자기 리포 안에서만 일한다 — 사람·에이전트 행동 규칙(커밋 작성자 점검 C33 과 리포별 커밋으로 간접 확인)",
+ "C35":"문진 스키마 담당 선언",
+ "C38":"push 허락(사람 절차)",
+ "C42":"모델 시행착오 방식",
+ "C7":"자기 리포 안에서만 일한다 — 사람·에이전트 행동 규칙(커밋 작성자 점검 C37 과 리포별 커밋으로 간접 확인)",
  "C8":"계약·문진 스키마 직접 수정 금지 — 행동 규칙(계약 커밋은 헤드 세션만, 기계 점검 불가)",
  "H1":"헤드 역할 규칙",
  "H2":"헤드 역할 규칙",
@@ -88,12 +91,38 @@ def decisions():
         m=re.match(r"^\|\s*(D\d+)\s*\|\s*(.*?)\s*\|\s*(.*)\|\s*$", line)
         if m: rows.append((m.group(1), m.group(2)[:60], m.group(2)+" "+m.group(3)))
     return rows
+LOCK = ROOT / "docs/RULE_IDS.json"
+# 왜: C·H 번호를 줄 위치로 세면 규칙 한 줄을 끼워 넣을 때마다 뒤 번호가 밀려, RECORD_IDS·RULE_CHECKS·점검 스크립트의 참조가
+#     조용히 다른 규칙을 가리켰다(2026-11-08 독립 검토가 찾음). 번호는 규칙 문장 앞부분에 묶어 잠그고, 위치가 바뀌어도 그대로 둔다.
+#     새 규칙·바뀐 문장 앞부분은 --relock 으로만 번호를 받는다(조용히 새 번호를 주지 않는다). 지운 규칙의 번호는 retired 로 남겨 다시 쓰지 않는다.
+KEYLEN = 24
+def _key(text): return re.sub(r"\s+", " ", re.sub(r"[*`]", "", text)).strip()[:KEYLEN]
+def _lock():
+    import json
+    return json.loads(LOCK.read_text(encoding="utf-8")) if LOCK.exists() else {}
 def claude_rules(path, sections, prefix):
-    rows=[]; sec=None; n=0
+    import json
+    texts=[]; sec=None
     for line in pathlib.Path(path).read_text(encoding="utf-8").splitlines():
         if line.startswith("## "): sec = line[3:].strip(); continue
         if sec and any(s in sec for s in sections) and re.match(r"^\s*(-|\d+\.)\s+", line):
-            n+=1; text=re.sub(r"^\s*(-|\d+\.)\s+","",line).strip(); rows.append((f"{prefix}{n}", text[:60], text))
+            texts.append(re.sub(r"^\s*(-|\d+\.)\s+","",line).strip())
+    lk=_lock(); ent=lk.setdefault(prefix, {"ids": {}, "retired": {}}); by_key={v:k for k,v in ent["ids"].items()}
+    rows=[]; seen=set(); errs=[]
+    for t in texts:
+        k=_key(t); rid=by_key.get(k)
+        if rid is None:
+            if "--relock" not in sys.argv: errs.append(f"번호 없는 규칙(새 규칙이거나 앞 {KEYLEN}자가 바뀜): {k!r}"); continue
+            used=[int(x[len(prefix):]) for x in list(ent["ids"])+list(ent["retired"])]
+            rid=f"{prefix}{max(used, default=0)+1}"; ent["ids"][rid]=k; by_key[k]=rid
+        if rid in seen: errs.append(f"앞 {KEYLEN}자가 같은 규칙이 둘: {k!r}")
+        seen.add(rid); rows.append((rid, t[:60], t))
+    gone=[r for r in ent["ids"] if r not in seen]
+    if gone and "--relock" not in sys.argv: errs.append(f"잠금에는 있는데 규칙이 없다(지웠거나 문장이 바뀜): {gone}")
+    if errs: print("\n".join(errs)+f"\n규칙 번호 잠금({LOCK.name})과 다르다. 잠금 파일은 쓰지 않았다. 참조(RECORD_IDS, RULE_CHECKS.md, 점검 스크립트)를 확인한 뒤 --relock", file=sys.stderr); sys.exit(1)
+    if "--relock" in sys.argv:
+        for r in gone: ent["retired"][r]=ent["ids"].pop(r)
+        LOCK.write_text(json.dumps(lk, ensure_ascii=False, indent=1, sort_keys=True)+"\n", encoding="utf-8")
     return rows
 def checks():
     out=[]
@@ -111,9 +140,21 @@ def checks():
     return out
 IDPAT=re.compile(r"\b(D\d{2,3}|U\d{2,3}|L\d{2}|G\d{2}|C\d{1,2}|H\d{1,2}|ADR[- ]?0?\d{3,4})\b")
 def ids(text): return {re.sub(r"ADR[- ]?0*","ADR",x) for x in IDPAT.findall(text)}
+def dangling_refs(rule_ids):
+    """RECORD_IDS·RULE_CHECKS.md·head/scripts 가 인용한 C·H 번호가 지금 규칙에 있는지(없으면 죽은 번호를 가리킨다)."""
+    srcs={"RECORD_IDS": " ".join(f"{k} {v}" for k,v in RECORD_IDS.items()), "RULE_CHECKS.md": (ROOT/"docs/RULE_CHECKS.md").read_text(encoding="utf-8")}
+    for f in sorted((ROOT/"scripts").glob("*.py"))+sorted((ROOT/"scripts").glob("*.sh")):
+        if f.name != pathlib.Path(__file__).name: srcs[f"scripts/{f.name}"]=f.read_text(encoding="utf-8")
+    bad=[]
+    for name,txt in srcs.items():
+        for x in sorted(set(re.findall(r"(?<![A-Za-z0-9])([CH]\d{1,2})(?!\d)", txt))):
+            if x not in rule_ids: bad.append(f"{name}: {x}")
+    return bad
 def build():
     rules=decisions()+claude_rules(WS/"CLAUDE.md",["구조 규칙","모든 세션의 규칙","컨테이너와 개발","커밋","자동화","구조 선택"],"C")+claude_rules(ROOT/"CLAUDE.md",["규칙","하지 않는 일","세션을 끝낼 때"],"H")
     chk=checks(); chk_ids=[(name, ids(desc)) for name,desc in chk]
+    bad=dangling_refs({r for r,_,_ in rules if r[0] in "CH"})
+    if bad: print("없는 규칙 번호를 인용한다(번호가 바뀌었거나 지운 규칙):\n  "+"\n  ".join(bad), file=sys.stderr); sys.exit(1)
     lines=["# 규칙 전수 대응표(생성물, U76)","", f"생성: `python3 scripts/rules-coverage.py`. 입력은 스크립트 머리 설명. **손으로 고치지 않는다.** 규칙을 추가하면 다시 만든다(`--check` 가 RULE_CHECKS 의 점검이다).","",
            "대응 규칙: 규칙 문장과 점검 설명이 같은 ID(D##·U##·L##·G##·ADR)를 가리킬 때만 대응으로 센다. 낱말 겹침은 쓰지 않는다. `RECORD` 는 점검 대상이 아닌 결정 기록(스크립트의 RECORD_IDS, 이유 포함).","",
            "| ID | 규칙(앞 60자) | 대응 점검 | 상태 |","|---|---|---|---|"]
@@ -121,9 +162,9 @@ def build():
     for rid,short,full in rules:
         if rid in RECORD_IDS: st="RECORD: "+RECORD_IDS[rid]; n_rec+=1; matched=[]
         else:
-            my={rid} | (ids(full) if rid.startswith(("C","H")) else set())
-            my.add(rid)
-            matched=[name for name,cids in chk_ids if rid in cids or (rid.startswith(("C","H")) and my & cids)]
+            # 왜: C·H 규칙 문장 속 D 번호로 대응을 받으면, 그 D 의 다른 부분을 보는 점검이 이 규칙을 점검하는 것처럼 센다(2026-11-08 검토: C43 이 구조 점검에 붙었다).
+            #     C·H 규칙은 자기 번호를 직접 인용한 점검만 대응으로 센다.
+            matched=[name for name,cids in chk_ids if rid in cids]
             st="있음" if matched else "없음"
             if matched: n_has+=1
             else: n_none+=1

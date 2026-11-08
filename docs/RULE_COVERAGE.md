@@ -2,7 +2,7 @@
 
 생성: `python3 scripts/rules-coverage.py`. 입력은 스크립트 머리 설명. **손으로 고치지 않는다.** 규칙을 추가하면 다시 만든다(`--check` 가 RULE_CHECKS 의 점검이다).
 
-규칙 178개: 점검 있음 81, **점검 없음 21**, 기록 76. (헤드 CLAUDE/루트 CLAUDE 규칙은 C·H 접두)
+규칙 178개: 점검 있음 82, **점검 없음 20**, 기록 76. (헤드 CLAUDE/루트 CLAUDE 규칙은 C·H 접두)
 
 대응 규칙: 규칙 문장과 점검 설명이 같은 ID(D##·U##·L##·G##·ADR)를 가리킬 때만 대응으로 센다. 낱말 겹침은 쓰지 않는다. `RECORD` 는 점검 대상이 아닌 결정 기록(스크립트의 RECORD_IDS, 이유 포함).
 
@@ -167,7 +167,7 @@
 | C31 | 영역 안에서 이웃과 통신하는 일은 `link_*` 통신 컴포넌트만 맡는다(D117). 서비스를 가진 영역은  | - | 없음 |
 | C32 | jsonschema 검증기는 제품 코드(tests 밖)에서 `boundary_contracts.format_ | RULE_CHECKS#26 | 있음 |
 | C33 | 시험은 샌드박스 방식으로 한다(D123). 제품 compose·config에 시험용 포트·플래그·줄을 두지  | - | 없음 |
-| C44 | 영역 이미지는 스스로 서는 단위다. 자기 진입점 기본값·`HEALTHCHECK`·`USER`를 갖고, dep | - | 없음 |
+| C44 | 영역 이미지는 스스로 서는 단위다. 자기 진입점 기본값·`HEALTHCHECK`·`USER`를 갖고, dep | RULE_CHECKS#29 | 있음 |
 | C34 | 이미지는 CI에서 빌드해 digest를 게시한다. 서버 안의 로컬 레지스트리에 올리고 digest를 depl | RULE_CHECKS#5 | 있음 |
 | C35 | 문진 스키마(`../survey-service/schema`) 변경은 survey-service가 반영한다( | - | RECORD: 문진 스키마 담당 선언 |
 | C36 | 작업 단위가 끝날 때마다 자기 리포지토리에 커밋한다(설계서 한 편, 기능 하나, 시험 통과 한 묶음). 커밋 | - | 없음 |

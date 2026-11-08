@@ -41,7 +41,8 @@ IMG = {"INFERENCE_IMAGE": "r/openit/model-serving@d", "INFERENCE_STEP_IMAGE": "r
 
 
 def render(files, overlay=None):
-    env = dict(os.environ); env["SECRETS_GID"] = "1000"; env.setdefault("INFERENCE_TLS_NAME", "infer.example.org")
+    # 왜 최소 환경: R9.1(C45) — 상속 환경을 통째로 넘기면 호스트의 우연한 변수가 compose 해석을 바꾼다. docker 호출에 필요한 이름만 넘긴다.
+    env = {k: os.environ[k] for k in ("PATH", "HOME", "DOCKER_CONFIG", "DOCKER_HOST") if k in os.environ}; env["SECRETS_GID"] = "1000"; env.setdefault("INFERENCE_TLS_NAME", "infer.example.org")
     for f in files:
         for v in re.findall(r"\$\{([A-Za-z0-9_]+):\?", (DEPLOY / f).read_text(encoding="utf-8")):
             env.setdefault(v, IMG.get(v, "1" if v.endswith("_PORT") else "/x"))   # 경로 자리표시는 절대 경로(상대면 짧은 마운트 문법이 달리 읽힌다), 포트는 숫자

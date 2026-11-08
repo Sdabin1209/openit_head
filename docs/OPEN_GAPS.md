@@ -141,6 +141,7 @@
 | D-G | I2(DatasetStore)를 HTTP로 정할지(경로, 클라이언트, 참조 서버). | 헤드 | 결정 적용 대기(D100) (HTTP로 한다. boundary-contracts·synthetic-data·model-lab 후속) |
 | D-H | admin-console CR-003: 생성된 검증기(`generated/contract-validators.cjs`)를 커밋 대상으로 둘지 | 헤드 | 닫힘(D90, D101 재확인) (파일은 git에 추적됨. check-all에 `--check` 연결은 확인하지 못함) |
 | D-I | 문진 결과가 병원으로 나가는 경로. **정정**: pull 경로(`GET /v1/results/{session_id}`, `PUBLIC_API.md` B절)는 이미 정의됨. push(Result Dispatcher)는 수신처 미정으로 붙이지 않음 | 사용자(제품 범위) | 사용자 확인 필요 (D102: 기본값 'pull만' 임시 적용. push 필요 여부와 형식은 사용자 결정) |
+| G-SUBJ-1 | 키오스크 환자 참조(subject_ref)의 접수 연동 방식. 계약 4.0.5 가 DeviceConfig.subject_ref 를 없앴다(`/config.json` 은 기기마다 같은 정적 파일이고 인증 없이 읽혀 환자 참조가 노출될 수 있다). 환자 참조는 접수가 넘기는 시작 URL 조각(KioskStartFragment)으로만 들어오고, 키오스크는 첫 세션 시작 한 번에만 쓰고 비운다(kiosk-frontend start_values.ts). 접수 쪽이 조각을 어떻게 만들지는 설치처 연동의 일이다 | 헤드(계약 4.0.5) | 닫힘(2026-11-08, 계약 4.0.5) |
 
 ## 3-0. 알려진 한계와 사람 몫 (2026-10-28 전수 점검 후, 이유 포함)
 

@@ -4,17 +4,17 @@
 # 왜 태그로 고정하나(2026-11-08): main 은 계속 움직여 나중에 받으면 다른 판이 나온다. demo-2026-11-08-r2 는 새 PC 설치 절차 수정(deploy 142b925)을 더한 판으로, 새 빈 폴더에서 setup.sh→prepare-areas→doctor→demo up→verify-survey 13/13 을 통과했다. r1(demo-2026-11-08) 은 데모 verify-survey 13/13 을 통과한 각 리포의 커밋이다. 원격 기본 브랜치도 리포마다 달라(openit_platform 은 작업 브랜치) 이름을 명시한다.
 host: git@github.com:Sdabin1209
 repos:
-  - {path: head,               remote: openit_head,               tag: demo-2026-11-08-r2}
-  - {path: boundary-contracts, remote: openit_boundary-contracts, tag: demo-2026-11-08-r2}
-  - {path: link,               remote: openit_link,               tag: demo-2026-11-08-r2}   # 영역 통신 기반(D118). turn-engine은 퇴역(D109)이라 목록에서 뺀다
-  - {path: model-runtime,      remote: openit_model-runtime,      tag: demo-2026-11-08-r2}
-  - {path: survey-service,     remote: openit_survey-service,     tag: demo-2026-11-08-r2}
-  - {path: question-authoring, remote: openit_question-authoring, tag: demo-2026-11-08-r2}
-  - {path: synthetic-data,     remote: openit_synthetic-data,     tag: demo-2026-11-08-r2}
-  - {path: model-lab,          remote: openit_model-lab,          tag: demo-2026-11-08-r2}
-  - {path: release-gate,       remote: openit_release-gate,       tag: demo-2026-11-08-r2}
-  - {path: ops-feedback,       remote: openit_ops-feedback,       tag: demo-2026-11-08-r2}
-  - {path: deploy,             remote: openit_deploy,             tag: demo-2026-11-08-r2}
-  - {path: kiosk-frontend,     remote: openit_kiosk-frontend,     tag: demo-2026-11-08-r2}
-  - {path: admin-console,      remote: openit_admin-console,      tag: demo-2026-11-08-r2}
-  - {path: platform,           remote: openit_platform,           tag: demo-2026-11-08-r2}   # 영역 게이트웨이·인증·PKI·백업 저장소·감시(D127). 빠져 있어 새 PC 에서 데모를 빌드할 수 없었다
+  - {path: head,               remote: openit_head,               tag: candidate-r3}
+  - {path: boundary-contracts, remote: openit_boundary-contracts, tag: candidate-r3}
+  - {path: link,               remote: openit_link,               tag: candidate-r3}   # 영역 통신 기반(D118). turn-engine은 퇴역(D109)이라 목록에서 뺀다
+  - {path: model-runtime,      remote: openit_model-runtime,      tag: candidate-r3}
+  - {path: survey-service,     remote: openit_survey-service,     tag: candidate-r3}
+  - {path: question-authoring, remote: openit_question-authoring, tag: candidate-r3}
+  - {path: synthetic-data,     remote: openit_synthetic-data,     tag: candidate-r3}
+  - {path: model-lab,          remote: openit_model-lab,          tag: candidate-r3}
+  - {path: release-gate,       remote: openit_release-gate,       tag: candidate-r3}
+  - {path: ops-feedback,       remote: openit_ops-feedback,       tag: candidate-r3}
+  - {path: deploy,             remote: openit_deploy,             tag: candidate-r3}
+  - {path: kiosk-frontend,     remote: openit_kiosk-frontend,     tag: candidate-r3}
+  - {path: admin-console,      remote: openit_admin-console,      tag: candidate-r3}
+  - {path: platform,           remote: openit_platform,           tag: candidate-r3}   # 영역 게이트웨이·인증·PKI·백업 저장소·감시(D127). 빠져 있어 새 PC 에서 데모를 빌드할 수 없었다

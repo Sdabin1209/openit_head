@@ -2,7 +2,7 @@
 
 생성: `python3 scripts/rules-coverage.py`. 입력은 스크립트 머리 설명. **손으로 고치지 않는다.** 규칙을 추가하면 다시 만든다(`--check` 가 RULE_CHECKS 의 점검이다).
 
-규칙 178개: 점검 있음 82, **점검 없음 20**, 기록 76. (헤드 CLAUDE/루트 CLAUDE 규칙은 C·H 접두)
+규칙 178개: 점검 있음 84, **점검 없음 18**, 기록 76. (헤드 CLAUDE/루트 CLAUDE 규칙은 C·H 접두)
 
 대응 규칙: 규칙 문장과 점검 설명이 같은 ID(D##·U##·L##·G##·ADR)를 가리킬 때만 대응으로 센다. 낱말 겹침은 쓰지 않는다. `RECORD` 는 점검 대상이 아닌 결정 기록(스크립트의 RECORD_IDS, 이유 포함).
 
@@ -46,7 +46,7 @@
 | D36 | 모델 출력 보호 | RULE_CHECKS#16 | 있음 |
 | D37 | 커밋 규칙 | RULE_CHECKS#12 | 있음 |
 | D38 | 완성 목표 | - | RECORD: 완성 목표 서술 |
-| D39 | 자동화 원칙 | - | 없음 |
+| D39 | 자동화 원칙 | deploy/scripts/test_sd_jobs.py | 있음 |
 | D40 | 서빙 서버와 학습·평가 서버 (가정) | - | RECORD: 서버 가정 |
 | D41 | push 허락 | - | RECORD: push 허락 절차(사람 절차, 기계 점검 불가) |
 | D42 | 경계 계약 1.0 확정 | - | RECORD: 계약 1.0 릴리스 기록 |
@@ -70,7 +70,7 @@
 | D60 | 문진 런타임 동결 | - | RECORD: 런타임 동결 기록 |
 | D61 | 목표는 작동하는 파이프라인 (모델 성능 비교 중단) | - | RECORD: 목표 서술 |
 | D62 | 문진 런타임에 LangGraph 사용, D60 동결 해제 | boundary-contracts/tests/test_survey_env_302.py | 있음 |
-| D63 | 이미지 라벨 확장 | - | 없음 |
+| D63 | 이미지 라벨 확장 | deploy/scripts/test_image_labels.py | 있음 |
 | D64 | 직원 알림은 웹 화면 + 푸시 (가정) | survey-service/tests/test_staff_alerts.py | 있음 |
 | D65 | 프론트는 떼어 낼 수 있는 별도 영역 (`kiosk-frontend`) | - | RECORD: 영역 신설 기록 |
 | D66 | 공개 API 보완 (kiosk-frontend CR-001~003 회신) | survey-service/tests/test_public_api_v132.py | 있음 |
@@ -91,12 +91,12 @@
 | D81 | 프로파일별 기반 모델: `gpu-12g`는 가벼운 Qwen3, 학습된 어댑터는 큰 GPU에서 | - | RECORD: 프로파일 선택 기록(model-runtime 프로파일 시험이 맡음, ID 미표기) |
 | D82 | 제약 디코딩이 `pattern`·`minItems`를 지키게 한다(relax-2): model-runtime | RULE_CHECKS#16 | 있음 |
 | D83 | `allOf`/`if-then` 의미 규칙을 제약 디코딩이 지키는 형태로 바꿔 건다: model-runtim | model-runtime/tests/test_anyof_constraint.py | 있음 |
-| D84 | 비밀(서비스 토큰·salt)은 환경 변수가 아니라 **파일**로 받는다: 서비스는 `<이름>_FILE`로 받 | deploy/scripts/test_e2e_diag_safety.py<br>model-lab/tests/test_gateway_publish.py<br>model-lab/tests/test_secrets.py<br>model-runtime/tests/test_secrets_hidden.py | 있음 |
-| D85 | 사용자 지시(2026-10-27)로 결함 목록의 결정을 닫는다 | deploy/scripts/test-gateway-auth.sh<br>release-gate/tests/test_actor.py<br>survey-service/tests/test_results_signals_retention.py | 있음 |
+| D84 | 비밀(서비스 토큰·salt)은 환경 변수가 아니라 **파일**로 받는다: 서비스는 `<이름>_FILE`로 받 | deploy/scripts/test_check_all_inline_secrets.py<br>deploy/scripts/test_e2e_diag_safety.py<br>deploy/scripts/test_no_secret_in_environment.py<br>deploy:"$VENV/bin/python" -W ignore "$DEPLOY_ROOT/scripts/test_no_secret_in_e | 있음 |
+| D85 | 사용자 지시(2026-10-27)로 결함 목록의 결정을 닫는다 | release-gate/tests/test_actor.py<br>survey-service/tests/test_results_signals_retention.py | 있음 |
 | D86 | 장애 대응 정책을 표준 관행으로 정한다(2026-10-28, 헤드 판단. 사용자 결정 항목은 FAULT_PO | survey-service/tests/test_readyz_db_outage.py<br>survey-service/tests/test_turn_db_outage_bounds.py | 있음 |
 | D87 | 직원 알림 SSE에 `heartbeat`, `resync` 이벤트를 추가한다(2026-10-28, 헤드 판단 | survey-service/tests/test_fault_a6_a8_a10.py<br>survey-service/tests/test_staff_alerts.py | 있음 |
 | D88 | 전수 점검(AUDIT_SUMMARY)의 사용자 결정 항목 U1~U12를 **가장 표준적인 방법으로 정해 적용 | boundary-contracts/tests/test_decide_303.py<br>question-authoring/tests/test_ops_hardening.py<br>question-authoring/tests/test_two_person.py<br>release-gate/tests/test_audit_fixes.py | 있음 |
-| D89 | 구조 선택에는 항상 '왜'가 있어야 한다. 영역마다 `docs/adr/`에 ADR(Nygard 형식: 상태, | deploy/scripts/test-hash-password-argv.sh | 있음 |
+| D89 | 구조 선택에는 항상 '왜'가 있어야 한다. 영역마다 `docs/adr/`에 ADR(Nygard 형식: 상태, | - | 없음 |
 | D90 | 스키마에서 생성한 검증기(admin-console `generated/contract-validators.c | - | 없음 |
 | D91 | synthetic-data의 v1 생성 경로(CR-007)는 **바로 삭제하지 않고 폐기 표시만 한다**(2 | - | RECORD: L17 처리 기록(완료) |
 | D92 | **D30을 대체한다**: 임상 근거 승인은 저자와 다른 검수자가 한다(4-eyes, 기본 켬, `QA_RE | question-authoring/tests/test_two_person.py | 있음 |
@@ -114,10 +114,10 @@
 | D122 | **원격 추론 서버는 게이트웨이의 기계 토큰 경로로 release-gate를 읽는다**(사용자 2026-11 | RULE_CHECKS#10 | 있음 |
 | D123 | **시험은 샌드박스 방식**(사용자 지시 2026-11-01): 제품(운영 compose·config)에는  | RULE_CHECKS#11 | 있음 |
 | D124 | **저자 환류 읽기 `GET /v1/signals`를 게이트웨이 저자 경로로 연다**(헤드 2026-11-0 | - | 없음 |
-| D125 | **시간 상한: 목표(SLO)와 실패 판정을 나눈다**(사용자 지시 2026-11-02 00:3x: "응답  | deploy/scripts/test_time_chain.py<br>model-runtime/tests/test_deadline_budget.py<br>survey-service/tests/test_inference_time_budget.py<br>survey-service/tests/test_time_chain_vs_contract_u20.py | 있음 |
+| D125 | **시간 상한: 목표(SLO)와 실패 판정을 나눈다**(사용자 지시 2026-11-02 00:3x: "응답  | deploy/scripts/test_area_test_timeout.py<br>deploy:"$VENV/bin/python" -W ignore "$DEPLOY_ROOT/scripts/test_area_test_time<br>model-runtime/tests/test_deadline_budget.py<br>survey-service/tests/test_inference_time_budget.py | 있음 |
 | D134 | **세 번째 계약(영역 밖에서 컨테이너에 주입하는 것)은 환경 변수만이 아니라 주입 전체다**(헤드, 202 | RULE_CHECKS#24 | 있음 |
 | D135 | **잡 설정은 구현 모듈 경로가 아니라 역할별 HttpClientSettings 로 이웃을 고른다**(헤드, | - | 없음 |
-| D136 | **키오스크 기기 인증은 mTLS(기기 인증서) 하나로**(사용자 결정 2026-11-07 "고쳐야지", 헤 | - | 없음 |
+| D136 | **키오스크 기기 인증은 mTLS(기기 인증서) 하나로**(사용자 결정 2026-11-07 "고쳐야지", 헤 | deploy/scripts/test-kiosk-device-config.sh<br>deploy/scripts/test-kiosk-devices.sh<br>deploy/scripts/test_e2e_session_tokens.py | 있음 |
 | D107 | **영역 경계 스키마 59개의 계약 승격(구조 규칙 6)**: 헤드 결정(2026-10-29). 각 영역이  | boundary-contracts/tests/test_promoted_schemas.py<br>model-lab/tests/test_u3_contracts.py<br>ops-feedback/tests/test_contract_schemas.py<br>question-authoring/tests/test_contract_u3.py | 있음 |
 | D108 | **2.2.0 계약 묶음의 범위 결정**(헤드, 2026-10-29): (1) I9 extract 요청에 ` | model-runtime/tests/test_image_labels.py | 있음 |
 | D109 | **turn-engine 퇴역의 2.x 범위**(헤드, 2026-10-29): 계약 2.x의 `turn_en | deploy/scripts/test_e2e_action_rules_version.py<br>model-lab/tests/test_semantic_diff.py<br>survey-service/tests/test_adr10_caller.py | 있음 |
@@ -167,11 +167,11 @@
 | C31 | 영역 안에서 이웃과 통신하는 일은 `link_*` 통신 컴포넌트만 맡는다(D117). 서비스를 가진 영역은  | - | 없음 |
 | C32 | jsonschema 검증기는 제품 코드(tests 밖)에서 `boundary_contracts.format_ | RULE_CHECKS#26 | 있음 |
 | C33 | 시험은 샌드박스 방식으로 한다(D123). 제품 compose·config에 시험용 포트·플래그·줄을 두지  | - | 없음 |
-| C44 | 영역 이미지는 스스로 서는 단위다. 자기 진입점 기본값·`HEALTHCHECK`·`USER`를 갖고, dep | RULE_CHECKS#29 | 있음 |
+| C44 | 영역 이미지는 스스로 서는 단위다. 자기 진입점 기본값·`HEALTHCHECK`·`USER`를 갖고, dep | - | 없음 |
 | C34 | 이미지는 CI에서 빌드해 digest를 게시한다. 서버 안의 로컬 레지스트리에 올리고 digest를 depl | RULE_CHECKS#5 | 있음 |
 | C35 | 문진 스키마(`../survey-service/schema`) 변경은 survey-service가 반영한다( | - | RECORD: 문진 스키마 담당 선언 |
-| C36 | 작업 단위가 끝날 때마다 자기 리포지토리에 커밋한다(설계서 한 편, 기능 하나, 시험 통과 한 묶음). 커밋 | - | 없음 |
-| C37 | 작성자는 `git -c user.name=Sdabin1209 -c user.email=99588729+Sda | RULE_CHECKS#12 | 있음 |
+| C36 | 작업 단위가 끝날 때마다 자기 리포지토리에 커밋한다(설계서 한 편, 기능 하나, 시험 통과 한 묶음). 커밋 | deploy/scripts/test_sd_jobs.py | 있음 |
+| C37 | 작성자는 `git -c user.name=Sdabin1209 -c user.email=99588729+Sda | RULE_CHECKS#12<br>deploy/scripts/test_sd_jobs.py | 있음 |
 | C38 | push는 헤드의 허락을 받아 한다(사용자가 헤드에게 위임, D41). 커밋하고 시험이 통과한 상태에서 헤드 | - | RECORD: push 허락(사람 절차) |
 | C39 | Python 의존은 리포지토리의 가상환경(`python3 -m venv .venv`)에 설치하고 `.venv | RULE_CHECKS#13 | 있음 |
 | C40 | 영역 사이의 자동 연결은 직접 호출이 아니라 **저장소를 보고 일하는 잡**으로 한다. 각 영역은 자기 잡을 | - | 없음 |

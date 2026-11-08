@@ -35,4 +35,3 @@
 | 26 | 스키마 형식(format) 검증기가 빠지지 않는다(검증기 생성마다 boundary_contracts.format_checker, 잠금에 검증기; C32) | `head/scripts/check-format-enforcement.py` | 있음 |
 | 27 | 고정 포트 금지: 직접 고른 호스트 포트를 Docker 에 넘기지 않는다(Docker 배정 또는 그 변수로 실제 게시 확인) | `head/scripts/check-host-ports.py`(변수 단위, 한계는 파일 설명) | 있음 |
 | 28 | 영역 전체 시험에 건너뛴 시험이 없다(필수 의존은 선언한 시험 명령이 준비, 선택 외부 데이터·GPU 전용은 명시적으로 뺀다) | deploy `check-all --strict` 규칙 8(`scripts/test_area_test_skips.py`) | 있음 |
-| 29 | 영역 이미지는 스스로 서는 단위: deploy compose 가 영역 이미지에 command·entrypoint·healthcheck·user·volumes_from 을 쓰지 않고(잡 command 는 JobsDeclaration), 영역 Dockerfile 은 HEALTHCHECK 와 root 가 아닌 USER 를 갖는다 (C44, CONVENTIONS 13절 3.4.17) | `head/scripts/check-image-autonomy.py`(자기 시험 포함) | 있음 |

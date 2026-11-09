@@ -18,6 +18,7 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 SKIP_DIR = re.compile(r"(^|/)(node_modules|\.venv|build|dist|vendor|wt-[^/]*)/")
 INSPECT = re.compile(r"context[\"',\s]+inspect")
+ARGV_INSPECT = re.compile(r"[\"']context[\"']\s*,\s*[\"']inspect[\"']")
 
 
 def _sh(text):
@@ -47,7 +48,7 @@ def _js(text):
 def _py(text):
     bad, lines = [], text.splitlines()
     for idx, ln in enumerate(lines):
-        if INSPECT.search(ln) and not ln.lstrip().startswith("#"):
+        if ARGV_INSPECT.search(ln) and not ln.lstrip().startswith("#"):   # 실제 호출(argv 목록)만 본다. 시험의 match="context inspect" 같은 문자열은 호출이 아니다
             window = "\n".join(lines[max(0, idx - 3): idx + 12])
             if not re.search(r"check\s*=\s*True|\.returncode|CalledProcessError", window):
                 bad.append(idx + 1)
@@ -91,6 +92,7 @@ def self_test():
         "ok.mjs": ('try { host = execFileSync("docker", ["context", "inspect"]).trim(); } catch (e) { throw new Error("context 해석 실패"); }\n', 0),
         "bad.py": ('r = subprocess.run(["docker", "context", "inspect"], capture_output=True)\nhost = r.stdout\n', 1),
         "ok.py": ('r = subprocess.run(["docker", "context", "inspect"], capture_output=True, check=True)\n', 0),
+        "ok3.py": ('with pytest.raises(RuntimeError, match="context inspect"):\n    f()\n', 0),
         "ok2.py": ('r = subprocess.run(["docker", "context", "inspect"], capture_output=True)\nif r.returncode != 0:\n    raise SystemExit(1)\n', 0),
     }
     bad = []

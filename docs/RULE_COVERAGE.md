@@ -2,7 +2,7 @@
 
 생성: `python3 scripts/rules-coverage.py`. 입력은 스크립트 머리 설명. **손으로 고치지 않는다.** 규칙을 추가하면 다시 만든다(`--check` 가 RULE_CHECKS 의 점검이다).
 
-규칙 178개: 점검 있음 84, **점검 없음 18**, 기록 76. (헤드 CLAUDE/루트 CLAUDE 규칙은 C·H 접두)
+규칙 178개: 점검 있음 90, **점검 없음 12**, 기록 76. (헤드 CLAUDE/루트 CLAUDE 규칙은 C·H 접두)
 
 대응 규칙: 규칙 문장과 점검 설명이 같은 ID(D##·U##·L##·G##·ADR)를 가리킬 때만 대응으로 센다. 낱말 겹침은 쓰지 않는다. `RECORD` 는 점검 대상이 아닌 결정 기록(스크립트의 RECORD_IDS, 이유 포함).
 
@@ -91,7 +91,7 @@
 | D81 | 프로파일별 기반 모델: `gpu-12g`는 가벼운 Qwen3, 학습된 어댑터는 큰 GPU에서 | - | RECORD: 프로파일 선택 기록(model-runtime 프로파일 시험이 맡음, ID 미표기) |
 | D82 | 제약 디코딩이 `pattern`·`minItems`를 지키게 한다(relax-2): model-runtime | RULE_CHECKS#16 | 있음 |
 | D83 | `allOf`/`if-then` 의미 규칙을 제약 디코딩이 지키는 형태로 바꿔 건다: model-runtim | model-runtime/tests/test_anyof_constraint.py | 있음 |
-| D84 | 비밀(서비스 토큰·salt)은 환경 변수가 아니라 **파일**로 받는다: 서비스는 `<이름>_FILE`로 받 | deploy/scripts/test_check_all_inline_secrets.py<br>deploy/scripts/test_e2e_diag_safety.py<br>deploy/scripts/test_no_secret_in_environment.py<br>deploy:"$VENV/bin/python" -W ignore "$DEPLOY_ROOT/scripts/test_no_secret_in_e | 있음 |
+| D84 | 비밀(서비스 토큰·salt)은 환경 변수가 아니라 **파일**로 받는다: 서비스는 `<이름>_FILE`로 받 | deploy/scripts/test-gen-secrets-format.sh<br>deploy/scripts/test_check_all_inline_secrets.py<br>deploy/scripts/test_e2e_diag_safety.py<br>deploy/scripts/test_no_secret_in_environment.py | 있음 |
 | D85 | 사용자 지시(2026-10-27)로 결함 목록의 결정을 닫는다 | release-gate/tests/test_actor.py<br>survey-service/tests/test_results_signals_retention.py | 있음 |
 | D86 | 장애 대응 정책을 표준 관행으로 정한다(2026-10-28, 헤드 판단. 사용자 결정 항목은 FAULT_PO | survey-service/tests/test_readyz_db_outage.py<br>survey-service/tests/test_turn_db_outage_bounds.py | 있음 |
 | D87 | 직원 알림 SSE에 `heartbeat`, `resync` 이벤트를 추가한다(2026-10-28, 헤드 판단 | survey-service/tests/test_fault_a6_a8_a10.py<br>survey-service/tests/test_staff_alerts.py | 있음 |
@@ -112,11 +112,11 @@
 | D102 | **D-I: 결과가 병원으로 나가는 경로 — 당겨 가기(pull)는 이미 정의돼 있어 범위 안, 밀어 넣기( | - | RECORD: D-I pull 기본(결정 대기) |
 | D103 | **L03·L05·L06은 '수용된 한계 + 문서화'로 결정해 닫는다. L08은 닫지 않고 순서만 정한다** | - | RECORD: 수용된 한계 기록 |
 | D122 | **원격 추론 서버는 게이트웨이의 기계 토큰 경로로 release-gate를 읽는다**(사용자 2026-11 | RULE_CHECKS#10 | 있음 |
-| D123 | **시험은 샌드박스 방식**(사용자 지시 2026-11-01): 제품(운영 compose·config)에는  | RULE_CHECKS#11 | 있음 |
+| D123 | **시험은 샌드박스 방식**(사용자 지시 2026-11-01): 제품(운영 compose·config)에는  | RULE_CHECKS#11<br>head/scripts/test_head_static_checks.py | 있음 |
 | D124 | **저자 환류 읽기 `GET /v1/signals`를 게이트웨이 저자 경로로 연다**(헤드 2026-11-0 | - | 없음 |
 | D125 | **시간 상한: 목표(SLO)와 실패 판정을 나눈다**(사용자 지시 2026-11-02 00:3x: "응답  | deploy/scripts/test_area_test_timeout.py<br>deploy:"$VENV/bin/python" -W ignore "$DEPLOY_ROOT/scripts/test_area_test_time<br>model-runtime/tests/test_deadline_budget.py<br>survey-service/tests/test_inference_time_budget.py | 있음 |
 | D134 | **세 번째 계약(영역 밖에서 컨테이너에 주입하는 것)은 환경 변수만이 아니라 주입 전체다**(헤드, 202 | RULE_CHECKS#24 | 있음 |
-| D135 | **잡 설정은 구현 모듈 경로가 아니라 역할별 HttpClientSettings 로 이웃을 고른다**(헤드, | - | 없음 |
+| D135 | **잡 설정은 구현 모듈 경로가 아니라 역할별 HttpClientSettings 로 이웃을 고른다**(헤드, | release-gate/tests/test_serve_requires_neighbors.py | 있음 |
 | D136 | **키오스크 기기 인증은 mTLS(기기 인증서) 하나로**(사용자 결정 2026-11-07 "고쳐야지", 헤 | deploy/scripts/test-kiosk-device-config.sh<br>deploy/scripts/test-kiosk-devices.sh<br>deploy/scripts/test_e2e_session_tokens.py | 있음 |
 | D107 | **영역 경계 스키마 59개의 계약 승격(구조 규칙 6)**: 헤드 결정(2026-10-29). 각 영역이  | boundary-contracts/tests/test_promoted_schemas.py<br>model-lab/tests/test_u3_contracts.py<br>ops-feedback/tests/test_contract_schemas.py<br>question-authoring/tests/test_contract_u3.py | 있음 |
 | D108 | **2.2.0 계약 묶음의 범위 결정**(헤드, 2026-10-29): (1) I9 extract 요청에 ` | model-runtime/tests/test_image_labels.py | 있음 |
@@ -128,21 +128,21 @@
 | D114 | **추론 경로 전송 보안은 TLS(사용자 결정 2026-10-29)**: survey-service → 추론 | RULE_CHECKS#10 | 있음 |
 | D115 | **LoRA-A 출력 값 규칙(계약 2.4.0, U32·U33)**(헤드, 2026-10-29): 칸 규격  | question-authoring/tests/test_slot_fields_u32.py | 있음 |
 | D116 | **계약 3.0.0을 GPU 일 전에 낸다**(헤드, 2026-10-30, 사용자 기준 'GPU를 뺀 나머지 | - | RECORD: 릴리스 시점 결정 |
-| D117 | **영역 설계 규칙(DESIGN.md)**(헤드, 2026-10-30, 사용자와 논의해 확정): 컴포넌트는  | RULE_CHECKS#1<br>deploy/tests/test_structure.py<br>deploy:"$VENV/bin/python" -W ignore "$DEPLOY_ROOT/tests/test_structure.py"<br>model-lab/tests/test_schemas.py | 있음 |
+| D117 | **영역 설계 규칙(DESIGN.md)**(헤드, 2026-10-30, 사용자와 논의해 확정): 컴포넌트는  | RULE_CHECKS#1<br>boundary-contracts/tests/test_contract_500.py<br>deploy/scripts/test-gen-secrets-format.sh<br>deploy/tests/test_structure.py | 있음 |
 | D118 | **영역 통신 기반 라이브러리 `link`를 둔다**(사용자 승인 2026-10-30): 받는 쪽(WSGI  | question-authoring/tests/test_standards_wo3.py | 있음 |
 | D119 | **응답 생성 상한 5초와 시간 상한 사슬 재배분**(사용자 결정 2026-10-30 23:1x): resp | RULE_CHECKS#4<br>release-gate/tests/test_exposure_budget.py | 있음 |
 | D120 | **사람용 요청에 서버 쪽 요청 전체 마감(마감 전파)**(헤드 결정 2026-10-31): release- | RULE_CHECKS#4<br>ops-feedback/tests/test_request_deadline.py<br>question-authoring/tests/test_request_deadline.py<br>release-gate/tests/test_deadline_hashing.py | 있음 |
 | D121 | **최종 고정 패치 판**(2026-10-31 14:5x): boundary-contracts v3.1.2( | - | RECORD: 고정 판 기록 |
 | C1 | 영역은 서로의 구조를 모른다. | RULE_CHECKS#1<br>model-runtime/tests/test_reference_data.py<br>release-gate/tests/test_upstream_faults.py<br>survey-service/tests/test_reference_data.py | 있음 |
-| C2 | 영역은 작업의 단위인 컴포넌트를 가진다. | model-lab/tests/test_yaml12.py<br>release-gate/tests/test_upstream_faults.py<br>survey-service/tests/test_device_header.py<br>survey-service/tests/test_skipped_details_u35.py | 있음 |
-| C3 | 컴포넌트는 다른 컴포넌트와 독립적이며 서로의 구조를 모른다. | RULE_CHECKS#1<br>release-gate/tests/test_audit_fixes.py<br>release-gate/tests/test_upstream_faults.py | 있음 |
-| C4 | 컴포넌트는 자신에게 할당된 입력·출력 스키마와 자신이 할 업무밖에 모른다. | RULE_CHECKS#1<br>release-gate/tests/test_pg_timeouts.py<br>synthetic-data/tests/test_pii_strict_default.py | 있음 |
+| C2 | 영역은 작업의 단위인 컴포넌트를 가진다. | deploy/scripts/test-lib-docker-context.sh<br>model-lab/tests/test_describe_no_values.py<br>model-lab/tests/test_yaml12.py<br>release-gate/tests/test_docker_env.py | 있음 |
+| C3 | 컴포넌트는 다른 컴포넌트와 독립적이며 서로의 구조를 모른다. | RULE_CHECKS#1<br>head/scripts/test_head_static_checks.py<br>release-gate/tests/test_audit_fixes.py<br>release-gate/tests/test_upstream_faults.py | 있음 |
+| C4 | 컴포넌트는 자신에게 할당된 입력·출력 스키마와 자신이 할 업무밖에 모른다. | RULE_CHECKS#1<br>head/scripts/test_head_static_checks.py<br>release-gate/tests/test_pg_timeouts.py<br>synthetic-data/tests/test_pii_strict_default.py | 있음 |
 | C5 | 영역은 자기 컴포넌트 사이의 스키마를 알고, 컴포넌트가 교류할 수 있게 그 스키마를 책임진다. | release-gate/tests/test_upstream_faults.py | 있음 |
 | C6 | 영역 간 스키마는 헤드가 책임진다. | RULE_CHECKS#18 | 있음 |
 | C7 | 자기 리포지토리 안에서만 일한다. 다른 폴더를 수정하지 않는다. 읽는 것도 `../survey-service | - | RECORD: 자기 리포 안에서만 일한다 — 사람·에이전트 행동 규칙(커밋 작성자 점검 C37 과 리포별 커밋으로 간접 확인) |
 | C8 | 문진 스키마와 `boundary-contracts`를 직접 수정하지 않는다(survey-service는 자기 | - | RECORD: 계약·문진 스키마 직접 수정 금지 — 행동 규칙(계약 커밋은 헤드 세션만, 기계 점검 불가) |
 | C9 | 영역 리포지토리끼리 코드를 가져오지 않는다. 의존할 수 있는 것은 문진 스키마, boundary-contra | - | 없음 |
-| C43 | 받아들이는 조건은 전부 스키마에 둔다. 코드 안에 스키마에 없는 거부 조건을 두지 않고, 같은 뜻의 타입은  | - | 없음 |
+| C43 | 받아들이는 조건은 전부 스키마에 둔다. 코드 안에 스키마에 없는 거부 조건을 두지 않고, 같은 뜻의 타입은  | head/scripts/test_head_static_checks.py | 있음 |
 | C10 | 문서는 **자기 영역의 사실만** 쓴다. 이웃 영역의 사실(시험 개수, 결과, 상태, 버전)은 복사하지 않고 | RULE_CHECKS#13 | 있음 |
 | C11 | 읽지 못한 것이나 확인하지 못한 것을 확인한 것처럼 쓰지 않는다. 확인한 것, 제안, 미정을 구분해서 말한다 | - | RECORD: 행동 규칙(확인 전 말하기 금지) — 기계 점검 불가 |
 | C12 | 수용 테스트와 계약 검증을 통과하기 전에 완료했다고 말하지 않는다. | - | RECORD: 행동 규칙(완료 선언 조건) — 열차 절차가 맡음 |
@@ -155,10 +155,10 @@
 | C19 | 결정이 바뀌면 ADR을 지우지 않고 새 ADR이 이전 것을 대체(`Supersedes`)한다. | - | RECORD: ADR 대체 규칙(수동 검토) |
 | C20 | 헤드의 `DECISIONS.md`는 영역 사이 결정의 기록이고, 영역 내부 구조 선택은 영역의 ADR이 정본 | - | RECORD: 기록 위치 규칙 |
 | C21 | 개발은 컨테이너 밖에서 한다(가상환경, 이웃 영역의 메모리 구현). 컨테이너는 개발 환경이 아니라 매 변경마 | - | RECORD: 개발 방식 규칙 |
-| C22 | 서비스를 가진 영역은 자기 리포지토리에 `Dockerfile`을 두고, 변경을 완료했다고 말하기 전에 이미지 | RULE_CHECKS#13 | 있음 |
+| C22 | 서비스를 가진 영역은 자기 리포지토리에 `Dockerfile`을 두고, 변경을 완료했다고 말하기 전에 이미지 | RULE_CHECKS#13<br>head/scripts/test_head_static_checks.py | 있음 |
 | C23 | 이웃 영역이 필요하면 그 영역의 메모리 구현(가짜 SDK)으로 대신해, 다른 영역 없이 혼자 시험할 수 있어 | - | RECORD: 단독 시험 방식(계약 기준 서버) — 영역 스모크가 맡음 |
-| C24 | **docker 호출은 프로젝트 자체 설정만 쓴다(2026-11-05).** 모든 리포의 스크립트·시험이 d | - | 없음 |
-| C25 | 이미지는 다음을 지킨다: 설정은 환경 변수로 받는다. **비밀(토큰·salt 등)은 환경 변수가 아니라 파일 | - | 없음 |
+| C24 | **docker 호출은 프로젝트 자체 설정만 쓴다(2026-11-05).** 모든 리포의 스크립트·시험이 d | head/scripts/test_head_static_checks.py | 있음 |
+| C25 | 이미지는 다음을 지킨다: 설정은 환경 변수로 받는다. **비밀(토큰·salt 등)은 환경 변수가 아니라 파일 | head/scripts/test_head_static_checks.py | 있음 |
 | C26 | `boundary-contracts`는 태그로 설치한다(현재 기준은 `deploy/scripts/lib.sh | RULE_CHECKS#5 | 있음 |
 | C27 | 라이브러리와 SDK는 Git 태그로 설치하고, 이미지를 빌드할 때 태그를 고정한다. 의존 버전은 잠금 파일로 | RULE_CHECKS#5 | 있음 |
 | C28 | 스모크 시험은 고정 포트를 쓰지 않는다. 여러 영역이 같은 서버에서 동시에 돌리면 충돌한다. 호스트 포트를  | RULE_CHECKS#13 | 있음 |
@@ -166,7 +166,7 @@
 | C30 | 영역 사이 호출은 `boundary-contracts/HTTP.md`의 HTTP API로 한다. 서버는 소유 | RULE_CHECKS#1 | 있음 |
 | C31 | 영역 안에서 이웃과 통신하는 일은 `link_*` 통신 컴포넌트만 맡는다(D117). 서비스를 가진 영역은  | - | 없음 |
 | C32 | jsonschema 검증기는 제품 코드(tests 밖)에서 `boundary_contracts.format_ | RULE_CHECKS#26 | 있음 |
-| C33 | 시험은 샌드박스 방식으로 한다(D123). 제품 compose·config에 시험용 포트·플래그·줄을 두지  | - | 없음 |
+| C33 | 시험은 샌드박스 방식으로 한다(D123). 제품 compose·config에 시험용 포트·플래그·줄을 두지  | head/scripts/test_head_static_checks.py | 있음 |
 | C44 | 영역 이미지는 스스로 서는 단위다. 자기 진입점 기본값·`HEALTHCHECK`·`USER`를 갖고, dep | - | 없음 |
 | C34 | 이미지는 CI에서 빌드해 digest를 게시한다. 서버 안의 로컬 레지스트리에 올리고 digest를 depl | RULE_CHECKS#5 | 있음 |
 | C35 | 문진 스키마(`../survey-service/schema`) 변경은 survey-service가 반영한다( | - | RECORD: 문진 스키마 담당 선언 |
@@ -175,7 +175,7 @@
 | C38 | push는 헤드의 허락을 받아 한다(사용자가 헤드에게 위임, D41). 커밋하고 시험이 통과한 상태에서 헤드 | - | RECORD: push 허락(사람 절차) |
 | C39 | Python 의존은 리포지토리의 가상환경(`python3 -m venv .venv`)에 설치하고 `.venv | RULE_CHECKS#13 | 있음 |
 | C40 | 영역 사이의 자동 연결은 직접 호출이 아니라 **저장소를 보고 일하는 잡**으로 한다. 각 영역은 자기 잡을 | - | 없음 |
-| C45 | 시험·잡은 입력을 인자·설정 파일(환경 변수는 스키마에 있는 이름만)로 받고, 상속받은 환경 변수를 통째로  | - | 없음 |
+| C45 | 시험·잡은 입력을 인자·설정 파일(환경 변수는 스키마에 있는 이름만)로 받고, 상속받은 환경 변수를 통째로  | head/scripts/test_head_static_checks.py | 있음 |
 | C41 | 잡을 언제 돌리는지는 deploy의 스케줄러가 정한다. 영역은 스스로 다른 영역을 깨우지 않는다. | - | 없음 |
 | C42 | 모델의 성능 시행착오는 설정으로 바꾸며 반복한다. 파이프라인을 손으로 이어 치는 방식은 두지 않는다. | - | RECORD: 모델 시행착오 방식 |
 | H1 | 영역 내부 설계와 구현을 정하지 않는다. 컴포넌트 표는 참고용 시드다. | - | RECORD: 헤드 역할 규칙 |

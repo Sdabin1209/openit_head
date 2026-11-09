@@ -12,7 +12,7 @@ EVIDENCE = HEAD / 'progress/schema-census'
 
 
 def invoke(root, command, cases):
-    environment = {key: value for key, value in os.environ.items() if key != 'PYTHONPATH'}
+    environment = {key: os.environ[key] for key in ('PATH', 'HOME', 'LANG', 'TMPDIR') if key in os.environ}   # R9.1 허용 목록(PYTHONPATH 는 넘기지 않는다)
     result = subprocess.run(
         [str(root / '.venv/bin/python'), *command], cwd=root,
         input=json.dumps(cases), text=True, capture_output=True,

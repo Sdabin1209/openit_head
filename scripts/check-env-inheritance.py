@@ -9,13 +9,17 @@
     .이름·[이름]·`const {A} = process.env` 가 아닌 쓰임이면 통째다(env: process.env, ...process.env, Object.entries(process.env) 등). Go 는 os.Environ().
   I 상속 — env 를 주지 않거나 env=None 인 하위 프로세스 호출: Python subprocess.run/Popen/call/check_call/check_output/getoutput, os.system/popen/
     exec*/spawn*(e 가 없는 것), asyncio.create_subprocess_*; JS child_process spawn/exec/execFile/fork(Sync 포함)의 인자에 env 가 없는 것.
-    **kwargs 로 넘기면 알 수 없으므로 세지 않는다.
+    **kwargs·JS ...opts 로 넘기면 env 가 있는지 알 수 없으므로 상속으로 센다(2026-11-09 면제 없앰). env=<이름> 인데 그 이름이 None 별칭(인자 기본값 None 이고
+    다시 대입하지 않음, 또는 범위 안 대입이 모두 = None)이면 env=None 과 같다.
+  문자열·heredoc 속 코드(2026-11-09): 파이썬 여러 줄·`;` 든 문자열(-c 코드), 셸 heredoc 본문·python -c·node -e 인자, JS 여러 줄 템플릿 글자에 subprocess·os.environ·
+    child_process·process.env 가 있으면 그 글을 파이썬(파싱되면) 또는 JS 규칙으로 보고 바깥 파일의 줄로 센다.
   S 셸 — exec 뒤에 env -i 가 없는 exec(파일 기술자 지정 exec 3>&1 은 제외), -i 가 없는 env 명령(env VAR=x cmd, env | …: 환경을 통째로 물려주거나
     찍는다), export -p·declare -x·printenv(환경 전체 출력). 셸의 일반 명령은 모두 환경을 물려받으므로 명령마다 세지 않는다.
 범위(W·I·S·X 모두): R9.1 은 RUNTIME 표상 '시험·잡의 실행' 규칙이라 시험·잡 파일에서만 센다. 시험·잡 파일(TESTJOB)은 tests/·test-*/·e2e*/·jobs?/·smoke 폴더,
   test_*·*_test.*·*.test.*·*.spec.*·*smoke*·*e2e*·*run-once*·*job* 이름, 그리고 제품 모듈 안의 잡 진입이다: 영역 deploy-jobs.json(JobsDeclaration)의
   argv 가 `python -m <모듈>` 로 부르는 모듈 파일과 그 모듈이 한 단계 가져오는 같은 패키지 모듈(components/·wiring/·__init__ 제외). 근거: deploy 의 잡 실행은
-  JobsDeclaration 의 argv 를 그대로 실행한다(CONVENTIONS 13절). 서비스 진입점·개발 도구는 배포가 준 환경(*Env 스키마의 이름)을 물려받는 것이 정상이다(12-Factor III).
+  JobsDeclaration 의 argv 를 그대로 실행한다(CONVENTIONS 13절). 이름과 무관하게 시험을 실행하는 파일(pytest·test-all·verify·smoke·node --test·npm test 를
+  주석 밖에서 부르는 파일)도 범위다(2026-11-09). 서비스 진입점·개발 도구는 배포가 준 환경(*Env 스키마의 이름)을 물려받는 것이 정상이다(12-Factor III).
 셈하지 않는 것(거짓 양성 방지, 모두 자기 줄이 아니라 쓰임으로 판정):
   - 이름만 읽는 함수에 넘김: NAME_ONLY 목록(함수 본문을 읽어 확인한 근거는 목록 주석). egress_proxy_from(os.environ)은 CONVENTIONS 13절이 정한 R9.1 준수 방식이다.
   - 주입 기본값: `X = os.environ if X is None else X`(대입·인자·`(a if a is not None else os.environ).get` 등 어느 자리든), `dict(os.environ if base is None else base)`,
@@ -25,7 +29,7 @@
   - 통째 복사를 지역 이름에 담은 경우(env = dict(os.environ) 등): 담는 줄이 아니라 그 이름이 이름으로만 읽히는지(.get·[]·in·NAME_ONLY 호출) 본다. 통째로 넘기면 그 줄이 위반이다.
   - 셸 heredoc 본문(다른 언어 코드·데이터)과 따옴표 안 글자, 주석.
 예외 표시: 줄(Python 은 호출·표현식의 줄 범위 또는 바로 윗줄)에 'R9.1-예외' 가 있으면 센다 안 한다(이유를 같은 줄에 적는다).
-보지 않는 것(이유): 셸 heredoc·python -c 문자열 안에 든 다른 언어 코드(셸 규칙은 본문을 건너뛴다), 주입된 환경을 그 뒤 통째로 넘기는 일,
+보지 않는 것(이유): 셸 heredoc 본문에 셸 규칙을 대는 일(본문은 위 '문자열·heredoc 속 코드' 로 파이썬·JS 규칙만 댄다), import 없이 이름만 쓰는 조각 코드(별칭을 모른다), 주입된 환경을 그 뒤 통째로 넘기는 일,
 const base = process.env; 처럼 JS 에서 이름에 담은 뒤의 쓰임(첫 줄에서 잡는다), Go 의 exec.Command 에 cmd.Env 를 안 준 상속(자료 흐름 추적이 필요하다),
 셸에서 환경 변수를 이름으로 읽는 일반 명령, 파싱에 실패한 Python 파일(줄 정규식으로 W 만 본다).
 사용: check-env-inheritance.py [--self-test]. 종료 0 통과, 1 위반(줄 목록), 2 사용 오류."""
@@ -202,6 +206,29 @@ def py_hits(text):
             return p
         return None
 
+    def none_alias(v, call):
+        """env=<이름> 인데 그 이름이 None 별칭인가: 함수 인자 기본값이 None 이고 함수 안에서 다시 대입하지 않았거나, 범위 안의 대입이 모두 `= None` 이다."""
+        if not isinstance(v, ast.Name):
+            return False
+        sc = scope_of(call)
+        assigns = []
+        for x in ast.walk(sc):
+            if isinstance(x, (ast.Assign, ast.AugAssign, ast.AnnAssign, ast.NamedExpr)):
+                tg = x.targets if isinstance(x, ast.Assign) else [x.target]
+                if any(isinstance(t, ast.Name) and t.id == v.id for t in tg):
+                    assigns.append(x)
+            elif isinstance(x, ast.For) and v.id in {t.id for t in ast.walk(x.target) if isinstance(t, ast.Name)}:
+                assigns.append(x)
+        is_none = lambda e: isinstance(e, ast.Constant) and e.value is None
+        if isinstance(sc, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            a = sc.args
+            pos = a.posonlyargs + a.args
+            defaults = dict(zip([x.arg for x in pos][len(pos) - len(a.defaults):], a.defaults))
+            defaults.update({x.arg: d for x, d in zip(a.kwonlyargs, a.kw_defaults) if d is not None})
+            if v.id in defaults:
+                return is_none(defaults[v.id]) and not assigns
+        return bool(assigns) and all(isinstance(x, (ast.Assign, ast.AnnAssign)) and is_none(x.value) for x in assigns)
+
     out, aliases = [], {}   # aliases: (범위, 이름) -> 만든 줄. 통째 복사를 지역 이름에 담으면 쓰이는 자리에서 본다(이름으로만 읽으면 통과, 넘기면 그 줄이 위반)
     for n in ast.walk(tree):
         if is_environ(n):
@@ -220,9 +247,9 @@ def py_hits(text):
         elif isinstance(n, ast.Call):
             mod, fn = callee(n)
             inherit = (mod == "subprocess" and fn in PY_SUB) or (mod == "os" and fn in OS_INHERIT) or (mod == "asyncio" and fn in ASYNC_SUB)
-            if inherit and not any(k.arg is None for k in n.keywords) and not marked(n):
+            if inherit and not marked(n):   # **kw 로 넘겨도 env 가 있는지 알 수 없으므로 상속으로 센다(면제 없음, 2026-11-09)
                 envkw = [k for k in n.keywords if k.arg == "env"]
-                if not envkw or (isinstance(envkw[0].value, ast.Constant) and envkw[0].value.value is None):
+                if not envkw or (isinstance(envkw[0].value, ast.Constant) and envkw[0].value.value is None) or none_alias(envkw[0].value, n):
                     out.append((n.lineno, "I"))
     if aliases:
         for n in ast.walk(tree):
@@ -296,7 +323,7 @@ def js_hits(text):
                 j += 1
             args = joined[m.end():j]
             lineno = joined.count("\n", 0, m.start()) + 1
-            if not re.search(r"\benv\b", args) and not re.search(r"\.\.\.\s*\w+", args) and MARK not in raw[lineno - 1]:
+            if not re.search(r"\benv\s*[:,}]|\benv\s*$", args) and MARK not in raw[lineno - 1]:   # ...opts 펼침은 env 가 있는지 알 수 없어 상속으로 센다(면제 없음)
                 out.append((lineno, "I"))
     return sorted(set(out))
 
@@ -355,10 +382,73 @@ def go_hits(text):
 
 # 범위: R9.1 은 '시험·잡의 실행' 규칙이다. 상속(I)·셸 exec(X)는 시험·잡 파일에서만 센다. 서비스 컨테이너의 진입점·개발 도구는 배포가 준 환경
 # (*Env 스키마의 이름)을 물려받는 것이 정상이고 12-Factor III 가 그 방식이다. 통째 사용(W)·환경 찍기(S)는 어디서든 센다.
-TESTJOB = re.compile(r"(^|/)(tests?|test-[\w-]+|e2e[\w-]*|jobs?|smoke)(/|$)|(^|/)(test[_-][^/]*|[^/]*_test\.[^/]*|[^/]*\.(test|spec)\.[^/]*|[^/]*(smoke|e2e|run-once)[^/]*|[^/]*job[^/]*)$")
+TESTJOB = re.compile(r"(^|/)(tests?|test-[\w-]+|e2e[\w-]*|jobs?|smoke)(/|$)|(^|/)(test[_-][^/]*|[^/]*_test\.[^/]*|[^/]*\.(test|spec)\.[^/]*|[^/]*(smoke|e2e|run-once)[^/]*|[^/]*job[^/]*|[^/]*(verify|census|probe|measure|serve_check)[^/]*\.(py|sh|mjs|js|ts))$")   # 시험을 돌리거나 재는 도구도 시험이다(codex C2 횡단 형4: verify_area, gpu_serve_check)
+
+
+EMBED_CUE = re.compile(r"subprocess|os\.environ|os\.system|os\.exec|os\.spawn|child_process|process\.env|create_subprocess")
+PY_C = re.compile(r"""\bpython[\d.]*\s+(?:-\w+\s+)*-c\s+(['"])(.*?)(?<!\\)\1""")
+NODE_E = re.compile(r"""\bnode\s+(?:--[\w=-]+\s+)*-[ep]\s+(['"])(.*?)(?<!\\)\1""")
+
+
+def _embedded(code, base, last=None):
+    """문자열·heredoc 속 코드: 파이썬으로 파싱되면 파이썬 규칙, 아니면 child_process·process.env 가 있으면 JS 규칙. 줄 번호는 바깥 파일 기준."""
+    if not EMBED_CUE.search(code):
+        return []
+    import textwrap
+    code = textwrap.dedent(code)
+    h = py_hits(code)
+    if h is None:
+        h = js_hits(code) if re.search(r"child_process|process\.env", code) else []
+    return [(min(base + ln - 1, last or 10**9), k) for ln, k in h]   # 한 줄 문자열 속 \n 은 바깥 줄을 넘지 않는다
+
+
+def embedded_hits(name, text, lg):
+    out = []
+    if lg == "py":
+        try:
+            tree = ast.parse(text)
+        except (SyntaxError, ValueError):
+            return []
+        for n in ast.walk(tree):
+            if isinstance(n, ast.Constant) and isinstance(n.value, str) and ("\n" in n.value or ";" in n.value):
+                out += _embedded(n.value, n.lineno, getattr(n, "end_lineno", None))
+    elif lg == "sh":
+        lines, i = text.splitlines(), 0
+        while i < len(lines):
+            raw = lines[i]
+            hd = HEREDOC.search(sh_strip(raw))
+            for m in list(PY_C.finditer(raw)) + list(NODE_E.finditer(raw)):
+                out += _embedded(m.group(2), i + 1)
+            if hd:
+                j = i + 1
+                while j < len(lines) and lines[j].strip() != hd.group(2):
+                    j += 1
+                out += _embedded("\n".join(lines[i + 1:j]), i + 2)
+                i = j
+            i += 1
+    elif lg == "js":
+        for m in re.finditer(r"`([^`]*)`", text, re.S):
+            if "\n" in m.group(1):
+                out += _embedded(m.group(1), text.count("\n", 0, m.start()) + 1)
+    return out
 
 
 def hits_for(name, text):
+    return sorted(set(_hits_for(name, text) + embedded_hits(name, text, _lang(name, text))))
+
+
+def _lang(name, text):
+    first = text.split("\n", 1)[0]
+    if name.endswith(".py") or (not pathlib.PurePath(name).suffix and re.match(r"#!.*python", first)):
+        return "py"
+    if name.endswith(JS_EXT) or (not pathlib.PurePath(name).suffix and re.match(r"#!.*node", first)):
+        return "js"
+    if name.endswith((".sh", ".bash")) or (not pathlib.PurePath(name).suffix and re.match(r"#!.*(ba)?sh\b", first)):
+        return "sh"
+    return None
+
+
+def _hits_for(name, text):
     first = text.split("\n", 1)[0]
     if name.endswith(".py") or (not pathlib.PurePath(name).suffix and re.match(r"#!.*python", first)):
         h = py_hits(text)
@@ -419,8 +509,17 @@ def job_files(root, fs):
     return out
 
 
-def in_scope(rel, jobs=frozenset()):
-    return bool(TESTJOB.search(rel)) or rel in jobs
+# 시험을 실행하는 파일: pytest·test-all·verify·smoke·node --test·npm test 를 부르는 파일은 이름과 무관하게 시험이다(2026-11-09 범위 확장).
+RUNS_TESTS = re.compile(r"(?:^|[\s\"'/(\[,])(?:py\.?test\b|-m\s*[\"']?,?\s*[\"']?pytest\b|test-all(?:\.sh)?\b|[\w-]*verify[\w-]*\.(?:sh|py|mjs)\b|[\w-]*smoke[\w-]*\.(?:sh|py|mjs)\b|node\s+--test\b|npm\s+(?:run\s+)?test\b|vitest\b)", re.M)
+
+
+def runs_tests(text):
+    body = "\n".join(ln for ln in text.splitlines() if not ln.lstrip().startswith(("#", "//")))
+    return bool(RUNS_TESTS.search(body))
+
+
+def in_scope(rel, jobs=frozenset(), text=""):
+    return bool(TESTJOB.search(rel)) or rel in jobs or (bool(text) and runs_tests(text))
 
 
 def areas():
@@ -455,7 +554,7 @@ def scan(root=WS):
                 continue
             lines = text.splitlines()
             for ln, kind in hits_for(rel, text):
-                if in_scope(rel, jobs):
+                if in_scope(rel, jobs, text):
                     out.append((a, kind, f"{a}/{rel}:{ln}: [{kind}] {lines[ln - 1].strip()[:100]}"))
                 else:
                     OUTSCOPE[kind] = OUTSCOPE.get(kind, 0) + 1
@@ -465,6 +564,8 @@ def scan(root=WS):
 def self_test():
     py_pos = ["for k in list(os.environ):\n    print(k)", "for k in os.environ:\n    x[k] = 1", "snap = dict(os.environ)\nsend(snap)", "os.environ.items()", "x.update(os.environ)", "os.environ | {'A': '1'}", "dict(os.environ)", "{**os.environ, 'A': '1'}",
               "subprocess.run(c, env=os.environ)", "os.environ.copy()", "e = os.environ\nsend(e)", "e = dict(os.environ)\nsubprocess.run(c, env=e)", "e = os.environ.copy()\nfor k in e: pass", "e = {**os.environ, 'A': '1'}\nsend(**e)", "for k in os.environ: pass", "return os.environ",
+              "subprocess.run(c, **kw)", "def f(env=None):\n    subprocess.run(c, env=env)", "e = None\nsubprocess.run(c, env=e)",
+              "code = '\\nimport subprocess\\nsubprocess.run(c)\\n'", "x = [sys.executable, '-c', 'import subprocess; subprocess.run(c)']",
               "subprocess.run(['x'])", "sp.check_output(['x'])", "run(['x'])", "dict(environ)", "dict(E)", "Popen(c, env=None)", "os.system('x')",
               "subprocess.run(['x'],\n    check=True)", "e = os.environ if flag else {}", "dict(os.environ, A='1')",
               # 제외 목록·접두 조건·항상 참은 허용 목록이 아니다(codex C2 H1)
@@ -472,10 +573,10 @@ def self_test():
               "{k: v for k, v in os.environ.items() if k not in ('X',)}", "{k: v for k, v in os.environ.items() if True}",
               "{k: v for k, v in os.environ.items() if k in os.environ}", "E = dict(os.environ)\nx = {k: v for k, v in os.environ.items() if k in E}"]
     py_neg = ["os.environ['A']", "os.environ.get('A')", "'A' in os.environ", "os.environ.setdefault('A', 'b')", "os.environ['A'] = 'b'",
-              "subprocess.run(c, env=env)", "subprocess.run(c, **kw)", "os.environ.update({'A': 'b'})", "x = 1  # R9.1-예외: 이유",
+              "subprocess.run(c, env=env)", "subprocess.run(c, env=env, **kw)", "os.environ.update({'A': 'b'})", "x = 1  # R9.1-예외: 이유",
               "# os.environ.copy()", "s = 'os.environ.copy()'", "x = dict(os.environ)  # R9.1-예외: 이유", "subprocess.run(['x'],  # R9.1-예외: 이유\n    check=True)", "# R9.1-예외: 이유\nx = dict(os.environ)", "subprocess.run(['x'], env={'PATH': p})", "len(os.environ)",
               "subprocess.run(['x'],\n    env=env)", "'''\nos.environ.copy()\n'''", "d = {}.get('x')", "re.run(['x'])",
-              "def f(env=None):\n    env = os.environ if env is None else env", "def f(env=os.environ):\n    pass",
+              "def f(env=None):\n    env = os.environ if env is None else env", "def f(env=None):\n    env = env or {'PATH': p}\n    subprocess.run(c, env=env)", "def f(env=os.environ):\n    pass",
               # 이름만 읽는 함수에 넘김(NAME_ONLY): 근거는 NAME_ONLY 주석
               "egress_proxy_from(os.environ)", "bc.egress_proxy_from(os.environ)", "validate_server_env(os.environ)", "env_violations(os.environ, cmd='x')",
               "pgbase._setting('A', os.environ)", "read_secret('A', environ=os.environ)", "build_from_config(cfg, require_verify(os.environ))", "e = dict(os.environ)\n_open(a, e)\nopen_log_store(e, 'p')", "backup_job.run(os.environ, now=n)", "backup_flow.restore(os.environ, 'latest')", "server_settings(os.environ, tokens=[])",
@@ -491,18 +592,18 @@ def self_test():
     pre = "import os, subprocess\nimport subprocess as sp\nfrom subprocess import run, Popen\nfrom os import environ\nfrom os import environ as E\n"
     js_pre = "const cp = require('child_process');\n"
     js_pos = ["spawn(c, {env: process.env})", "const e = {...process.env, A: 1}", "Object.assign({}, process.env)", "Object.entries(process.env)",
-              "const e = process.env;", "spawn('x')", "cp.execSync('x')", "cp.spawn('x',\n  ['a'])", "child_process.fork('x.js')"]
+              "const e = process.env;", "spawn('x')", "spawn('x', ...opts)", "spawn('x', {...opts})", "cp.execSync('x')", "cp.spawn('x',\n  ['a'])", "child_process.fork('x.js')"]
     js_neg = ["const h = process.env.HOME", "const a = process.env['A']", "const {A} = process.env;", "spawn('x', {env: {PATH: p}})",
               "const ok = re.exec(s)", "// const e = {...process.env}", "/* process.env */", "cp.spawn('x',\n  {env: m})", "spawn('x') // R9.1-예외: 이유",
               "const h = process.env?.HOME", "const e = {...process.env} // R9.1-예외: 이유",
               "function f(base = process.env) { return base.A; }", "const g = (a, base = process.env) => base.A;", "export function dockerEnv(base = process.env) {\n  return { ...base, X: 1 };\n}"]
-    sh_pos = ["cat <<EOF\nx\nEOF\nenv FOO=1 cmd", "exec python3 app.py", "env FOO=1 cmd", "env | sort", "export -p", "printenv", "if x; then exec ./run; fi", "x=$(env)", "sudo env A=1 cmd", "declare -x"]
+    sh_pos = ["python3 - <<'E'\nimport subprocess\nsubprocess.run(c)\nE", "python3 -c 'import subprocess; subprocess.run(c)'", "cat <<EOF\nx\nEOF\nenv FOO=1 cmd", "exec python3 app.py", "env FOO=1 cmd", "env | sort", "export -p", "printenv", "if x; then exec ./run; fi", "x=$(env)", "sudo env A=1 cmd", "declare -x"]
     sh_neg = ["env = lambda s: s", "env(s)", "exec env -i PATH=$P python3 x", "env -i A=1 cmd", "#!/usr/bin/env bash", "env -u OPS_X cmd", "python3 - <<'E'\nprintenv\nexec python x\nenv FOO=1 cmd\nE", "cat <<-EOF\n\texec python x\n\tEOF", "exec 3>&1", "exec >log", "docker run --env-file x img",
               "docker run -e NAME img", "# env FOO=1", "echo .env", "export A=1", "cmd # env x", "exec python x  # R9.1-예외: 이유", "ENV_X=1 cmd"]
     bad = []
 
     def run(kind, name, text, want, jobs=frozenset()):
-        got = any(in_scope(name, jobs) for _, k in hits_for(name, text))
+        got = any(in_scope(name, jobs, text) for _, k in hits_for(name, text))
         if got != want:
             bad.append(("놓침: " if want else "거짓양성: ") + kind + " " + repr(text[:60]))
     for t in py_pos:
@@ -519,6 +620,9 @@ def self_test():
         run("sh", "tests/a.sh", t + "\n", False)
     run("scope", "tools/a.py", pre + "subprocess.run(['x'])\n", False)
     run("scope", "tools/a.py", pre + "dict(os.environ)\n", False)
+    run("scope-runs-tests", "tools/check.sh", "cd x && .venv/bin/python -m pytest -q\nexec python x\n", True)
+    run("scope-runs-tests", "tools/ci.py", pre + "subprocess.run(['pytest', '-q'])\n", True)
+    run("scope-runs-tests", "tools/b.sh", "# pytest 는 따로 돈다\nexec python x\n", False)
     run("scope", "tools/a.sh", "exec python x\n", False)
     run("scope", "db/entrypoint.sh", "exec docker-entrypoint.sh \"$@\"\n", False)
     run("scope", "tools/a.sh", "env FOO=1 cmd\n", False)

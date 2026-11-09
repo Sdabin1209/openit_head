@@ -6,6 +6,7 @@
 import json
 import pathlib
 import posixpath
+import shlex
 import re
 import subprocess
 import sys
@@ -79,7 +80,7 @@ def _container_map(repo_files, df, instrs):
 
 
 INTERP = re.compile(r"^(python[\d.]*|node|tsx|ts-node|bash|sh|dash|ash|deno|bun)$")   # 이들의 첫 비옵션 인자가 실행 대상이다
-WRAPPER = {"exec", "env", "nice", "nohup", "npx", "time", "tini", "gosu", "su-exec", "--", "export", "if", "!", "while", "until"}   # 앞에 붙어 다음 명령을 실행하는 것
+WRAPPER = {"exec", "env", "nice", "nohup", "npx", "time", "tini", "gosu", "su-exec", "--", "export", "if", "!", "while", "until", "then", "do", "else", "elif", "{"}   # 앞에 붙어 다음 명령을 실행하는 것
 
 
 def _exec_targets(cmdline):
@@ -95,8 +96,32 @@ def _exec_targets(cmdline):
         except ValueError:
             pass
     out = []
-    for part in re.split(r"&&|\|\||\$\(|[;|\n`]|\b(?:then|do|else)\b", s):   # 명령 치환 $( … ) 안도 한 명령이다
-        toks = [t.strip("\"'") for t in TOKEN.findall(part)]
+    # 명령 치환 $( … )·`…` 은 작은따옴표 밖이면(큰따옴표 안 포함) 실제로 실행된다: 안쪽을 따로 한 명령 줄로 보고 바깥에서는 지운다
+    subs = []
+
+    def take(m):
+        subs.append(m.group(1) or m.group(2) or "")
+        return " _ "
+    s = re.sub(r"\$\(([^()]*)\)|`([^`]*)`", take, s)
+    for inner in subs:
+        out += _exec_targets(inner)
+    # 따옴표를 존중해 나눈다(codex C2 3묶음 H2): `echo "a; python x.py"` 의 ; 는 명령 구분자가 아니다
+    try:
+        s = re.sub(r"\\\n", " ", s).rstrip().removesuffix("\\")   # 줄 잇기(\ 줄바꿈)와 한 줄씩 읽을 때 남는 끝 \ 는 명령의 일부다
+        lex = shlex.shlex(s.replace("\n", " ; "), posix=True, punctuation_chars=";&|()")
+        lex.whitespace_split = True
+        lex.commenters = ""
+        toks_all = list(lex)
+    except ValueError:   # 닫히지 않은 따옴표: 실행 대상을 판정할 수 없다 → 진입점으로 세지 않는다(누락은 구조 위반으로 드러난다)
+        return out
+    parts, cur = [], []
+    for t in toks_all:
+        if t and set(t) <= set(";&|()"):
+            parts.append(cur); cur = []
+        else:
+            cur.append(t)
+    parts.append(cur)
+    for toks in parts:
         i = 0
         while i < len(toks):
             t = toks[i]
@@ -249,7 +274,7 @@ def self_test():
         "db/gen.py": "", "db/database.json": "{}",
         "Dockerfile": "FROM x\nCOPY entry.sh /usr/local/bin/entry.sh\nCOPY gen_cfg.py /usr/local/bin/gen_cfg.py\nCOPY chk.sh /usr/local/bin/chk\nCOPY chk.py /usr/local/bin/chk.py\n"
                       "COPY copyonly.py /app/copyonly.py\nCOPY tests/img.sh /t/img.sh\n# RUN python /usr/local/bin/cmt.py\nCOPY cmt.py /usr/local/bin/cmt.py\n# lonely.py 는 주석에만 있다\nLABEL note=\"lonely.py\"\nENTRYPOINT [\"/usr/local/bin/entry.sh\"]\n",
-        "entry.sh": "#!/bin/sh\n# python /usr/local/bin/cmt.py\nexec python /usr/local/bin/gen_cfg.py \"$@\"\n",
+        "entry.sh": "#!/bin/sh\n# python /usr/local/bin/cmt.py\nexec python /usr/local/bin/gen_cfg.py \"$@\" \\\n  --x 1\n",
         "gen_cfg.py": "", "chk.sh": "#!/bin/sh\nexec python /usr/local/bin/chk.py\n", "chk.py": "", "copyonly.py": "", "lonely.py": "",
         "scripts/build-image.sh": "#!/bin/sh\ndocker build -f Dockerfile .\npython tools/mk.py out\n\"$PYTHON\" tools/varpy.py a\nX=$(python3 tools/subst.py)\necho bare_name.py\ntest -f tools/tested.py\ncp tools/copied.py /x/\n",
         "tools/mk.py": "", "bare_name.py": "", "tools/tested.py": "", "tools/varpy.py": "", "tools/subst.py": "", "tools/copied.py": "", "tools/loose.py": "", "tools/echoed.py": "",
@@ -266,9 +291,9 @@ def self_test():
     }
     # components·wiring·__init__ 가 Dockerfile 에서 직접 불려도 인정하지 않는다
     # echo·test 의 인자는 실행이 아니다(codex C2 H2)
-    files["Dockerfile"] += "COPY tools/ /app/tools/\nRUN echo /app/tools/loose.py && test -f /app/tools/loose.py\n"
+    files["Dockerfile"] += "COPY tools/ /app/tools/\nRUN echo /app/tools/loose.py && test -f /app/tools/loose.py\nRUN echo \"memo; python /app/tools/loose.py\"\n"
     files["entry.sh"] += "echo /usr/local/bin/chk.py\n"
-    files["package.json"] = "{\"scripts\": {\"gen\": \"tsx tools/gen.ts\", \"say\": \"echo tools/echoed.py\"}}"
+    files["package.json"] = "{\"scripts\": {\"gen\": \"tsx tools/gen.ts\", \"say\": \"echo tools/echoed.py\", \"q\": \"echo 'memo; python tools/echoed.py'\"}}"
     files["Dockerfile"] += "RUN python /app/pkg/components/x.py && python /app/pkg/wiring/w.py && python /app/pkg/__init__.py\nCOPY pkg/ /app/pkg/\n"
     want = {"db/gen.py", "gen_cfg.py", "chk.py", "tools/mk.py", "tools/gen.ts", "tools/varpy.py", "tools/subst.py"}
     with tempfile.TemporaryDirectory() as t:

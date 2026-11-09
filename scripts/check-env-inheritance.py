@@ -91,10 +91,16 @@ def py_hits(text):
         for c in ast.iter_child_nodes(p):
             parent[c] = p
 
+    environ_holders = set()   # filtered_items 가 허용 이름 모음으로 쓰면 안 되는 이름(환경 전체를 담은 이름)
+
     def is_environ(n):
         if isinstance(n, ast.Attribute) and n.attr in ("environ", "environb") and isinstance(n.value, ast.Name):
             return mods.get(n.value.id) == "os"
         return isinstance(n, ast.Name) and names.get(n.id, ("", ""))[0] == "os" and names[n.id][1] in ("environ", "environb")
+
+    for a in ast.walk(tree):
+        if isinstance(a, ast.Assign) and any(is_environ(x) for x in ast.walk(a.value)):
+            environ_holders.update(t.id for t in a.targets if isinstance(t, ast.Name))
 
     def dotted(f):
         if isinstance(f, ast.Name):
@@ -138,7 +144,12 @@ def py_hits(text):
             isinstance(cond, ast.Compare) and len(cond.ops) == 1 and isinstance(cond.ops[0], ast.In)
             and isinstance(cond.left, ast.Name) and cond.left.id == key.id
             and isinstance(cond.comparators[0], (ast.Tuple, ast.List, ast.Set, ast.Name, ast.Attribute))
+            and not is_environ(cond.comparators[0]) and not env_named(cond.comparators[0])   # `if k in os.environ`(별칭 포함)은 통째 전달이다(codex C2 3묶음)
             for cond in g.ifs)
+
+    def env_named(c):
+        """이 파일에서 os.environ(또는 그 사본·뷰)을 담은 이름인가: `E = os.environ`, `E = dict(os.environ)`, `E = os.environ.copy()` 등 우변 어디든 environ 이 있는 대입."""
+        return isinstance(c, ast.Name) and c.id in environ_holders
 
     def isolation_loop(n):
         """`for k in list(os.environ): if k.startswith("OPS_"): monkeypatch.delenv(k)` 와 `for k in [k for k in os.environ if …]: os.environ.pop(k)`:
@@ -458,7 +469,8 @@ def self_test():
               "subprocess.run(['x'],\n    check=True)", "e = os.environ if flag else {}", "dict(os.environ, A='1')",
               # 제외 목록·접두 조건·항상 참은 허용 목록이 아니다(codex C2 H1)
               "{k: v for k, v in os.environ.items() if not k.startswith('OPS_')}", "subprocess.run(c, env={k: v for k, v in os.environ.items() if k != 'PYTHONPATH'})",
-              "{k: v for k, v in os.environ.items() if k not in ('X',)}", "{k: v for k, v in os.environ.items() if True}"]
+              "{k: v for k, v in os.environ.items() if k not in ('X',)}", "{k: v for k, v in os.environ.items() if True}",
+              "{k: v for k, v in os.environ.items() if k in os.environ}", "E = dict(os.environ)\nx = {k: v for k, v in os.environ.items() if k in E}"]
     py_neg = ["os.environ['A']", "os.environ.get('A')", "'A' in os.environ", "os.environ.setdefault('A', 'b')", "os.environ['A'] = 'b'",
               "subprocess.run(c, env=env)", "subprocess.run(c, **kw)", "os.environ.update({'A': 'b'})", "x = 1  # R9.1-예외: 이유",
               "# os.environ.copy()", "s = 'os.environ.copy()'", "x = dict(os.environ)  # R9.1-예외: 이유", "subprocess.run(['x'],  # R9.1-예외: 이유\n    check=True)", "# R9.1-예외: 이유\nx = dict(os.environ)", "subprocess.run(['x'], env={'PATH': p})", "len(os.environ)",
